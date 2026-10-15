@@ -1,0 +1,23 @@
+aid: engrate
+name: Engrate
+description: 'Engrate is a company surfaced via the API Evangelist harvest backlog (source: stockholm-trip)
+  and added to the network as a stub for full-pipeline profiling.'
+url: https://raw.githubusercontent.com/api-evangelist/engrate/refs/heads/main/apis.yml
+x-type: company
+x-source: harvest:stockholm-trip
+x-tier: stub
+x-tier-reason: harvest
+specificationVersion: '0.20'
+created: '2026-10-15'
+modified: '2026-10-15'
+tags:
+- Company
+apis: []
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+- FN: APIs.json
+  email: info@apis.io
+common:
+- type: Website
+  url: https://engrate.io/
