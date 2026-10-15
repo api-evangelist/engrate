@@ -1,23 +1,701 @@
 aid: engrate
 name: Engrate
-description: 'Engrate is a company surfaced via the API Evangelist harvest backlog (source: stockholm-trip)
-  and added to the network as a stub for full-pipeline profiling.'
+image: https://engrate.io/og/home.png
+description: Engrate provides a unified platform for energy market communication, enabling balance responsible parties and suppliers to integrate
+  with multiple energy markets through a single API. The solution abstracts diverse market protocols, message formats, identifiers, and deadlines,
+  allowing seamless asset trading across bidding zones. By offering a comprehensive market communication layer, Engrate reduces integration complexity,
+  accelerates time‑to‑market, and supports cost‑of‑energy analysis, documentation, and developer tools. Book a demo or explore the docs to learn
+  how Engrate simplifies energy market interactions.
 url: https://raw.githubusercontent.com/api-evangelist/engrate/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:stockholm-trip
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-15 (modular-v1; was harvest)
 specificationVersion: '0.20'
 created: '2026-10-15'
 modified: '2026-10-15'
 tags:
 - Company
-apis: []
+- Energy
+- Platform
+- Integration
+- Market
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/engrate-agentic-access.yml
+- type: Spectral
+  url: rules/engrate-rules.yml
+- type: JSONLD
+  url: json-ld/engrate-context.jsonld
+- type: Vocabulary
+  url: vocabulary/engrate-vocabulary.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DataModel
+  url: data-model/engrate-data-model.yml
+- type: ChangeLog
+  url: changelog/engrate-changelog.yml
+- type: Authentication
+  url: authentication/engrate-authentication.yml
+- type: ErrorCatalog
+  url: errors/engrate-problem-types.yml
+- type: Conformance
+  url: conformance/engrate-conformance.yml
+- type: LLMsTxt
+  url: llms/engrate-llms.txt
+- type: AgentCard
+  url: a2a/engrate-a2a.yml
+- type: WellKnown
+  url: well-known/engrate-well-known.yml
+- type: Hosts
+  url: hosts/engrate-hosts.yml
+- type: Vendors
+  url: vendors/engrate-vendors.yml
+- type: SDKs
+  url: packages/engrate-packages.yml
+- type: Packages
+  url: packages/engrate-packages.yml
+- type: ChangeLog
+  url: https://docs.engrate.io/changelog/product-updates
+- type: GitHubOrganization
+  url: https://github.com/engrate
+- type: DomainSecurity
+  url: security/engrate-domain-security.yml
 - type: Website
   url: https://engrate.io/
+- type: Documentation
+  url: https://docs.engrate.io/
+- type: DeveloperPortal
+  url: https://console.engrate.io/
+- type: APIReference
+  url: https://docs.engrate.io/api-reference/
+- type: GettingStarted
+  url: https://docs.engrate.io/guides/welcome
+- type: TermsOfService
+  url: https://engrate.io/legal/terms-of-use
+- type: PrivacyPolicy
+  url: https://engrate.io/legal/privacy-policy
+apis:
+- aid: engrate:engrate-audit-logs-api
+  name: Engrate Audit Logs API
+  description: The audit-logs API from Engrate — 1 operation(s) for audit-logs.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - audit-logs
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-audit-logs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-benachrichtigung-api
+  name: Engrate Benachrichtigung API
+  description: Abonnement von Änderungsereignissen.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Benachrichtigung
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-benachrichtigung-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-betrieb-api
+  name: Engrate Betrieb API
+  description: Umsetzungsstand und Betriebsinformationen.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Betrieb
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-betrieb-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-clearing-api
+  name: Engrate Clearing API
+  description: Abweichende Sichtweisen als Vorgang mit definiertem Endzustand.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Clearing
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-clearing-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-core-api
+  name: Engrate Core API
+  description: The Core API from Engrate — 5 operation(s) for core.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Core
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-core-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-cost-of-energy-api
+  name: Engrate Cost Of Energy API
+  description: The Cost Of Energy API from Engrate — 5 operation(s) for cost of energy.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Cost Of Energy
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-cost-of-energy-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-geo-api
+  name: Engrate Geo API
+  description: The geo API from Engrate — 1 operation(s) for geo.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - geo
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-geo-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-holidays-api
+  name: Engrate Holidays API
+  description: The holidays API from Engrate — 1 operation(s) for holidays.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - holidays
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-holidays-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-lokationen-api
+  name: Engrate Lokationen API
+  description: Einzelressourcen der referenzierten Netz-, Markt- und Messlokationen.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Lokationen
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-lokationen-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-lokationsb-ndel-api
+  name: Engrate Lokationsbündel API
+  description: Abruf und Pflege von Lokationsbündeln in der Hoheit des Netzbetreibers.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Lokationsbündel
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-lokationsb-ndel-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-mabis-api
+  name: Engrate Mabis API
+  description: The mabis API from Engrate — 13 operation(s) for mabis.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - mabis
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-mabis-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-netzbetreiberwechsel-api
+  name: Engrate Netzbetreiberwechsel API
+  description: Übergabepaket beim Wechsel des zuständigen Netzbetreibers.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Netzbetreiberwechsel
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-netzbetreiberwechsel-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-nl-settlement-api
+  name: Engrate Nl Settlement API
+  description: The nl-settlement API from Engrate — 4 operation(s) for nl-settlement.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - nl-settlement
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-nl-settlement-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-profiles-api
+  name: Engrate Profiles API
+  description: The profiles API from Engrate — 2 operation(s) for profiles.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - profiles
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-profiles-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-reference-api
+  name: Engrate Reference API
+  description: The reference API from Engrate — 2 operation(s) for reference.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - reference
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-reference-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-schedules-api
+  name: Engrate Schedules API
+  description: The schedules API from Engrate — 10 operation(s) for schedules.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - schedules
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-schedules-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-status-request-api
+  name: Engrate Status Request API
+  description: The status-request API from Engrate — 1 operation(s) for status-request.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - status-request
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-status-request-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+- aid: engrate:engrate-time-series-api
+  name: Engrate Time Series API
+  description: The Time Series API from Engrate — 3 operation(s) for time series.
+  humanURL: https://docs.engrate.io/api-reference/
+  baseURL: https://api.engrate.io
+  tags:
+  - Time Series
+  properties:
+  - type: OpenAPI
+    url: openapi/engrate-time-series-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/engrate-tariff-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-version-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-simplified-tariff-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-schedule-series-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-period-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-objection-response-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-subscription-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-implementation-status-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-metering-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-market-location-document-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-clearing-case-write-schema.json
+  - type: JSONSchema
+    url: json-schema/engrate-network-location-document-schema.json
+x-enrichment:
+  date: '2026-10-15'
+  status: enriched
+  artifacts_added: 46
+  pass: modular-v1
+  engine: identity=local,contract=local,surfaces=local,docs=local,regulatory=local

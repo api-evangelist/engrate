@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-clearing-period-response-schema.json",
+  "title": "ClearingPeriodResponse",
+  "description": "A [Clearing Period](/api-reference/settlement-management/models/clearing-period) representing one settlement month for a balance group.",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/engrate-openapi.json#/components/schemas/ClearingPeriodResponse",
+  "properties": {
+    "bilanzierungsmonat": {
+      "description": "First day of the settlement month in ISO 8601 format.",
+      "title": "Bilanzierungsmonat",
+      "type": "string"
+    },
+    "bilanzkreis_eic": {
+      "description": "Balance group (Bilanzkreis) EIC X code.",
+      "title": "Bilanzkreis Eic",
+      "type": "string"
+    },
+    "created_ts": {
+      "description": "ISO 8601 datetime when this clearing period was created.",
+      "title": "Created Ts",
+      "type": "string"
+    },
+    "final_deadline": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Final billing deadline (M+42 WT) as ISO 8601 datetime.",
+      "title": "Final Deadline"
+    },
+    "last_modified_ts": {
+      "description": "ISO 8601 datetime of the most recent modification.",
+      "title": "Last Modified Ts",
+      "type": "string"
+    },
+    "objection_deadline": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Objection window closing deadline (M+30 WT) as ISO 8601 datetime.",
+      "title": "Objection Deadline"
+    },
+    "org_uid": {
+      "description": "Organization that owns this clearing period.",
+      "title": "Org Uid",
+      "type": "string"
+    },
+    "preliminary_deadline": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Preliminary billing deadline (M+18 WT) as ISO 8601 datetime.",
+      "title": "Preliminary Deadline"
+    },
+    "status": {
+      "description": "Clearing status: `open`, `preliminary`, `objection`, `final`, or `closed`.",
+      "title": "Status",
+      "type": "string"
+    },
+    "total_imbalance_cost_eur": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Total imbalance cost in EUR based on reBAP prices.",
+      "title": "Total Imbalance Cost Eur"
+    },
+    "total_imbalance_mwh": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Total imbalance energy in MWh across all settlement days.",
+      "title": "Total Imbalance Mwh"
+    },
+    "uid": {
+      "description": "Unique identifier for this clearing period.",
+      "title": "Uid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "bilanzierungsmonat",
+    "bilanzkreis_eic",
+    "created_ts",
+    "last_modified_ts",
+    "org_uid",
+    "status",
+    "uid"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,507 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-clearing-case-write-schema.json",
+  "title": "ClearingCaseWrite",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/engrate-netzbetreiber-api-openapi.yml#/components/schemas/ClearingCaseWrite",
+  "type": "object",
+  "required": [
+    "expected",
+    "reason"
+  ],
+  "properties": {
+    "timeSlice": {
+      "type": "string",
+      "format": "date",
+      "description": "Beginn der betroffenen Zeitscheibe."
+    },
+    "observedETag": {
+      "type": "string",
+      "description": "`ETag` des Stands, auf den sich der Fall bezieht. Damit ist eindeutig, welchen\nStand der Eröffner gesehen hat — auch wenn der Verantwortliche zwischenzeitlich\ngeändert hat.\n"
+    },
+    "expected": {
+      "$ref": "#/$defs/TimeSliceWrite"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "BundleMember": {
+      "description": "Ein Knoten des Lokationsbündels. Der Typ wird über das Feld `type` markiert\n(tagged union). Damit ist für jeden Typ genau festgelegt, welche Felder zulässig\nund welche erforderlich sind — Kombinationen, die es fachlich nicht gibt, sind\nnicht darstellbar.\n\nDies ist der in Abschnitt 3.5 der Stellungnahme beschriebene Hebel: Bedingungen,\ndie heute als natürlichsprachliche Ad-hoc-Bedingungen im Anwendungshandbuch stehen\nund von jedem Marktpartner eigenständig implementiert werden, wandern in das\nSchema und werden von Standardwerkzeugen geprüft.\n",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/NetworkLocationMember"
+        },
+        {
+          "$ref": "#/$defs/MeteringLocationMember"
+        },
+        {
+          "$ref": "#/$defs/MarketLocationMember"
+        },
+        {
+          "$ref": "#/$defs/TrancheMember"
+        },
+        {
+          "$ref": "#/$defs/TechnicalResourceMember"
+        },
+        {
+          "$ref": "#/$defs/ControllableResourceMember"
+        }
+      ]
+    },
+    "BundleRelation": {
+      "description": "Eine gerichtete Kante zwischen zwei Knoten der Zeitscheibe. Quelle und Ziel werden\nüber ihre fachliche ID benannt.\n\nDie zulässigen Typkombinationen sind hier abschließend als `oneOf` festgelegt.\nSie entsprechen den Zuordnungen der konsultierten Fassung:\nNetzlokation → Messlokation, Messlokation → Messlokation,\nMesslokation → Marktlokation, Messlokation → technische Ressource,\nMarktlokation → technische Ressource, Marktlokation → Tranche.\n",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/RelationNeloToMelo"
+        },
+        {
+          "$ref": "#/$defs/RelationMeloToMelo"
+        },
+        {
+          "$ref": "#/$defs/RelationMeloToMalo"
+        },
+        {
+          "$ref": "#/$defs/RelationMeloToTr"
+        },
+        {
+          "$ref": "#/$defs/RelationMaloToTr"
+        },
+        {
+          "$ref": "#/$defs/RelationMaloToTranche"
+        }
+      ]
+    },
+    "ControllableResourceMember": {
+      "type": "object",
+      "required": [
+        "type",
+        "srId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "SteuerbareRessource"
+        },
+        "srId": {
+          "$ref": "#/$defs/SrId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      }
+    },
+    "DayBoundary": {
+      "type": "string",
+      "format": "date",
+      "description": "Kalendertag. Der zugehörige Zeitpunkt ist stets der Tagesbeginn 00:00 Uhr\ngesetzlicher deutscher Zeit.\n\nAnmerkung zur Abweichung von der konsultierten Fassung: Dort wird derselbe\nSachverhalt als UTC-Zeitstempel mit Regex-Muster übertragen\n(`2023-08-01T22:00:00Z` für den 2. August 2023). Das ist fehleranfällig, weil der\nZeitzonenversatz zwischen Sommer- und Winterzeit wechselt und ein Leser den\nKalendertag zurückrechnen muss. Ein Datum ohne Uhrzeit drückt genau das aus, was\ngemeint ist, und ist nicht falsch interpretierbar.\n"
+    },
+    "FlatRateMetering": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "pauschal"
+        },
+        "description": {
+          "type": "string",
+          "description": "Pauschale Messlokation ohne Zähler. Trägt eine Zählpunktbezeichnung, aber\nkeine Messeinrichtung, keine OBIS-Kennzahlen und keine Messwerte.\n\nMitteilung Nr. 57 sieht vor, dass künftig jede Marktlokation Strom mindestens\neine zugeordnete Messlokation aufweist — entweder eine pauschale ohne Zähler\noder eine gemessene. Dieser Typ macht die Unterscheidung im Schema explizit,\nstatt sie einer Bedingung im Anwendungshandbuch zu überlassen.\n"
+        }
+      }
+    },
+    "IntelligentMeteringSystem": {
+      "type": "object",
+      "required": [
+        "type",
+        "configurationId",
+        "obisCodes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "iMS"
+        },
+        "configurationId": {
+          "type": "string",
+          "description": "Konfigurations-ID. Bei einem intelligenten Messsystem erforderlich."
+        },
+        "obisCodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "MaloId": {
+      "type": "string",
+      "pattern": "^\\d{11}$",
+      "description": "Identifiziert die Marktlokation oder Tranche."
+    },
+    "MarketLocationMember": {
+      "type": "object",
+      "required": [
+        "type",
+        "maloId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Marktlokation"
+        },
+        "maloId": {
+          "$ref": "#/$defs/MaloId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "supplier": {
+          "$ref": "#/$defs/MarketPartnerRef"
+        },
+        "transmissionSystemOperator": {
+          "$ref": "#/$defs/MarketPartnerRef"
+        }
+      }
+    },
+    "MarketPartnerId": {
+      "type": "string",
+      "pattern": "^\\d{13}$",
+      "description": "Marktpartner-ID."
+    },
+    "MarketPartnerRef": {
+      "type": "object",
+      "required": [
+        "marketPartnerId"
+      ],
+      "properties": {
+        "marketPartnerId": {
+          "$ref": "#/$defs/MarketPartnerId"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "NB",
+            "LF",
+            "MSB",
+            "MWV",
+            "UENB"
+          ]
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      }
+    },
+    "MeloId": {
+      "type": "string",
+      "pattern": "^DE\\d{11}[A-Z\\d]{20}$",
+      "description": "Messlokations-ID (Zählpunktbezeichnung)."
+    },
+    "Metering": {
+      "description": "Die Messung an einer Messlokation, als tagged union über die Art des Messsystems.\n\n**Konkretes Beispiel für den Nutzen:** Bei einem intelligenten Messsystem ist die\nKonfigurations-ID erforderlich; bei einem konventionellen Messsystem darf sie\nnicht vorhanden sein; bei einer pauschalen Messlokation gibt es weder Zähler noch\nOBIS-Kennzahlen noch Messwerte. Heute stehen diese drei Regeln als Bedingungen im\nAnwendungshandbuch. Hier sind sie Teil des Schemas: Ein Payload, der einer\npauschalen Messlokation eine OBIS-Kennzahl zuordnet, ist schlicht nicht gültig und\nwird von jedem Standardvalidator abgelehnt — nicht erst im Produktivbetrieb durch\neinen Klärfall.\n",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/IntelligentMeteringSystem"
+        },
+        {
+          "$ref": "#/$defs/ModernMeteringDevice"
+        },
+        {
+          "$ref": "#/$defs/FlatRateMetering"
+        }
+      ]
+    },
+    "MeteringLocationMember": {
+      "type": "object",
+      "required": [
+        "type",
+        "meloId",
+        "metering"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Messlokation"
+        },
+        "meloId": {
+          "$ref": "#/$defs/MeloId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "meteringPointOperator": {
+          "$ref": "#/$defs/MarketPartnerRef"
+        },
+        "metering": {
+          "$ref": "#/$defs/Metering"
+        }
+      }
+    },
+    "ModernMeteringDevice": {
+      "type": "object",
+      "required": [
+        "type",
+        "obisCodes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "mME"
+        },
+        "obisCodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "NeloId": {
+      "type": "string",
+      "pattern": "^E[A-Z\\d]{9}\\d$",
+      "description": "Netzlokations-ID."
+    },
+    "NetworkLocationMember": {
+      "type": "object",
+      "required": [
+        "type",
+        "neloId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Netzlokation"
+        },
+        "neloId": {
+          "$ref": "#/$defs/NeloId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      }
+    },
+    "RelationMaloToTr": {
+      "type": "object",
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "MarktlokationZuTechnischerRessource"
+        },
+        "from": {
+          "$ref": "#/$defs/MaloId"
+        },
+        "to": {
+          "$ref": "#/$defs/TrId"
+        }
+      }
+    },
+    "RelationMaloToTranche": {
+      "type": "object",
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "MarktlokationZuTranche"
+        },
+        "from": {
+          "$ref": "#/$defs/MaloId"
+        },
+        "to": {
+          "$ref": "#/$defs/MaloId"
+        }
+      }
+    },
+    "RelationMeloToMalo": {
+      "type": "object",
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "MesslokationZuMarktlokation"
+        },
+        "from": {
+          "$ref": "#/$defs/MeloId"
+        },
+        "to": {
+          "$ref": "#/$defs/MaloId"
+        }
+      }
+    },
+    "RelationMeloToMelo": {
+      "type": "object",
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "MesslokationZuMesslokation"
+        },
+        "from": {
+          "$ref": "#/$defs/MeloId"
+        },
+        "to": {
+          "$ref": "#/$defs/MeloId"
+        }
+      }
+    },
+    "RelationMeloToTr": {
+      "type": "object",
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "MesslokationZuTechnischerRessource"
+        },
+        "from": {
+          "$ref": "#/$defs/MeloId"
+        },
+        "to": {
+          "$ref": "#/$defs/TrId"
+        }
+      }
+    },
+    "RelationNeloToMelo": {
+      "type": "object",
+      "required": [
+        "kind",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "NetzlokationZuMesslokation"
+        },
+        "from": {
+          "$ref": "#/$defs/NeloId"
+        },
+        "to": {
+          "$ref": "#/$defs/MeloId"
+        }
+      }
+    },
+    "SrId": {
+      "type": "string",
+      "pattern": "^C[A-Z\\d]{9}\\d$",
+      "description": "ID der steuerbaren Ressource."
+    },
+    "TechnicalResourceMember": {
+      "type": "object",
+      "required": [
+        "type",
+        "trId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "TechnischeRessource"
+        },
+        "trId": {
+          "$ref": "#/$defs/TrId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      }
+    },
+    "TimeSliceWrite": {
+      "type": "object",
+      "required": [
+        "validFrom",
+        "validTo",
+        "members"
+      ],
+      "properties": {
+        "validFrom": {
+          "$ref": "#/$defs/DayBoundary"
+        },
+        "validTo": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/DayBoundary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/BundleMember"
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BundleRelation"
+          }
+        }
+      }
+    },
+    "TrId": {
+      "type": "string",
+      "pattern": "^D[A-Z\\d]{9}\\d$",
+      "description": "ID der technischen Ressource."
+    },
+    "TrancheMember": {
+      "type": "object",
+      "required": [
+        "type",
+        "trancheId"
+      ],
+      "additionalProperties": false,
+      "description": "Die Tranche als eigener Knotentyp.\n\nIn der konsultierten Fassung ist die Tranche kein eigenes Objekt, sondern eine\nID-Liste unter der Marktlokation, die den Datentyp der Marktlokations-ID\nmitbenutzt. Ob eine gegebene elfstellige Ziffernfolge eine Marktlokation oder eine\nTranche bezeichnet, ergibt sich dort nur aus der Position im Dokument. Als eigener\nTyp ist es eindeutig.\n",
+      "properties": {
+        "type": {
+          "const": "Tranche"
+        },
+        "trancheId": {
+          "$ref": "#/$defs/MaloId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "supplier": {
+          "$ref": "#/$defs/MarketPartnerRef"
+        }
+      }
+    }
+  }
+}

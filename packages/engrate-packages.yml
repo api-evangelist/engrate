@@ -1,0 +1,16 @@
+generated: '2026-10-15'
+method: probed
+generator: harvest-packages.py
+source: registry metadata endpoints (registry.npmjs.org, pypi.org, rubygems.org, api.nuget.org, packagist.org, crates.io) ; github.com/engrate
+ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (engrate.io,
+  security/engrate-domain-security.yml) or its accepted GitHub org (engrate).'
+packages:
+- name: mako-api-referenzentwurf
+  registry: github
+  url: https://github.com/engrate/mako-api-referenzentwurf
+  language: MDX
+  official: true
+  version: null
+  published: '2026-09-10'
+  source_repo: https://github.com/engrate/mako-api-referenzentwurf
+  evidence: repository in github.com/engrate, whose profile names the provider's domain

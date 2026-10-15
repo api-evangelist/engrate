@@ -1,0 +1,754 @@
+openapi: 3.2.0
+info:
+  title: Engrate Timeseries API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Time Series
+paths:
+  /market-access/v1alpha1/timeseries/aggregate-allocations:
+    get:
+      description: 'List aggregate allocations timeseries data matching the provided filters.
+
+
+        Note that this can return multiple values per ISP for the same dimensions, as the underlying storage is append-only. You tell those rows apart by looking at the finality and known_at. If you are training a model this allows you to train the model on data that was known at the time the model will be running, avoiding training it on data that is "from the future". If you are doing controlling, this allows you to reason about how final the values are, so you can decide how much trust to put in the analysis you build on top.
+
+
+        To read the volumes of one aggregate allocation, use the `external_id` filter, and the `flow_direction` filter if the external id has both directions. List Aggregate Allocation Series gives the external id of each aggregate allocation.'
+      operationId: list_aggregate_allocations_market_access_v1alpha1_timeseries_aggregate_allocations_get
+      parameters:
+      - description: Inclusive lower bound on the settlement period start (RFC 3339).
+        in: query
+        name: isp_from
+        required: true
+        schema:
+          description: Inclusive lower bound on the settlement period start (RFC 3339).
+          format: date-time
+          title: Isp From
+          type: string
+      - description: Exclusive upper bound on the settlement period start (RFC 3339).
+        in: query
+        name: isp_until
+        required: true
+        schema:
+          description: Exclusive upper bound on the settlement period start (RFC 3339).
+          format: date-time
+          title: Isp Until
+          type: string
+      - description: External ids of the aggregate allocations to read.
+        in: query
+        name: external_id
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: External ids of the aggregate allocations to read.
+          title: External Id
+      - description: Areas to read, each one as kind:code, where kind is one of metering_grid_area, control_area or scheduling_area, for example scheduling_area:10YDE-RWENET---I. Omit this parameter to read every area.
+        in: query
+        name: area
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Areas to read, each one as kind:code, where kind is one of metering_grid_area, control_area or scheduling_area, for example scheduling_area:10YDE-RWENET---I. Omit this parameter to read every area.
+          title: Area
+      - description: Flow directions to read. Omit to read both.
+        in: query
+        name: flow_direction
+        required: false
+        schema:
+          anyOf:
+          - items:
+              enum:
+              - consumption
+              - production
+              type: string
+            type: array
+          - type: 'null'
+          description: Flow directions to read. Omit to read both.
+          title: Flow Direction
+      - description: Balance groups to read. Omit to read every group.
+        in: query
+        name: balance_group
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Balance groups to read. Omit to read every group.
+          title: Balance Group
+      - description: Suppliers to read. Omit to read every supplier.
+        in: query
+        name: supplier
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Suppliers to read. Omit to read every supplier.
+          title: Supplier
+      - description: Aggregator roles to read. Omit to read every role.
+        in: query
+        name: aggregator
+        required: false
+        schema:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AggregatorRole'
+            type: array
+          - type: 'null'
+          description: Aggregator roles to read. Omit to read every role.
+          title: Aggregator
+      - description: Allocation bases to read. Omit to read every basis.
+        in: query
+        name: allocation_basis
+        required: false
+        schema:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AllocationBasis'
+            type: array
+          - type: 'null'
+          description: Allocation bases to read. Omit to read every basis.
+          title: Allocation Basis
+      - description: Market dimensions to filter by, as key:value. A market dimension is the market's own key and code on which it divides accounting points, for example series_type:SLS. An aggregate allocation matches when it carries every pair.
+        in: query
+        name: market_dimension
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Market dimensions to filter by, as key:value. A market dimension is the market's own key and code on which it divides accounting points, for example series_type:SLS. An aggregate allocation matches when it carries every pair.
+          title: Market Dimension
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateAllocationsResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Aggregate Allocations
+      tags:
+      - Time Series
+  /market-access/v1alpha1/timeseries/allocations:
+    get:
+      description: 'List the volumes allocated to the requested accounting points.
+
+
+        Note that the markets often send multiple values per Imbalance Settlement Period (ISP) for each accounting point, starting with lower quality levels and then moving to higher quality levels. This endpoint returns *all* values received, including the timestamp when the value was known.
+
+
+        The reason for this is twofold: It makes fitting models to the data easier, and it allows you to consider the data quality when you do controlling and analysis.
+
+
+        For fitting models, you''ll want to use the "known_at" attribute to filter out values that would not be known to the model when it''s expected to run. For instance, if you''re fitting a model to estimate imbalance at 10AM every day, you''d exclude values known only after 10AM, as otherwise the model ends up trained on "data from the future".
+
+
+        For controlling and analysis, seeing all available quality levels lets you make decisions on your level of trust in the data - you may be happy for an analysis to be based on early `estimated` or `provisional` values, while controlling pipelines may rather wait. The API leaves the decision of which value to use up to you.'
+      operationId: list_allocations_market_access_v1alpha1_timeseries_allocations_get
+      parameters:
+      - description: Inclusive lower bound on the settlement period start (RFC 3339).
+        in: query
+        name: isp_from
+        required: true
+        schema:
+          description: Inclusive lower bound on the settlement period start (RFC 3339).
+          format: date-time
+          title: Isp From
+          type: string
+      - description: Exclusive upper bound on the settlement period start (RFC 3339).
+        in: query
+        name: isp_until
+        required: true
+        schema:
+          description: Exclusive upper bound on the settlement period start (RFC 3339).
+          format: date-time
+          title: Isp Until
+          type: string
+      - description: Accounting points to read, repeated per point.
+        in: query
+        name: accounting_point_id
+        required: true
+        schema:
+          description: Accounting points to read, repeated per point.
+          items:
+            format: uuid
+            type: string
+          maxItems: 500
+          minItems: 1
+          title: Accounting Point Id
+          type: array
+      - description: Flow directions to read. Omit to read both.
+        in: query
+        name: flow_direction
+        required: false
+        schema:
+          anyOf:
+          - items:
+              enum:
+              - consumption
+              - production
+              type: string
+            type: array
+          - type: 'null'
+          description: Flow directions to read. Omit to read both.
+          title: Flow Direction
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationsResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Allocations
+      tags:
+      - Time Series
+  /market-access/v1alpha1/timeseries/series/aggregate-allocations:
+    get:
+      description: 'Show the series of the aggregate allocations that agree with the filters.
+
+
+        Each series is one aggregate allocation, with the aggregation dimensions that the market gave for it. Each aggregate allocation record has the `external_id` of its aggregate allocation. Use this `external_id` to find the values of an aggregate allocation in List Aggregate Allocations. The list also includes the aggregate allocations that have no values.
+
+
+        If the supplier or the balance group is null, the aggregate allocation includes the accounting points of all suppliers or all balance groups. If a key is not in the market dimensions, the aggregate allocation includes the accounting points of all values of that aggregation dimension. A `supplier` or `balance_group` filter does not select an aggregate allocation in which that value is null. To select one aggregate allocation alone, use the `external_id` filter, and the `flow_direction` filter if the external id has both directions.
+
+
+        The list shows the aggregate allocations in the sequence of `external_id`, then `flow_direction`. To read the full list, use `offset` and `limit` to get one page at a time. `total` is the number of aggregate allocations that agree with the filters, on all pages.
+
+
+        The API gives the status code 422 in these conditions:
+
+
+        - An `area` filter is not in the format `kind:code`, or it has an unknown area kind.
+
+
+        - A `market_dimension` filter is not in the format `key:value`.
+
+
+        - A `market_dimension` filter has one key two times.
+
+
+        - A `flow_direction`, `aggregator` or `allocation_basis` filter has an unknown value.
+
+
+        - An `external_id`, `area`, `balance_group`, `supplier` or `market_dimension` filter has more values than its maximum.
+
+
+        - `offset` is less than 0, or `limit` is less than 1 or more than its maximum.'
+      operationId: list_aggregate_allocation_series_market_access_v1alpha1_timeseries_series_aggregate_allocations_get
+      parameters:
+      - description: External ids of the aggregate allocations to read.
+        in: query
+        name: external_id
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: External ids of the aggregate allocations to read.
+          title: External Id
+      - description: Areas to read, each one as kind:code, where kind is one of metering_grid_area, control_area or scheduling_area, for example scheduling_area:10YDE-RWENET---I. Omit this parameter to read every area.
+        in: query
+        name: area
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Areas to read, each one as kind:code, where kind is one of metering_grid_area, control_area or scheduling_area, for example scheduling_area:10YDE-RWENET---I. Omit this parameter to read every area.
+          title: Area
+      - description: Flow directions to read. Omit to read both.
+        in: query
+        name: flow_direction
+        required: false
+        schema:
+          anyOf:
+          - items:
+              enum:
+              - consumption
+              - production
+              type: string
+            type: array
+          - type: 'null'
+          description: Flow directions to read. Omit to read both.
+          title: Flow Direction
+      - description: Balance groups to read. Omit to read every group.
+        in: query
+        name: balance_group
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Balance groups to read. Omit to read every group.
+          title: Balance Group
+      - description: Suppliers to read. Omit to read every supplier.
+        in: query
+        name: supplier
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Suppliers to read. Omit to read every supplier.
+          title: Supplier
+      - description: Aggregator roles to read. Omit to read every role.
+        in: query
+        name: aggregator
+        required: false
+        schema:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AggregatorRole'
+            type: array
+          - type: 'null'
+          description: Aggregator roles to read. Omit to read every role.
+          title: Aggregator
+      - description: Allocation bases to read. Omit to read every basis.
+        in: query
+        name: allocation_basis
+        required: false
+        schema:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/AllocationBasis'
+            type: array
+          - type: 'null'
+          description: Allocation bases to read. Omit to read every basis.
+          title: Allocation Basis
+      - description: Market dimensions to filter by, as key:value. A market dimension is the market's own key and code on which it divides accounting points, for example series_type:SLS. An aggregate allocation matches when it carries every pair.
+        in: query
+        name: market_dimension
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            maxItems: 500
+            type: array
+          - type: 'null'
+          description: Market dimensions to filter by, as key:value. A market dimension is the market's own key and code on which it divides accounting points, for example series_type:SLS. An aggregate allocation matches when it carries every pair.
+          title: Market Dimension
+      - description: The position of the first aggregate allocation of the page in the list. The first aggregate allocation in the list has the position 0.
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          description: The position of the first aggregate allocation of the page in the list. The first aggregate allocation in the list has the position 0.
+          minimum: 0
+          title: Offset
+          type: integer
+      - description: The maximum number of aggregate allocations on the page.
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 100
+          description: The maximum number of aggregate allocations on the page.
+          maximum: 1000
+          minimum: 1
+          title: Limit
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateAllocationPage'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Aggregate Allocation Series
+      tags:
+      - Time Series
+components:
+  schemas:
+    AllocationRecord:
+      description: A volume allocated to some Accounting Point for one Imbalance Settlement Period (ISP).
+      properties:
+        accounting_point_id:
+          format: uuid
+          title: Accounting Point Id
+          type: string
+        flow_direction:
+          enum:
+          - consumption
+          - production
+          title: Flow Direction
+          type: string
+        isp_resolution_minutes:
+          title: Isp Resolution Minutes
+          type: integer
+        isp_time:
+          format: date-time
+          title: Isp Time
+          type: string
+        known_at:
+          format: date-time
+          title: Known At
+          type: string
+        quality:
+          $ref: '#/components/schemas/AllocationQuality'
+        volume_wh:
+          title: Volume Wh
+          type: integer
+      required:
+      - accounting_point_id
+      - flow_direction
+      - isp_resolution_minutes
+      - isp_time
+      - known_at
+      - quality
+      - volume_wh
+      title: AllocationRecord
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    AggregateAllocationPage:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AggregateAllocation'
+          title: Items
+          type: array
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+        total:
+          description: The number of aggregate allocations that agree with the filters, on all pages.
+          title: Total
+          type: integer
+      required:
+      - items
+      - limit
+      - offset
+      - total
+      title: AggregateAllocationPage
+      type: object
+    AllocationsResponse:
+      properties:
+        values:
+          items:
+            $ref: '#/components/schemas/AllocationRecord'
+          title: Values
+          type: array
+      required:
+      - values
+      title: AllocationsResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    Finality:
+      description: 'The settlement data comes in different levels of "finality". Each market has its own names for these levels, and all of them map to this common ladder. When one settlement period has more than one record, use the record with the highest finality, then the latest `known_at`.
+
+
+        ### Available finalities
+
+
+        - **preliminary** — The first level, sent before the market has all the data.
+
+
+        - **revised** — The level used for corrections to the preliminary data.
+
+
+        - **final** — The level used for settlement and invoicing.
+
+
+        - **correction** — The level used for corrections when the final value was wrong. A correction replaces the final value.'
+      enum:
+      - preliminary
+      - revised
+      - final
+      - correction
+      title: Finality
+      type: string
+    AreaKind:
+      description: '### Available area kinds
+
+
+        - **metering_grid_area** — The area of one grid operator.
+
+
+        - **control_area** — The area of one transmission system operator.
+
+
+        - **scheduling_area** — See [Scheduling Area](/api-reference/core/models/scheduling-area).'
+      enum:
+      - metering_grid_area
+      - control_area
+      - scheduling_area
+      title: AreaKind
+      type: string
+    AggregateAllocationRecord:
+      description: A volume for one aggregate timeseries and one Imbalance Settlement Period (ISP).
+      properties:
+        external_id:
+          title: External Id
+          type: string
+        finality:
+          $ref: '#/components/schemas/Finality'
+          examples:
+          - final
+        flow_direction:
+          enum:
+          - consumption
+          - production
+          title: Flow Direction
+          type: string
+        isp_resolution_minutes:
+          title: Isp Resolution Minutes
+          type: integer
+        isp_time:
+          format: date-time
+          title: Isp Time
+          type: string
+        known_at:
+          format: date-time
+          title: Known At
+          type: string
+        quality:
+          $ref: '#/components/schemas/AllocationQuality'
+          examples:
+          - calculated
+        volume_wh:
+          title: Volume Wh
+          type: integer
+      required:
+      - external_id
+      - finality
+      - flow_direction
+      - isp_resolution_minutes
+      - isp_time
+      - known_at
+      - quality
+      - volume_wh
+      title: AggregateAllocationRecord
+      type: object
+    AllocationBasis:
+      description: 'The basis tells you where the energy data for an aggregation is coming from: Is it directly metered values from smart meters, or is it something calculated from some standard profile?
+
+
+        ### Available allocation basises
+
+
+        - **metered** — Indicates this aggregation''s data comes from directly metered energy, like from smart meters.
+
+
+        - **profiled** — Indicates this aggregation''s data is coming from a ''profile'' of some kind, a pre-determined shape of consumption or production, usually coupled with some adjustment calculations, like adjusting for daily temperature or past annual metered consumption.'
+      enum:
+      - metered
+      - profiled
+      title: AllocationBasis
+      type: string
+    AggregatorRole:
+      description: '### Available aggregator roles
+
+
+        - **grid_operator** — Indicates the source of the aggregation is a grid operator.
+
+
+        - **transmission_operator** — Indicates the source of the aggregation is a transmission system operator.'
+      enum:
+      - grid_operator
+      - transmission_operator
+      title: AggregatorRole
+      type: string
+    AggregateAllocation:
+      description: An aggregate allocation and its aggregation dimensions. A null or absent dimension includes the accounting points of all values.
+      properties:
+        aggregator:
+          $ref: '#/components/schemas/AggregatorRole'
+        allocation_basis:
+          $ref: '#/components/schemas/AllocationBasis'
+        area_code:
+          examples:
+          - 10YDE-RWENET---I
+          title: Area Code
+          type: string
+        area_kind:
+          $ref: '#/components/schemas/AreaKind'
+        balance_group:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: The balance group of the accounting points in the aggregate allocation. If the value is null, the aggregate allocation includes all balance groups.
+          examples:
+          - 11XBILANZKREIS-X
+          - null
+          title: Balance Group
+        external_id:
+          description: The identification that the market gives to the aggregate allocation. Each aggregate allocation record has the identification of its aggregate allocation.
+          title: External Id
+          type: string
+        flow_direction:
+          enum:
+          - consumption
+          - production
+          title: Flow Direction
+          type: string
+        market_dimensions:
+          additionalProperties:
+            type: string
+          description: Market-specific additional dimensions, used in markets that sub-divide aggregate allocations beyond what the common dimensions can represent
+          examples:
+          - series_type: SLS
+          title: Market Dimensions
+          type: object
+        market_meta:
+          additionalProperties:
+            type: string
+          description: Market-specific additional metadata, for instance in markets where datasets with the exact same dimensions are sent at different cadences (daily, monthly), this metadata tells them apart.
+          examples:
+          - summed_series: Z97
+          title: Market Meta
+          type: object
+        supplier:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: The supplier of the accounting points in the aggregate allocation. If the value is null, the aggregate allocation includes all suppliers.
+          examples:
+          - '9900000000001'
+          - null
+          title: Supplier
+      required:
+      - aggregator
+      - allocation_basis
+      - area_code
+      - area_kind
+      - balance_group
+      - external_id
+      - flow_direction
+      - market_dimensions
+      - market_meta
+      - supplier
+      title: AggregateAllocation
+      type: object
+    AggregateAllocationsResponse:
+      properties:
+        values:
+          items:
+            $ref: '#/components/schemas/AggregateAllocationRecord'
+          title: Values
+          type: array
+      required:
+      - values
+      title: AggregateAllocationsResponse
+      type: object
+    AllocationQuality:
+      description: 'How the volume was arrived at, in ascending order of trust. When one settlement period carries several records, prefer the highest quality.
+
+
+        ### Available allocation qualities
+
+
+        - **provisional** — A placeholder the sender intends to replace.
+
+
+        - **estimated** — Substituted because no reading was available: profiled, interpolated, or copied from a comparable period. Expect it to be superseded.
+
+
+        - **calculated** — Derived by a defined computation rather than read
+
+
+        - **measured** — Read off the meter.'
+      enum:
+      - provisional
+      - estimated
+      - calculated
+      - measured
+      examples:
+      - measured
+      title: AllocationQuality
+      type: string
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

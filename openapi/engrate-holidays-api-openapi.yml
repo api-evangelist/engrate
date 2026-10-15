@@ -1,0 +1,282 @@
+openapi: 3.2.0
+info:
+  title: Engrate Holidays API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: holidays
+paths:
+  /core/v1/holidays:
+    get:
+      description: 'List public holidays in a range of years.
+
+
+        Returns the holiday occurrences for years in `[start_year, end_year)` (`start_year` inclusive, `end_year` exclusive). Optionally filterable by country (ISO 3166-1 alpha-2 lowercase) and by specific holiday identifiers (e.g. `se/julafton`). Each occurrence carries the IANA timezone in which the holiday is observed.'
+      operationId: list_holidays_core_v1_holidays_get
+      parameters:
+      - description: Start year (inclusive).
+        in: query
+        name: start_year
+        required: true
+        schema:
+          description: Start year (inclusive).
+          title: Start Year
+          type: integer
+      - description: End year (exclusive).
+        in: query
+        name: end_year
+        required: true
+        schema:
+          description: End year (exclusive).
+          title: End Year
+          type: integer
+      - description: ISO 3166-1 alpha-2 country code (lowercase).
+        in: query
+        name: country
+        required: false
+        schema:
+          anyOf:
+          - maxLength: 2
+            minLength: 2
+            type: string
+          - type: 'null'
+          description: ISO 3166-1 alpha-2 country code (lowercase).
+          examples:
+          - se
+          title: Country
+      - description: Filter to specific holiday identifiers.
+        in: query
+        name: holiday
+        required: false
+        schema:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Holiday'
+            type: array
+          - type: 'null'
+          description: Filter to specific holiday identifiers.
+          title: Holiday
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                holidays:
+                - date: '2026-12-25'
+                  holiday: se/juldagen
+                  timezone: Europe/Stockholm
+              schema:
+                $ref: '#/components/schemas/HolidaysResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Holidays
+      tags:
+      - holidays
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    HolidaysResponse:
+      description: Holidays in the requested range.
+      properties:
+        holidays:
+          items:
+            $ref: '#/components/schemas/HolidayOccurrence'
+          title: Holidays
+          type: array
+      required:
+      - holidays
+      title: HolidaysResponse
+      type: object
+    Holiday:
+      description: 'Public holiday
+
+
+        ### Available holidays
+
+
+        - **no/forste_nyttarsdag** — January 1st.
+
+
+        - **no/skjartorsdag** — The Thursday before Easter Sunday (moveable).
+
+
+        - **no/langfredag** — The Friday before Easter Sunday (moveable).
+
+
+        - **no/forste_paskedag** — Easter Sunday (moveable).
+
+
+        - **no/andre_paskedag** — The Monday after Easter Sunday (moveable).
+
+
+        - **no/arbeidernes_dag** — May 1st.
+
+
+        - **no/kristi_himmelfartsdag** — Ascension Day, the Thursday 39 days after Easter (moveable).
+
+
+        - **no/grunnlovsdag** — May 17th.
+
+
+        - **no/forste_pinsedag** — Whit Sunday / Pentecost (moveable).
+
+
+        - **no/andre_pinsedag** — Whit Monday (moveable).
+
+
+        - **no/forste_juledag** — December 25th.
+
+
+        - **no/andre_juledag** — December 26th.
+
+
+        - **se/nyarsdagen** — January 1st.
+
+
+        - **se/trettondagsafton** — January 5th (Epiphany Eve).
+
+
+        - **se/trettondedag_jul** — January 6th (Epiphany).
+
+
+        - **se/skartorsdagen** — The Thursday before Easter Sunday (moveable).
+
+
+        - **se/langfredagen** — The Friday before Easter Sunday (moveable).
+
+
+        - **se/paskafton** — The Saturday before Easter Sunday — Easter Eve (moveable).
+
+
+        - **se/paskdagen** — Easter Sunday (moveable).
+
+
+        - **se/annandag_pask** — The Monday after Easter Sunday (moveable).
+
+
+        - **se/forsta_maj** — May 1st.
+
+
+        - **se/kristi_himmelsfard** — Ascension Day, the Thursday 39 days after Easter (moveable).
+
+
+        - **se/pingstafton** — Whitsun Eve, the Saturday before Pentecost (moveable).
+
+
+        - **se/nationaldagen** — June 6th.
+
+
+        - **se/midsommarafton** — The Friday before Midsummer Day (moveable).
+
+
+        - **se/allhelgonaafton** — The Friday between October 30th and November 5th — All Saints'' Eve.
+
+
+        - **se/julafton** — December 24th.
+
+
+        - **se/juldagen** — December 25th.
+
+
+        - **se/annandag_jul** — December 26th.
+
+
+        - **se/nyarsafton** — December 31st.'
+      enum:
+      - no/forste_nyttarsdag
+      - no/skjartorsdag
+      - no/langfredag
+      - no/forste_paskedag
+      - no/andre_paskedag
+      - no/arbeidernes_dag
+      - no/kristi_himmelfartsdag
+      - no/grunnlovsdag
+      - no/forste_pinsedag
+      - no/andre_pinsedag
+      - no/forste_juledag
+      - no/andre_juledag
+      - se/nyarsdagen
+      - se/trettondagsafton
+      - se/trettondedag_jul
+      - se/skartorsdagen
+      - se/langfredagen
+      - se/paskafton
+      - se/paskdagen
+      - se/annandag_pask
+      - se/forsta_maj
+      - se/kristi_himmelsfard
+      - se/pingstafton
+      - se/nationaldagen
+      - se/midsommarafton
+      - se/allhelgonaafton
+      - se/julafton
+      - se/juldagen
+      - se/annandag_jul
+      - se/nyarsafton
+      title: Holiday
+      type: string
+    HolidayOccurrence:
+      description: A single occurrence of a holiday on a calendar date.
+      properties:
+        date:
+          format: date
+          title: Date
+          type: string
+        holiday:
+          $ref: '#/components/schemas/Holiday'
+        timezone:
+          title: Timezone
+          type: string
+      required:
+      - date
+      - holiday
+      - timezone
+      title: HolidayOccurrence
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

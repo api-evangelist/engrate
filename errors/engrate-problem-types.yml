@@ -1,0 +1,39 @@
+generated: '2026-10-15'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/engrate-openapi.json
+format: custom
+envelope:
+  media_type: application/json
+  schema: HTTPValidationError
+coverage:
+  operations: 54
+  statuses_declared: 4
+problems:
+- status: 400
+  title: Bad Request
+  description: The request is well-formed but cannot be fulfilled.
+  operations: 1
+  media_types: []
+  schema: null
+- status: 404
+  title: Not Found
+  description: A referenced resource was not found.
+  operations: 1
+  media_types: []
+  schema: null
+- status: 422
+  title: Unprocessable Content
+  description: Validation Error
+  operations: 51
+  media_types:
+  - application/json
+  schema: HTTPValidationError
+- status: 501
+  title: Not Implemented
+  description: Coming soon.
+  operations: 6
+  media_types:
+  - application/json
+  schema: null

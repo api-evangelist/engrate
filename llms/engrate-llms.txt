@@ -1,0 +1,145 @@
+# Engrate Developer Documentation
+
+> Engrate is the building blocks for your energy management and optimization applications. Without the complexity of traditional integration platforms our developer-first approach gets you from concept to production in days, not months.
+
+- [Welcome](https://docs.engrate.io/guides/welcome.md): _Build smarter. Ship faster._
+- [Cost of Energy Quickstart](https://docs.engrate.io/guides/cost-of-energy-quickstart.md): Go from zero to a working cost calculation in minutes.
+- [Authentication](https://docs.engrate.io/guides/authentication.md)
+- [Connect via MCP](https://docs.engrate.io/guides/mcp.md): Give your AI agent direct access to up-to-date energy data and integrations
+- [Cost of Energy](https://docs.engrate.io/products/cost-of-energy.md): One API for the full cost of energy — grid fees, taxes, transfer charges, and more.
+- [Schedule Management](https://docs.engrate.io/products/schedule-management.md): Schedule your energy with 4 TSOs in Germany and TenneT in the Netherlands with one API
+- [Settlement Management](https://docs.engrate.io/products/settlement-management.md): Handles the complete settlement lifecycle
+- [Core API Overview](https://docs.engrate.io/api-reference/core/overview.md): Engrate Core API covers the fundamentals
+- [Party](https://docs.engrate.io/api-reference/core/models/party.md)
+- [Bidding Zone](https://docs.engrate.io/api-reference/core/models/bidding-zone.md)
+- [Scheduling Area](https://docs.engrate.io/api-reference/core/models/scheduling-area.md)
+- [Control Area](https://docs.engrate.io/api-reference/core/models/control-area.md)
+- [Metering Grid Area](https://docs.engrate.io/api-reference/core/models/metering-grid-area.md)
+- [Metering Point](https://docs.engrate.io/api-reference/core/models/metering-point.md)
+- [Accounting Point](https://docs.engrate.io/api-reference/core/models/accounting-point.md)
+- [Meter](https://docs.engrate.io/api-reference/core/models/meter.md)
+- [Register](https://docs.engrate.io/api-reference/core/models/register.md)
+- [Resource](https://docs.engrate.io/api-reference/core/models/resource.md)
+- [Extra Identifier](https://docs.engrate.io/api-reference/core/models/extra-identifier.md)
+- [List Parties](https://docs.engrate.io/api-reference/list-parties.md): List & filter market parties.
+- [List Bidding Zones](https://docs.engrate.io/api-reference/list-bidding-zones.md): List & filter bidding zones.
+- [List Scheduling Areas](https://docs.engrate.io/api-reference/list-scheduling-areas.md): List & filter scheduling areas.
+- [List Control Areas](https://docs.engrate.io/api-reference/list-control-areas.md): List & filter control areas.
+- [List Metering Grid Areas](https://docs.engrate.io/api-reference/list-metering-grid-areas.md): List & filter Metering Grid Areas.
+- [Get Geodata](https://docs.engrate.io/api-reference/geo/get-geodata.md): Get GeoJSON data for electricity grid entities.
+- [List holidays](https://docs.engrate.io/api-reference/core/holidays.md): List public holidays in a range of years.
+- [Cost of Energy API Overview](https://docs.engrate.io/api-reference/cost-of-energy/overview.md): Calculate the cost of energy
+- [Python SDK](https://docs.engrate.io/api-reference/cost-of-energy/engratepy.md): Use engratepy to calculate and optimise cost of energy in Python.
+- [Calculation Pipeline](https://docs.engrate.io/api-reference/cost-of-energy/calculation-pipeline.md): An algebra for calculating the cost of energy
+- [In Optimisation](https://docs.engrate.io/api-reference/cost-of-energy/optimisation.md): How calculation pipelines map to optimisation models
+- [Tariff](https://docs.engrate.io/api-reference/cost-of-energy/models/tariff.md)
+- [Tariff Component](https://docs.engrate.io/api-reference/cost-of-energy/models/tariff-component.md)
+- [Dataset](https://docs.engrate.io/api-reference/cost-of-energy/models/dataset.md)
+- [Unit](https://docs.engrate.io/api-reference/cost-of-energy/models/unit.md)
+- [Level](https://docs.engrate.io/api-reference/cost-of-energy/models/level.md)
+- [Periodic Amount](https://docs.engrate.io/api-reference/cost-of-energy/models/periodic-amount.md)
+- [Resolution](https://docs.engrate.io/api-reference/cost-of-energy/models/resolution.md)
+- [Function](https://docs.engrate.io/api-reference/cost-of-energy/functions/overview.md): Available Functions
+- [Function: Constant](https://docs.engrate.io/api-reference/cost-of-energy/functions/constant.md)
+- [Function: Add](https://docs.engrate.io/api-reference/cost-of-energy/functions/add.md)
+- [Function: Subtract](https://docs.engrate.io/api-reference/cost-of-energy/functions/subtract.md)
+- [Function: Divide](https://docs.engrate.io/api-reference/cost-of-energy/functions/divide.md)
+- [Function: Multiply](https://docs.engrate.io/api-reference/cost-of-energy/functions/multiply.md)
+- [Function: Aggregate](https://docs.engrate.io/api-reference/cost-of-energy/functions/aggregate.md)
+- [Function: Resample](https://docs.engrate.io/api-reference/cost-of-energy/functions/resample.md)
+- [Function: Select](https://docs.engrate.io/api-reference/cost-of-energy/functions/select.md)
+- [Function: Mask](https://docs.engrate.io/api-reference/cost-of-energy/functions/mask.md)
+- [Function: Clip](https://docs.engrate.io/api-reference/cost-of-energy/functions/clip.md)
+- [Function: Lookup](https://docs.engrate.io/api-reference/cost-of-energy/functions/lookup.md)
+- [Conditions](https://docs.engrate.io/api-reference/cost-of-energy/conditions/overview.md): Available Conditions
+- [Condition: Month](https://docs.engrate.io/api-reference/cost-of-energy/conditions/month.md)
+- [Condition: DayOfWeek](https://docs.engrate.io/api-reference/cost-of-energy/conditions/day-of-week.md)
+- [Condition: TimeOfDay](https://docs.engrate.io/api-reference/cost-of-energy/conditions/time-of-day.md)
+- [Condition: ExcludeHolidays](https://docs.engrate.io/api-reference/cost-of-energy/conditions/exclude-holidays.md)
+- [Condition: And](https://docs.engrate.io/api-reference/cost-of-energy/conditions/and.md)
+- [Condition: Or](https://docs.engrate.io/api-reference/cost-of-energy/conditions/or.md)
+- [Condition: Not](https://docs.engrate.io/api-reference/cost-of-energy/conditions/not.md)
+- [Condition: Highest](https://docs.engrate.io/api-reference/cost-of-energy/conditions/highest.md)
+- [Condition: Lowest](https://docs.engrate.io/api-reference/cost-of-energy/conditions/lowest.md)
+- [List profiles](https://docs.engrate.io/api-reference/profiles/list-profiles.md): List all profiles visible to the caller. Returns global profiles (available to everyone) plus any profiles owned by the caller's organization.
+- [Get a profile](https://docs.engrate.io/api-reference/profiles/get-a-profile.md): Retrieve a profile by ID including its full timeseries values. Optionally downsample the returned values to a coarser resolution.
+- [Create a profile](https://docs.engrate.io/api-reference/profiles/create-a-profile.md): Create a new profile owned by the caller's organization. The number of values must match the expected count for the given time range and resolution.
+- [Update a profile](https://docs.engrate.io/api-reference/profiles/update-a-profile.md): Replace the contents of an existing profile.
+- [Delete a profile](https://docs.engrate.io/api-reference/profiles/delete-a-profile.md): Delete a profile.
+- [List Datasets](https://docs.engrate.io/api-reference/list-datasets.md): List all [Registered Datasets](/api-reference/cost-of-energy/models/dataset)
+- [List Tariffs](https://docs.engrate.io/api-reference/list-tariffs.md): List [Tariffs](/api-reference/cost-of-energy/models/tariff).
+- [Get Tariff](https://docs.engrate.io/api-reference/get-tariff.md): Get a single [Tariff](/api-reference/cost-of-energy/models/tariff) by ID.
+- [Calculate Tariff](https://docs.engrate.io/api-reference/calculate-tariff.md): Calculate costs for a [Tariff](/api-reference/cost-of-energy/models/tariff).
+- [Get Simplified Tariff](https://docs.engrate.io/api-reference/cost-of-energy/get-simplified-tariff.md): Get a simplified, indicative view of a [Tariff](/api-reference/cost-of-energy/models/tariff)'s rates over a time range.
+- [Schedule Management API Overview](https://docs.engrate.io/api-reference/schedule-management/overview.md): Submit and track energy schedules across German and Dutch TSOs
+- [Schedule Lifecycle](https://docs.engrate.io/api-reference/schedule-management/schedule-lifecycle.md): How energy schedules move from creation through TSO acceptance to anomaly reconciliation
+- [Schedule](https://docs.engrate.io/api-reference/schedule-management/models/schedule.md)
+- [Schedule Version](https://docs.engrate.io/api-reference/schedule-management/models/schedule-version.md)
+- [Schedule Series](https://docs.engrate.io/api-reference/schedule-management/models/schedule-series.md)
+- [Audit Log](https://docs.engrate.io/api-reference/schedule-management/models/audit-log.md)
+- [Exchange Priority](https://docs.engrate.io/api-reference/schedule-management/models/exchange-priority.md)
+- [List Schedules](https://docs.engrate.io/api-reference/schedules/list-schedules.md): List all [Schedules](/api-reference/schedule-management/models/schedule) for the authenticated organization.
+- [Create Schedule](https://docs.engrate.io/api-reference/schedules/create-schedule.md): Create a [Schedule](/api-reference/schedule-management/models/schedule) or replace the desired spec of an existing one.
+- [Get Schedule](https://docs.engrate.io/api-reference/schedules/get-schedule.md): Get a specific [Schedule](/api-reference/schedule-management/models/schedule) by UID.
+- [List Schedule Versions](https://docs.engrate.io/api-reference/schedules/list-schedule-versions.md): List all [Schedule Versions](/api-reference/schedule-management/models/schedule-version) for a schedule, newest version first.
+- [Get Schedule Version](https://docs.engrate.io/api-reference/schedules/get-schedule-version.md): Get a specific [Schedule Version](/api-reference/schedule-management/models/schedule-version) by version number. **Coming soon.**
+- [Get Schedule Series](https://docs.engrate.io/api-reference/schedules/get-schedule-series.md): List all [Schedule Series](/api-reference/schedule-management/models/schedule-series) within a schedule version.
+- [Get Delivery Status](https://docs.engrate.io/api-reference/schedules/get-delivery-status.md): Get Delivery Status for a schedule. **Coming soon.**
+- [List Incoming Messages](https://docs.engrate.io/api-reference/schedules/list-incoming-messages.md): List all incoming TSO messages for a schedule, newest first.
+- [List Audit Logs](https://docs.engrate.io/api-reference/audit-logs/list-audit-logs.md): Query audit logs with optional filters.
+- [Send Status Request](https://docs.engrate.io/api-reference/status-request/send-status-request.md): Send a Status Request (SRQ) to a German TSO.
+- [List Exchange Priority Balance Groups](https://docs.engrate.io/api-reference/reference/list-exchange-priority-balance-groups.md): List all balance groups with exchange priority (Börsenvorrang).
+- [Check Exchange Priority](https://docs.engrate.io/api-reference/reference/check-exchange-priority.md): Check if a specific balance group has exchange priority.
+- [Get Schedule Anomalies](https://docs.engrate.io/api-reference/schedules/get-schedule-anomalies.md): List all anomaly time series records for a schedule. **Coming soon.**
+- [Get Schedule Reconciliation](https://docs.engrate.io/api-reference/schedules/get-schedule-reconciliation.md): Side-by-side reconciliation of our values vs counterparty values. **Coming soon.**
+- [List Anomalies](https://docs.engrate.io/api-reference/schedules/list-anomalies.md): List anomaly time series across all schedules. **Coming soon.**
+- [Allocations API Overview](https://docs.engrate.io/api-reference/allocations/overview.md): Read the volumes the market allocates to your accounting points
+- [Allocation record](https://docs.engrate.io/api-reference/allocations/models/allocation-record.md)
+- [Allocation quality](https://docs.engrate.io/api-reference/allocations/models/allocation-quality.md)
+- [Aggregate allocation record](https://docs.engrate.io/api-reference/allocations/models/aggregate-allocation-record.md)
+- [Aggregate allocation](https://docs.engrate.io/api-reference/allocations/models/aggregate-allocation.md)
+- [Finality](https://docs.engrate.io/api-reference/allocations/models/finality.md)
+- [Aggregator role](https://docs.engrate.io/api-reference/allocations/models/aggregator-role.md)
+- [Allocation basis](https://docs.engrate.io/api-reference/allocations/models/allocation-basis.md)
+- [List Allocations](https://docs.engrate.io/api-reference/timeseries/list-allocations.md): List the volumes allocated to the requested accounting points.
+- [List Aggregate Allocations](https://docs.engrate.io/api-reference/timeseries/list-aggregate-allocations.md): List aggregate allocations timeseries data matching the provided filters.
+- [List Aggregate Allocation Series](https://docs.engrate.io/api-reference/timeseries/list-aggregate-allocation-series.md): Show the series of the aggregate allocations that agree with the filters.
+- [Portfolio Forecasts API Overview](https://docs.engrate.io/api-reference/portfolio-forecasts/overview.md): Submit production and consumption forecasts for a delivery day, and read back what is stored
+- [Submit portfolio forecast](https://docs.engrate.io/api-reference/submit-portfolio-forecast.md): Submit a portfolio forecast for one delivery day. Re-submitting for the same delivery day replaces the previous submission. Submitting an identical payload changes nothing, so retries are safe.
+- [List stored delivery days](https://docs.engrate.io/api-reference/list-stored-delivery-days.md): List every delivery day the forecast service holds, newest first, with the `input_hash` of its stored submission and whether that exact input was already processed downstream.
+- [Read back stored forecast](https://docs.engrate.io/api-reference/read-back-stored-forecast.md): Return exactly the series the last accepted submission for the delivery day carried, plus the derived totals, the `input_hash` from the acknowledgment, and the processing state. What you read back is what a re-submission would replace.
+- [Settlement Management API Overview](https://docs.engrate.io/api-reference/settlement-management/overview.md): MaBiS clearing periods, settlements, objections, and energy volumes
+- [Clearing & Settlement Flow](https://docs.engrate.io/api-reference/settlement-management/clearing-settlement-flow.md): How MaBiS settlement works — from schedule submission through clearing to final billing
+- [Clearing Period](https://docs.engrate.io/api-reference/settlement-management/models/clearing-period.md)
+- [Clearing Settlement](https://docs.engrate.io/api-reference/settlement-management/models/clearing-settlement.md)
+- [Objection](https://docs.engrate.io/api-reference/settlement-management/models/objection.md)
+- [Aggregation Object](https://docs.engrate.io/api-reference/settlement-management/models/aggregation-object.md)
+- [Energy Volume](https://docs.engrate.io/api-reference/settlement-management/models/energy-volume.md)
+- [Imbalance](https://docs.engrate.io/api-reference/settlement-management/models/imbalance.md)
+- [Control Energy Price](https://docs.engrate.io/api-reference/settlement-management/models/control-energy-price.md)
+- [Monthly Summary](https://docs.engrate.io/api-reference/settlement-management/models/monthly-summary.md)
+- [Clearing Calendar](https://docs.engrate.io/api-reference/settlement-management/models/clearing-calendar.md)
+- [List Clearing Periods](https://docs.engrate.io/api-reference/mabis/list-clearing-periods.md): List [Clearing Periods](/api-reference/settlement-management/models/clearing-period) for the organization.
+- [Create Clearing Period](https://docs.engrate.io/api-reference/mabis/create-clearing-period.md): Create a new [Clearing Period](/api-reference/settlement-management/models/clearing-period).
+- [Get Clearing Period](https://docs.engrate.io/api-reference/mabis/get-clearing-period.md): Get detailed [Clearing Period](/api-reference/settlement-management/models/clearing-period) with aggregated summary.
+- [List Settlements](https://docs.engrate.io/api-reference/mabis/list-settlements.md): List daily [Clearing Settlements](/api-reference/settlement-management/models/clearing-settlement) for a clearing period.
+- [List Objections](https://docs.engrate.io/api-reference/mabis/list-objections.md): List [Objections](/api-reference/settlement-management/models/objection) filed for a clearing period.
+- [Create Objection](https://docs.engrate.io/api-reference/mabis/create-objection.md): Submit a MaBiS [Objection](/api-reference/settlement-management/models/objection) (Einspruch) for a clearing period. **Coming soon.**
+- [List Messages](https://docs.engrate.io/api-reference/mabis/list-messages.md): List EDIFACT messages for a clearing period.
+- [Calculate Imbalance](https://docs.engrate.io/api-reference/mabis/calculate-imbalance.md): Calculate energy imbalance for a clearing period.
+- [Validate Clearing Data](https://docs.engrate.io/api-reference/mabis/validate-clearing-data.md): Validate clearing data completeness for a clearing period.
+- [Get Control Energy Prices](https://docs.engrate.io/api-reference/mabis/get-control-energy-prices.md): Get control energy prices (reBAP) for settlement calculations.
+- [List Aggregation Objects](https://docs.engrate.io/api-reference/mabis/list-aggregation-objects.md): List registered aggregation objects.
+- [Send Response To Aggregation Time Series](https://docs.engrate.io/api-reference/mabis/send-response-to-aggregation-time-series.md): Send accept/reject response to an aggregation time series (BAS/ASZR). **Coming soon.**
+- [List Energy Volumes](https://docs.engrate.io/api-reference/mabis/list-energy-volumes.md): List energy volumes from MSCONS messages.
+- [Get Monthly Summary](https://docs.engrate.io/api-reference/mabis/get-monthly-summary.md): Get monthly energy summary and cost calculation.
+- [Get Clearing Calendar](https://docs.engrate.io/api-reference/mabis/get-clearing-calendar.md): Get MaBiS clearing deadlines for a settlement month.
+- [Changelog](https://docs.engrate.io/changelog/product-updates.md): Product & technology updates and announcements
+
+## OpenAPI Specs
+
+- [openapi](/openapi.json)
+- [portfolio-forecasts-openapi](/portfolio-forecasts-openapi.json)
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

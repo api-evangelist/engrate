@@ -1,0 +1,2429 @@
+openapi: 3.2.0
+info:
+  title: Engrate Cost Of Energy API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Cost Of Energy
+paths:
+  /cost-of-energy/v1/calculate:
+    post:
+      description: 'Calculate costs for a Tariff.
+
+
+        Executes the calculation pipeline for each tariff component that is active within the requested period. The caller must supply data for every dataset required by the active components, either as inline `time_series`, persisted `profiles`, or a combination of both. Dataset names must not overlap between the two inputs.'
+      operationId: calculate_tariff_cost_of_energy_v1_calculate_post
+      parameters:
+      - description: When true, the response includes all intermediate pipeline time series (e.g. hourly-power-offtake, monthly-peak) in addition to the final cost. When false (default), only the cost time series is returned per component.
+        in: query
+        name: include_intermediate_time_series
+        required: false
+        schema:
+          default: false
+          description: When true, the response includes all intermediate pipeline time series (e.g. hourly-power-offtake, monthly-peak) in addition to the final cost. When false (default), only the cost time series is returned per component.
+          title: Include intermediate time series
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateTariffRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateTariffResponse'
+          description: Successful Response
+        '400':
+          description: The request is well-formed but cannot be fulfilled.
+        '404':
+          description: A referenced resource was not found.
+        '422':
+          description: The request body failed schema validation.
+      summary: Calculate Tariff
+      tags:
+      - Cost Of Energy
+  /cost-of-energy/v1/datasets:
+    get:
+      description: List all Registered Datasets
+      operationId: list_datasets_cost_of_energy_v1_datasets_get
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                datasets:
+                - id: quarter-hourly-energy-offtake
+                  resolution: quarter_hourly
+                  unit: kWh
+                - id: quarter-hourly-energy-injection
+                  resolution: quarter_hourly
+                  unit: kWh
+                - id: yearly-firm-subscribed-offtake-capacity
+                  resolution: yearly
+                  unit: kW
+                - id: quarter-hourly-day-ahead-price-se3
+                  resolution: quarter_hourly
+                  unit: SEK_per_kWh
+              schema:
+                $ref: '#/components/schemas/GetDatasetsResponse'
+          description: Successful Response
+      summary: List Datasets
+      tags:
+      - Cost Of Energy
+  /cost-of-energy/v1/tariffs:
+    get:
+      description: 'List Tariffs.
+
+
+        Multiple values within a single parameter are combined with OR. Different parameters are combined with AND. Omitting all parameters returns all published tariffs.'
+      operationId: list_tariffs_cost_of_energy_v1_tariffs_get
+      parameters:
+      - description: Filter by system operator Party UUIDs (OR within list).
+        in: query
+        name: system_operator_id
+        required: false
+        schema:
+          anyOf:
+          - items:
+              format: uuid
+              type: string
+            type: array
+          - type: 'null'
+          description: Filter by system operator Party UUIDs (OR within list).
+          title: System Operator Id
+      - description: Filter by system operator extra identifiers such as EIC or EDIEL codes (OR within list).
+        in: query
+        name: system_operator_extra_id
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          description: Filter by system operator extra identifiers such as EIC or EDIEL codes (OR within list).
+          title: System Operator Extra Id
+      - description: Filter by metering grid area UUIDs (OR within list).
+        in: query
+        name: metering_grid_area_id
+        required: false
+        schema:
+          anyOf:
+          - items:
+              format: uuid
+              type: string
+            type: array
+          - type: 'null'
+          description: Filter by metering grid area UUIDs (OR within list).
+          title: Metering Grid Area Id
+      - description: Filter by metering grid area extra identifiers such as MGA codes (OR within list).
+        in: query
+        name: metering_grid_area_extra_id
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          description: Filter by metering grid area extra identifiers such as MGA codes (OR within list).
+          title: Metering Grid Area Extra Id
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                tariffs:
+                - available_from: '2024-01-01T00:00:00+01:00'
+                  eligibility:
+                    fuse_size:
+                      unit: A
+                      value: 20.0
+                    metering_grid_area_ids:
+                    - 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+                    other:
+                    - fuse_based
+                    type: system_operator
+                  id: 0199c317-25ec-7cf7-94cc-32a39f068433
+                  name: Säkringsabonnemang - 20 A
+                  summary: Fuse-based tariff for 20A with energy tax and monthly subscription fee.
+                  tariff_components:
+                  - applicable_from: '2026-01-01T00:00:00+01:00'
+                    cost:
+                      id: cost
+                      resolution: quarter_hourly
+                      unit: SEK
+                    datasets:
+                    - id: quarter-hourly-energy-offtake
+                      resolution: quarter_hourly
+                      unit: kWh
+                    functions:
+                    - left:
+                        id: quarter-hourly-energy-offtake
+                        resolution: quarter_hourly
+                        unit: kWh
+                      output:
+                        id: cost
+                        resolution: quarter_hourly
+                        unit: SEK
+                      right:
+                        unit: SEK_per_kWh
+                        value: 0.36
+                      type: multiply
+                    name: Energiskatt
+                    timezone: Europe/Stockholm
+              schema:
+                $ref: '#/components/schemas/GetTariffsResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Tariffs
+      tags:
+      - Cost Of Energy
+  /cost-of-energy/v1/tariffs/{tariff_id}:
+    get:
+      description: Get a single Tariff by ID.
+      operationId: get_tariff_cost_of_energy_v1_tariffs__tariff_id__get
+      parameters:
+      - in: path
+        name: tariff_id
+        required: true
+        schema:
+          format: uuid
+          title: Tariff Id
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tariff'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Tariff
+      tags:
+      - Cost Of Energy
+  /cost-of-energy/v1/tariffs/{tariff_id}/simplified:
+    get:
+      description: 'Get a simplified, indicative view of a Tariff''s rates over a time range.
+
+
+        The response is a set of rate timeseries, one per (input dataset, rate unit). In each interval, `rate` is what is paid per kWh of energy on the input (for per-kWh series) or per kW of power peak derived from the input (for per-kW series), in the series'' own currency.
+
+
+        This is an approximation of the tariff''s price shape, meant for heuristics that need a coarse "when is energy cheap/expensive" signal — not for exact cost calculation or optimisation.
+
+
+        Components that don''t fit a simple per-kWh or per-kW rate (fixed fees, spot-price-linked charges, overdraft fees …) are surfaced by name and applicability window in `unprojectable_components` rather than appearing in the rate timeseries.
+
+
+        Use Calculate Tariff for exact cost calculation, or In Optimisation for using tariffs in optimisation models.'
+      operationId: get_simplified_tariff_cost_of_energy_v1_tariffs__tariff_id__simplified_get
+      parameters:
+      - in: path
+        name: tariff_id
+        required: true
+        schema:
+          format: uuid
+          title: Tariff Id
+          type: string
+      - description: ISO 8601 timezone-aware datetime at which the range begins (inclusive).
+        in: query
+        name: start_time
+        required: true
+        schema:
+          description: ISO 8601 timezone-aware datetime at which the range begins (inclusive).
+          format: date-time
+          title: Start Time
+          type: string
+      - description: ISO 8601 timezone-aware datetime at which the range ends (exclusive). Must be strictly greater than `start_time`.
+        in: query
+        name: end_time
+        required: true
+        schema:
+          description: ISO 8601 timezone-aware datetime at which the range ends (exclusive). Must be strictly greater than `start_time`.
+          format: date-time
+          title: End Time
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimplifiedTariffResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Simplified Tariff
+      tags:
+      - Cost Of Energy
+components:
+  schemas:
+    InputProfile:
+      description: A reference to a persisted profile to use as input for a dataset.
+      example:
+        name: quarter-hourly-day-ahead-price-se1
+        profile_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      properties:
+        name:
+          description: Dataset identifier.
+          title: Name
+          type: string
+        profile_id:
+          description: UUID of the persisted profile to use as input for this dataset.
+          format: uuid
+          title: Profile Id
+          type: string
+      required:
+      - name
+      - profile_id
+      title: InputProfile
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    Constant:
+      description: Emit a constant value at a given resolution.
+      example:
+        output:
+          id: cost
+          resolution: monthly
+          unit: SEK
+        resolution: monthly
+        type: constant
+        value:
+          unit: SEK
+          value: 500.0
+      properties:
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Cadence at which the constant is emitted.
+        type:
+          const: constant
+          default: constant
+          title: Type
+          type: string
+        value:
+          $ref: '#/components/schemas/Level'
+          description: The constant [Level](/api-reference/cost-of-energy/models/level) to emit.
+      required:
+      - output
+      - resolution
+      - value
+      title: Constant
+      type: object
+    OrCondition:
+      description: Condition that applies when any sub-conditions is met
+      example:
+        conditions:
+        - months:
+          - 6
+          - 7
+          - 8
+          type: month
+        - months:
+          - 12
+          - 1
+          - 2
+          type: month
+        type: or
+      properties:
+        conditions:
+          description: Sub-conditions to be ORed together
+          items:
+            discriminator:
+              mapping:
+                and: '#/components/schemas/AndCondition'
+                day_of_week: '#/components/schemas/DayOfWeekCondition'
+                exclude_holidays: '#/components/schemas/ExcludeHolidaysCondition'
+                month: '#/components/schemas/MonthCondition'
+                not: '#/components/schemas/NotCondition'
+                or: '#/components/schemas/OrCondition'
+                time_of_day: '#/components/schemas/TimeOfDayCondition'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/MonthCondition'
+            - $ref: '#/components/schemas/DayOfWeekCondition'
+            - $ref: '#/components/schemas/TimeOfDayCondition'
+            - $ref: '#/components/schemas/ExcludeHolidaysCondition'
+            - $ref: '#/components/schemas/AndCondition'
+            - $ref: '#/components/schemas/OrCondition'
+            - $ref: '#/components/schemas/NotCondition'
+          minItems: 1
+          title: Conditions
+          type: array
+        type:
+          const: or
+          default: or
+          title: Type
+          type: string
+      required:
+      - conditions
+      title: OrCondition
+      type: object
+    Unit:
+      description: 'Units indicate, well, the unit of values. These are used in places like [Datasets](/api-reference/cost-of-energy/models/dataset) and [Levels](/api-reference/cost-of-energy/models/level) to indicate the unit the data is in.
+
+
+        ### Available units
+
+
+        - **A** — Current in Amperes
+
+
+        - **kV** — Voltage in kilo volts
+
+
+        - **kW** — Power in kilo watts
+
+
+        - **kWh** — Energy in kilo watt hours
+
+
+        - **hours** — Time in hours
+
+
+        - **SEK** — Monetary amount in SEK
+
+
+        - **NOK** — Monetary amount in NOK
+
+
+        - **EUR** — Monetary amount in EUR
+
+
+        - **SEK_per_kWh** — Monetary rate in SEK per kWh
+
+
+        - **SEK_per_kW** — Monetary rate in SEK per kW
+
+
+        - **NOK_per_kWh** — Monetary rate in NOK per kWh
+
+
+        - **NOK_per_kW** — Monetary rate in NOK per kW
+
+
+        - **EUR_per_kWh** — Monetary rate in EUR per kWh
+
+
+        - **EUR_per_kW** — Monetary rate in EUR per kW
+
+
+        - **%** — Percentage, as a float, where 1.0 represents 100%'
+      enum:
+      - A
+      - kV
+      - kW
+      - kWh
+      - hours
+      - SEK
+      - NOK
+      - EUR
+      - SEK_per_kWh
+      - SEK_per_kW
+      - NOK_per_kWh
+      - NOK_per_kW
+      - EUR_per_kWh
+      - EUR_per_kW
+      - '%'
+      title: Unit
+      type: string
+    Subtract:
+      description: 'Element-wise computation of ``left - right``.
+
+
+        Left and right are required to have the same resolution.'
+      example:
+        left:
+          id: peak
+          resolution: monthly
+          unit: kW
+        output:
+          id: excess
+          resolution: monthly
+          unit: kW
+        right:
+          id: subscribed
+          resolution: monthly
+          unit: kW
+        type: subtract
+      properties:
+        left:
+          anyOf:
+          - $ref: '#/components/schemas/Level'
+          - $ref: '#/components/schemas/Dataset'
+            description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/dataset) to subtract from - if you want to get fancy this is called the ''minuend''.'
+          title: Left
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Difference](/api-reference/cost-of-energy/models/dataset) produced by subtracting the right operand from the left operand'
+        right:
+          anyOf:
+          - $ref: '#/components/schemas/Level'
+          - $ref: '#/components/schemas/Dataset'
+            description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/dataset) to subtract with - if you want to get fancy this is called the ''subtrahend''.'
+          title: Right
+        type:
+          const: subtract
+          default: subtract
+          title: Type
+          type: string
+      required:
+      - left
+      - output
+      - right
+      title: Subtract
+      type: object
+    Clip:
+      description: Clip values to a min/max range.
+      example:
+        input:
+          id: diff
+          resolution: monthly
+          unit: kW
+        minimum:
+          unit: kW
+          value: 0.0
+        output:
+          id: overdraft
+          resolution: monthly
+          unit: kW
+        type: clip
+      properties:
+        input:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) to be clipped'
+        maximum:
+          anyOf:
+          - anyOf:
+            - $ref: '#/components/schemas/Level'
+            - $ref: '#/components/schemas/Dataset'
+              description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+            description: Either a [Dataset](/api-reference/cost-of-energy/models/dataset) or a literal level value.
+          - type: 'null'
+          title: Maximum
+        minimum:
+          anyOf:
+          - anyOf:
+            - $ref: '#/components/schemas/Level'
+            - $ref: '#/components/schemas/Dataset'
+              description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+            description: Either a [Dataset](/api-reference/cost-of-energy/models/dataset) or a literal level value.
+          - type: 'null'
+          title: Minimum
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        type:
+          const: clip
+          default: clip
+          title: Type
+          type: string
+      required:
+      - input
+      - output
+      title: Clip
+      type: object
+    Resolution:
+      description: 'Temporal resolution
+
+
+        ### Available resolutions
+
+
+        - **quarter_hourly** — 15-minute resolution
+
+
+        - **hourly** — 60-minute resolution
+
+
+        - **daily** — Daily resolution in *calendar* days, not necessarily exactly 24 hours, depending on daylight savings etc
+
+
+        - **weekly** — Weekly resolution in *calendar* weeks, not necessarily exactly 24 * 7 hours, depending on daylight savings etc
+
+
+        - **monthly** — Monthly resolution in *calendar* months, taking into account things like daylight savings and leap year calculations
+
+
+        - **yearly** — Annual resolution in *calendar* years, taking into account things like daylight savings and leap year calculations'
+      enum:
+      - quarter_hourly
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - yearly
+      title: Resolution
+      type: string
+    MonthCondition:
+      description: Condition that only applies in the specified months.
+      example:
+        months:
+        - 1
+        - 2
+        - 3
+        - 11
+        - 12
+        type: month
+      properties:
+        months:
+          items:
+            description: Month number (1=January, 12=December)
+            maximum: 12.0
+            minimum: 1.0
+            type: integer
+          minItems: 1
+          title: Months
+          type: array
+        type:
+          const: month
+          default: month
+          title: Type
+          type: string
+      required:
+      - months
+      title: MonthCondition
+      type: object
+    PeriodicAmount:
+      description: An [amount](/api-reference/cost-of-energy/models/unit) accumulated over a [period](/api-reference/cost-of-energy/models/resolution), constrained to a [Range](/api-reference/cost-of-energy/models/range) — for example, an annual energy offtake of at least 100 000 kWh.
+      example:
+        range:
+          minimum: 100000.0
+          unit: kWh
+        resolution: yearly
+      properties:
+        range:
+          $ref: '#/components/schemas/Range'
+          description: Bounds the accumulated amount must fall within.
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: The period over which the amount is accumulated.
+      required:
+      - range
+      - resolution
+      title: PeriodicAmount
+      type: object
+    Holiday:
+      description: 'Public holiday
+
+
+        ### Available holidays
+
+
+        - **no/forste_nyttarsdag** — January 1st.
+
+
+        - **no/skjartorsdag** — The Thursday before Easter Sunday (moveable).
+
+
+        - **no/langfredag** — The Friday before Easter Sunday (moveable).
+
+
+        - **no/forste_paskedag** — Easter Sunday (moveable).
+
+
+        - **no/andre_paskedag** — The Monday after Easter Sunday (moveable).
+
+
+        - **no/arbeidernes_dag** — May 1st.
+
+
+        - **no/kristi_himmelfartsdag** — Ascension Day, the Thursday 39 days after Easter (moveable).
+
+
+        - **no/grunnlovsdag** — May 17th.
+
+
+        - **no/forste_pinsedag** — Whit Sunday / Pentecost (moveable).
+
+
+        - **no/andre_pinsedag** — Whit Monday (moveable).
+
+
+        - **no/forste_juledag** — December 25th.
+
+
+        - **no/andre_juledag** — December 26th.
+
+
+        - **se/nyarsdagen** — January 1st.
+
+
+        - **se/trettondagsafton** — January 5th (Epiphany Eve).
+
+
+        - **se/trettondedag_jul** — January 6th (Epiphany).
+
+
+        - **se/skartorsdagen** — The Thursday before Easter Sunday (moveable).
+
+
+        - **se/langfredagen** — The Friday before Easter Sunday (moveable).
+
+
+        - **se/paskafton** — The Saturday before Easter Sunday — Easter Eve (moveable).
+
+
+        - **se/paskdagen** — Easter Sunday (moveable).
+
+
+        - **se/annandag_pask** — The Monday after Easter Sunday (moveable).
+
+
+        - **se/forsta_maj** — May 1st.
+
+
+        - **se/kristi_himmelsfard** — Ascension Day, the Thursday 39 days after Easter (moveable).
+
+
+        - **se/pingstafton** — Whitsun Eve, the Saturday before Pentecost (moveable).
+
+
+        - **se/nationaldagen** — June 6th.
+
+
+        - **se/midsommarafton** — The Friday before Midsummer Day (moveable).
+
+
+        - **se/allhelgonaafton** — The Friday between October 30th and November 5th — All Saints'' Eve.
+
+
+        - **se/julafton** — December 24th.
+
+
+        - **se/juldagen** — December 25th.
+
+
+        - **se/annandag_jul** — December 26th.
+
+
+        - **se/nyarsafton** — December 31st.'
+      enum:
+      - no/forste_nyttarsdag
+      - no/skjartorsdag
+      - no/langfredag
+      - no/forste_paskedag
+      - no/andre_paskedag
+      - no/arbeidernes_dag
+      - no/kristi_himmelfartsdag
+      - no/grunnlovsdag
+      - no/forste_pinsedag
+      - no/andre_pinsedag
+      - no/forste_juledag
+      - no/andre_juledag
+      - se/nyarsdagen
+      - se/trettondagsafton
+      - se/trettondedag_jul
+      - se/skartorsdagen
+      - se/langfredagen
+      - se/paskafton
+      - se/paskdagen
+      - se/annandag_pask
+      - se/forsta_maj
+      - se/kristi_himmelsfard
+      - se/pingstafton
+      - se/nationaldagen
+      - se/midsommarafton
+      - se/allhelgonaafton
+      - se/julafton
+      - se/juldagen
+      - se/annandag_jul
+      - se/nyarsafton
+      title: Holiday
+      type: string
+    SystemOperatorEligibility:
+      description: Criteria defining the characteristics a customer and their metering point need to have to be eligible for a system operator tariff.
+      example:
+        fuse_size:
+          unit: A
+          value: 20.0
+        metering_grid_area_ids:
+        - 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+        - 0199c317-25ec-7c00-b1a0-f6e5d4c3b2a1
+        other:
+        - offtake
+        - fuse_based
+        type: system_operator
+      properties:
+        energy:
+          anyOf:
+          - $ref: '#/components/schemas/PeriodicAmount'
+          - type: 'null'
+          description: Energy-volume-over-a-period characteristics, if any — e.g. an annual offtake of at least 100 000 kWh. Always expressed in kWh.
+          examples:
+          - range:
+              minimum: 100000.0
+              unit: kWh
+            resolution: yearly
+        fuse_size:
+          anyOf:
+          - $ref: '#/components/schemas/Range'
+          - $ref: '#/components/schemas/Level'
+          - type: 'null'
+          description: Fuse-size characteristics, if any.
+          examples:
+          - unit: A
+            value: 20.0
+          - maximum: 25.0
+            minimum: 16.0
+            unit: A
+          title: Fuse Size
+        metering_grid_area_ids:
+          description: Unique identifiers of the [Metering Grid Areas](/api-reference/core/models/metering-grid-area) where this tariff is available.
+          examples:
+          - - 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+            - 0199c317-25ec-7c00-b1a0-f6e5d4c3b2a1
+          items:
+            type: string
+          title: Metering Grid Area Ids
+          type: array
+        other:
+          description: Other characteristics, specified as a list of specifiers.
+          examples:
+          - - offtake
+            - fuse_based
+          - - injection
+            - high_voltage_grid
+          items:
+            $ref: '#/components/schemas/Specifier'
+          title: Other
+          type: array
+        power:
+          anyOf:
+          - $ref: '#/components/schemas/Range'
+          - $ref: '#/components/schemas/Level'
+          - type: 'null'
+          description: Power characteristics, if any.
+          examples:
+          - maximum: 500.0
+            minimum: 63.0
+            unit: kW
+          title: Power
+        type:
+          const: system_operator
+          default: system_operator
+          title: Type
+          type: string
+        voltage:
+          anyOf:
+          - $ref: '#/components/schemas/Range'
+          - $ref: '#/components/schemas/Level'
+          - type: 'null'
+          description: Voltage characteristics, if any.
+          examples:
+          - unit: kV
+            value: 0.4
+          - maximum: 1.0
+            unit: kV
+          title: Voltage
+      required:
+      - metering_grid_area_ids
+      title: SystemOperatorEligibility
+      type: object
+    TimeOfDayCondition:
+      description: Condition that only applies within the specified time-of-day range.
+      example:
+        from_time: 06:00:00
+        to_time: '22:00:00'
+        type: time_of_day
+      properties:
+        from_time:
+          description: Start of the time period (inclusive).
+          format: time
+          title: From Time
+          type: string
+        to_time:
+          description: End of the time period (exclusive).
+          format: time
+          title: To Time
+          type: string
+        type:
+          const: time_of_day
+          default: time_of_day
+          title: Type
+          type: string
+      required:
+      - from_time
+      - to_time
+      title: TimeOfDayCondition
+      type: object
+    ExcludeHolidaysCondition:
+      description: Condition that applies on all days except the specified holidays
+      example:
+        holidays:
+        - se/julafton
+        - se/juldagen
+        - se/nyarsdagen
+        type: exclude_holidays
+      properties:
+        holidays:
+          description: One or more holidays
+          items:
+            $ref: '#/components/schemas/Holiday'
+          minItems: 1
+          title: Holidays
+          type: array
+        type:
+          const: exclude_holidays
+          default: exclude_holidays
+          title: Type
+          type: string
+      required:
+      - holidays
+      title: ExcludeHolidaysCondition
+      type: object
+    Range:
+      example:
+        maximum: 25.0
+        minimum: 16.0
+        unit: A
+      properties:
+        maximum:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Maximum level, if any.
+          examples:
+          - 1
+          - 10.0
+          - 20.0
+          title: Maximum
+        minimum:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Minimum level, if any.
+          examples:
+          - 1
+          - 10.0
+          - 20.0
+          title: Minimum
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit of the level.
+      required:
+      - unit
+      title: Range
+      type: object
+    CalculateTariffRequest:
+      example:
+        end_time: '2026-01-01T00:30:00+01:00'
+        profiles:
+        - name: quarter-hourly-day-ahead-price-se1
+          profile_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        start_time: '2026-01-01T00:00:00+01:00'
+        tariff_id: 123e4567-e89b-12d3-a456-426614174000
+        time_series:
+        - name: quarter-hourly-energy-offtake
+          values:
+          - 1.5
+          - 1.2
+      properties:
+        end_time:
+          description: End of the calculation period (exclusive). Must include timezone offset and be after start_time. For correct monthly/daily bucketing, align to local midnight in the tariff's timezone.
+          format: date-time
+          title: End Time
+          type: string
+        profiles:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/InputProfile'
+            type: array
+          - type: 'null'
+          description: Profile references for datasets. Each entry maps a dataset to a persisted profile UUID. Can be combined with time_series.
+          title: Profiles
+        start_time:
+          description: Start of the calculation period (inclusive). Must include timezone offset. For correct monthly/daily bucketing, align to local midnight in the tariff's timezone (e.g. 2026-01-01T00:00:00+01:00 for Europe/Stockholm).
+          format: date-time
+          title: Start Time
+          type: string
+        tariff_id:
+          description: ID of the tariff to calculate.
+          format: uuid
+          title: Tariff Id
+          type: string
+        time_series:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/InputTimeSeries'
+            type: array
+          - type: 'null'
+          description: Input time series data for each dataset required by the tariff's active components. Can be combined with profiles.
+          title: Time Series
+      required:
+      - end_time
+      - start_time
+      - tariff_id
+      title: CalculateTariffRequest
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    NotCondition:
+      description: Condition that applies when the sub condition doesn't apply
+      example:
+        condition:
+          days:
+          - 6
+          - 7
+          type: day_of_week
+        type: not
+      properties:
+        condition:
+          description: Sub-condition to be inversed
+          discriminator:
+            mapping:
+              and: '#/components/schemas/AndCondition'
+              day_of_week: '#/components/schemas/DayOfWeekCondition'
+              exclude_holidays: '#/components/schemas/ExcludeHolidaysCondition'
+              month: '#/components/schemas/MonthCondition'
+              not: '#/components/schemas/NotCondition'
+              or: '#/components/schemas/OrCondition'
+              time_of_day: '#/components/schemas/TimeOfDayCondition'
+            propertyName: type
+          oneOf:
+          - $ref: '#/components/schemas/MonthCondition'
+          - $ref: '#/components/schemas/DayOfWeekCondition'
+          - $ref: '#/components/schemas/TimeOfDayCondition'
+          - $ref: '#/components/schemas/ExcludeHolidaysCondition'
+          - $ref: '#/components/schemas/AndCondition'
+          - $ref: '#/components/schemas/OrCondition'
+          - $ref: '#/components/schemas/NotCondition'
+          title: Condition
+        type:
+          const: not
+          default: not
+          title: Type
+          type: string
+      required:
+      - condition
+      title: NotCondition
+      type: object
+    GetDatasetsResponse:
+      properties:
+        datasets:
+          items:
+            $ref: '#/components/schemas/Dataset'
+          title: Datasets
+          type: array
+      required:
+      - datasets
+      title: GetDatasetsResponse
+      type: object
+    Add:
+      description: 'Element-wise addition of two or more operands.
+
+
+        All operands are required to have the same resolution.'
+      example:
+        inputs:
+        - id: a
+          resolution: monthly
+          unit: SEK
+        - unit: SEK
+          value: 10.0
+        output:
+          id: total
+          resolution: monthly
+          unit: SEK
+        type: add
+      properties:
+        inputs:
+          description: Operands to sum.
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/Level'
+            - $ref: '#/components/schemas/Dataset'
+              description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+            description: Either a [Dataset](/api-reference/cost-of-energy/models/dataset) or a literal level value.
+          minItems: 2
+          title: Inputs
+          type: array
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        type:
+          const: add
+          default: add
+          title: Type
+          type: string
+      required:
+      - inputs
+      - output
+      title: Add
+      type: object
+    CalculatedTimeSeries:
+      description: A named time series returned from a calculation, with explicit resolution and unit.
+      example:
+        name: cost
+        resolution: quarter_hourly
+        unit: SEK
+        values:
+        - 0.54
+        - 0.432
+      properties:
+        name:
+          description: Time series identifier.
+          title: Name
+          type: string
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Temporal resolution of the time series.
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit of the time series values.
+        values:
+          description: Ordered values aligned to the implicit timestamp grid. Uses null for absent values.
+          items:
+            anyOf:
+            - type: number
+            - type: 'null'
+          title: Values
+          type: array
+      required:
+      - name
+      - resolution
+      - unit
+      - values
+      title: CalculatedTimeSeries
+      type: object
+    SimplifiedTariffResponse:
+      description: Indicative, simplified view of a [Tariff](/api-reference/cost-of-energy/models/tariff)'s rates over a time range.
+      example:
+        component_rates:
+        - component:
+            applicable_from: '2026-01-01T00:00:00+01:00'
+            name: Energiskatt
+          rate:
+            dataset_id: quarter-hourly-energy-offtake
+            intervals:
+            - end_time: '2026-01-02T00:00:00Z'
+              rate: 0.36
+              start_time: '2026-01-01T00:00:00Z'
+            unit: SEK_per_kWh
+        - component:
+            applicable_from: '2026-01-01T00:00:00+01:00'
+            name: Effektavgift
+          rate:
+            dataset_id: quarter-hourly-energy-offtake
+            intervals:
+            - end_time: '2026-01-01T06:00:00Z'
+              rate: 0.0
+              start_time: '2026-01-01T00:00:00Z'
+            - end_time: '2026-01-01T22:00:00Z'
+              rate: 50.0
+              start_time: '2026-01-01T06:00:00Z'
+            - end_time: '2026-01-02T00:00:00Z'
+              rate: 0.0
+              start_time: '2026-01-01T22:00:00Z'
+            unit: SEK_per_kW
+        dataset_rates:
+        - dataset_id: quarter-hourly-energy-offtake
+          intervals:
+          - end_time: '2026-01-02T00:00:00Z'
+            rate: 0.56
+            start_time: '2026-01-01T00:00:00Z'
+          unit: SEK_per_kWh
+        - dataset_id: quarter-hourly-energy-offtake
+          intervals:
+          - end_time: '2026-01-01T06:00:00Z'
+            rate: 0.0
+            start_time: '2026-01-01T00:00:00Z'
+          - end_time: '2026-01-01T22:00:00Z'
+            rate: 50.0
+            start_time: '2026-01-01T06:00:00Z'
+          - end_time: '2026-01-02T00:00:00Z'
+            rate: 0.0
+            start_time: '2026-01-01T22:00:00Z'
+          unit: SEK_per_kW
+        unprojectable_components:
+        - applicable_from: '2026-01-01T00:00:00+01:00'
+          name: Abonnemangsavgift
+      properties:
+        component_rates:
+          description: Per-component rate timeseries, for components that can be projected onto a per-kWh or per-kW rate. Empty if the tariff has no projectable components.
+          items:
+            $ref: '#/components/schemas/ComponentRate'
+          title: Component Rates
+          type: array
+        dataset_rates:
+          description: Summed rate timeseries per `(dataset_id, unit)` group, across all projectable components contributing to that group. Empty if the tariff has no projectable components.
+          items:
+            $ref: '#/components/schemas/RateTimeseries'
+          title: Dataset Rates
+          type: array
+        unprojectable_components:
+          description: Tariff components present on the tariff that could not be projected onto a rate timeseries. Listed by name and applicability window only; see [Get Tariff](/api-reference/cost-of-energy/get-tariff) for full component definitions.
+          items:
+            $ref: '#/components/schemas/ComponentIdentity'
+          title: Unprojectable Components
+          type: array
+      required:
+      - component_rates
+      - dataset_rates
+      - unprojectable_components
+      title: SimplifiedTariffResponse
+      type: object
+    GetTariffsResponse:
+      properties:
+        tariffs:
+          items:
+            $ref: '#/components/schemas/Tariff'
+          title: Tariffs
+          type: array
+      required:
+      - tariffs
+      title: GetTariffsResponse
+      type: object
+    Multiply:
+      description: 'Element-wise multiplication of two operands.
+
+
+        Left and right opererands are required to have the same resolution.
+
+
+        The output dataset will have a unit that follows the following algebra:
+
+
+        **Unit algebra (commutative):**
+
+
+        - kW * SEK_per_kW = SEK
+
+
+        - kWh * SEK_per_kWh = SEK
+
+
+        - kW * hours = kWh
+
+
+        - % * any = same as the other operand (dimensionless scaling)'
+      example:
+        left:
+          id: peak
+          resolution: monthly
+          unit: kW
+        output:
+          id: cost
+          resolution: monthly
+          unit: SEK
+        right:
+          unit: SEK_per_kW
+          value: 50.0
+        type: multiply
+      properties:
+        left:
+          anyOf:
+          - $ref: '#/components/schemas/Level'
+          - $ref: '#/components/schemas/Dataset'
+            description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/level) to multiply'
+          title: Left
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Product](/api-reference/cost-of-energy/models/dataset) of element-wise multiplication of the left and right operands'
+        right:
+          anyOf:
+          - $ref: '#/components/schemas/Level'
+          - $ref: '#/components/schemas/Dataset'
+            description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/level) to multiply'
+          title: Right
+        type:
+          const: multiply
+          default: multiply
+          title: Type
+          type: string
+      required:
+      - left
+      - output
+      - right
+      title: Multiply
+      type: object
+    AndCondition:
+      description: Condition that applies when all sub-conditions are met
+      example:
+        conditions:
+        - days:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          type: day_of_week
+        - from_time: 06:00:00
+          to_time: '22:00:00'
+          type: time_of_day
+        type: and
+      properties:
+        conditions:
+          description: Sub-conditions to be ANDed together
+          items:
+            discriminator:
+              mapping:
+                and: '#/components/schemas/AndCondition'
+                day_of_week: '#/components/schemas/DayOfWeekCondition'
+                exclude_holidays: '#/components/schemas/ExcludeHolidaysCondition'
+                month: '#/components/schemas/MonthCondition'
+                not: '#/components/schemas/NotCondition'
+                or: '#/components/schemas/OrCondition'
+                time_of_day: '#/components/schemas/TimeOfDayCondition'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/MonthCondition'
+            - $ref: '#/components/schemas/DayOfWeekCondition'
+            - $ref: '#/components/schemas/TimeOfDayCondition'
+            - $ref: '#/components/schemas/ExcludeHolidaysCondition'
+            - $ref: '#/components/schemas/AndCondition'
+            - $ref: '#/components/schemas/OrCondition'
+            - $ref: '#/components/schemas/NotCondition'
+          minItems: 1
+          title: Conditions
+          type: array
+        type:
+          const: and
+          default: and
+          title: Type
+          type: string
+      required:
+      - conditions
+      title: AndCondition
+      type: object
+    RateTimeseries:
+      description: A single rate timeseries for one input dataset and unit, made up of chronologically ordered, non-overlapping flat-rate Rate Intervals.
+      example:
+        dataset_id: quarter-hourly-energy-offtake
+        intervals:
+        - end_time: '2026-01-01T06:00:00Z'
+          rate: 0.0
+          start_time: '2026-01-01T00:00:00Z'
+        - end_time: '2026-01-01T22:00:00Z'
+          rate: 50.0
+          start_time: '2026-01-01T06:00:00Z'
+        - end_time: '2026-01-02T00:00:00Z'
+          rate: 0.0
+          start_time: '2026-01-01T22:00:00Z'
+        unit: SEK_per_kW
+      properties:
+        dataset_id:
+          description: Identifier of the [Dataset](/api-reference/cost-of-energy/models/dataset) this timeseries' rates apply to.
+          examples:
+          - quarter-hourly-energy-offtake
+          - quarter-hourly-energy-injection
+          title: Dataset Id
+          type: string
+        intervals:
+          description: Chronologically ordered, non-overlapping flat-rate intervals covering the requested range exactly.
+          items:
+            $ref: '#/components/schemas/RateInterval'
+          title: Intervals
+          type: array
+        unit:
+          anyOf:
+          - enum:
+            - SEK_per_kWh
+            - NOK_per_kWh
+            - EUR_per_kWh
+            type: string
+          - enum:
+            - SEK_per_kW
+            - NOK_per_kW
+            - EUR_per_kW
+            type: string
+          description: Unit of the rates in this timeseries — a monetary rate per energy (`SEK_per_kWh`, `NOK_per_kWh`, `EUR_per_kWh`) or per power (`SEK_per_kW`, `NOK_per_kW`, `EUR_per_kW`).
+          title: Unit
+      required:
+      - dataset_id
+      - intervals
+      - unit
+      title: RateTimeseries
+      type: object
+    CalculateComponentResult:
+      example:
+        end_time: '2026-01-01T00:30:00+01:00'
+        name: Energiskatt
+        start_time: '2026-01-01T00:00:00+01:00'
+        time_series:
+        - name: cost
+          resolution: quarter_hourly
+          unit: SEK
+          values:
+          - 0.54
+          - 0.432
+      properties:
+        end_time:
+          description: Actual end of the data range (after clipping to the component's applicable window).
+          format: date-time
+          title: End Time
+          type: string
+        name:
+          title: Name
+          type: string
+        start_time:
+          description: Actual start of the data range (after clipping to the component's applicable window).
+          format: date-time
+          title: Start Time
+          type: string
+        time_series:
+          description: Calculated time series for this component. By default only the final cost time series is included. Pass include_intermediate_time_series=true to also get intermediate pipeline outputs.
+          items:
+            $ref: '#/components/schemas/CalculatedTimeSeries'
+          title: Time Series
+          type: array
+      required:
+      - end_time
+      - name
+      - start_time
+      - time_series
+      title: CalculateComponentResult
+      type: object
+    ComponentIdentity:
+      description: Identifies a tariff component by its issuing-party name and applicability window. See [Tariff Component](/api-reference/cost-of-energy/models/tariff-component) for the full definition.
+      example:
+        applicable_from: '2026-01-01T00:00:00+01:00'
+        name: Energiskatt
+      properties:
+        applicable_from:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: ISO 8601 formatted datetime from when the tariff component becomes applicable, if any. If `null` or not included, applicable immediately.
+          examples:
+          - '2026-01-01T00:00:00+01:00'
+          title: Applicable From
+        applicable_to:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: ISO 8601 formatted datetime at which the tariff component ceases to be applicable (exclusive — the component does not apply at this instant). If `null` or not included, applicable until further notice.
+          examples:
+          - '2027-01-01T00:00:00+01:00'
+          title: Applicable To
+        name:
+          description: Name of the tariff component as given by the issuing [Party](/api-reference/core/models/party).
+          examples:
+          - Energiskatt
+          - Överföringsavgift
+          - Effektavgift
+          - Abonnemangsavgift
+          - Nätnytta
+          - Överuttagsavgift
+          title: Name
+          type: string
+      required:
+      - name
+      title: ComponentIdentity
+      type: object
+    InputTimeSeries:
+      description: 'A time series of data for a registered dataset that is input for a tariff component.
+
+
+        Use ``null`` in the values array to represent absent values.'
+      example:
+        name: quarter-hourly-energy-offtake
+        values:
+        - 1.5
+        - 1.2
+      properties:
+        name:
+          description: Dataset identifier.
+          title: Name
+          type: string
+        values:
+          description: Ordered values aligned to the implicit timestamp grid. Use null for absent values.
+          items:
+            anyOf:
+            - type: number
+            - type: 'null'
+          title: Values
+          type: array
+      required:
+      - name
+      - values
+      title: InputTimeSeries
+      type: object
+    DayOfWeekCondition:
+      description: Condition that only applies on the specified days of the week.
+      example:
+        days:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        type: day_of_week
+      properties:
+        days:
+          items:
+            description: Day of week (1=Monday, 7=Sunday, ISO 8601)
+            maximum: 7.0
+            minimum: 1.0
+            type: integer
+          minItems: 1
+          title: Days
+          type: array
+        type:
+          const: day_of_week
+          default: day_of_week
+          title: Type
+          type: string
+      required:
+      - days
+      title: DayOfWeekCondition
+      type: object
+    RateInterval:
+      description: A flat-rate slice of a Rate Timeseries, spanning the half-open UTC range `[start_time, end_time)`.
+      example:
+        end_time: '2026-01-01T22:00:00Z'
+        rate: 50.0
+        start_time: '2026-01-01T06:00:00Z'
+      properties:
+        end_time:
+          description: ISO 8601 formatted UTC datetime at which this interval ends (exclusive).
+          examples:
+          - '2026-01-01T22:00:00Z'
+          format: date-time
+          title: End Time
+          type: string
+        rate:
+          description: Flat rate that applies across this interval, expressed in the parent timeseries' unit.
+          title: Rate
+          type: number
+        start_time:
+          description: ISO 8601 formatted UTC datetime at which this interval begins (inclusive).
+          examples:
+          - '2026-01-01T06:00:00Z'
+          format: date-time
+          title: Start Time
+          type: string
+      required:
+      - end_time
+      - rate
+      - start_time
+      title: RateInterval
+      type: object
+    Dataset:
+      description: 'A named timeseries with known resolution and unit.
+
+
+        Used both for describing registered datasets (see below) as well as for naming the intermediate results that get created by each step in a function pipeline.
+
+
+        ## Absent values
+
+
+        All datasets in this API are fixed resolution. For an hourly dataset, there is some "slot" for each hour''s value. However, some operations - [Select](api-reference/cost-of-energy/ops/select) for instance - can remove values from datasets, leaving "holes" or absent values behind. This is used for instance to select only weekends or certain times of year, "clearing" the rest of the dataset.
+
+
+        We leave it up to users of the API to decide how they wish to represent absent values. A common strategy is to use `NaN` to represent absent values, another common option is bit masking.'
+      example:
+        id: quarter-hourly-energy-offtake
+        resolution: quarter_hourly
+        unit: kWh
+      properties:
+        id:
+          description: Identifier for this dataset. For registered datasets this is a globally unique slug; for intermediate pipeline results it is a local reference name.
+          examples:
+          - quarter-hourly-energy-offtake
+          - filtered_power
+          - weighted_power
+          title: Id
+          type: string
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Temporal resolution of the timeseries.
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit of the timeseries.
+      required:
+      - id
+      - resolution
+      - unit
+      title: Dataset
+      type: object
+    Resample:
+      description: 'Resample a coarse-resolution series to a finer resolution.
+
+
+        The resampling strategy depends on the unit type:
+
+
+        **Rate units** (kW, SEK/kWh, etc.) are **forward-filled**: each sub-period inherits its parent period''s value unchanged.
+
+
+        **Amount units** (SEK, NOK, kWh, hours) are **distributed proportionally**: each sub-period receives a share of the parent value weighted by the number of quarter-hour periods it contains relative to the parent period.'
+      example:
+        input:
+          id: yearly-capacity
+          resolution: yearly
+          unit: kW
+        output:
+          id: monthly-capacity
+          resolution: monthly
+          unit: kW
+        resolution: monthly
+        type: resample
+      properties:
+        input:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) to resample'
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Resulting Dataset](/api-reference/cost-of-energy/models/dataset) after resampling the input to the specified resolution'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Target resolution to resample into (must be finer than input).
+        type:
+          const: resample
+          default: resample
+          title: Type
+          type: string
+      required:
+      - input
+      - output
+      - resolution
+      title: Resample
+      type: object
+    TariffComponent:
+      description: 'Describes some component of the cost of energy of a [Tariff](/api-reference/cost-of-energy/models/tariff), like peak tariffs, taxes, fixed monthly fees etc.
+
+
+        Tariff components describe how to transform some [Datasets](/api-reference/cost-of-energy/models/dataset) through a series of Functions, arriving at a cost dataset.
+
+
+        When tariffs are changed, as they frequently are, a new Tariff Component is created, and the applicable_from/applicable_to fields are set to represent when the switch-over occurred.
+
+
+        This allows you to model historic cost as well as upcoming transitions to new tariffs.'
+      example:
+        applicable_from: '2026-01-01T00:00:00+01:00'
+        cost:
+          id: cost
+          resolution: quarter_hourly
+          unit: SEK
+        datasets:
+        - id: quarter-hourly-energy-offtake
+          resolution: quarter_hourly
+          unit: kWh
+        functions:
+        - left:
+            id: quarter-hourly-energy-offtake
+            resolution: quarter_hourly
+            unit: kWh
+          output:
+            id: cost
+            resolution: quarter_hourly
+            unit: SEK
+          right:
+            unit: SEK_per_kWh
+            value: 0.36
+          type: multiply
+        name: Energiskatt
+        timezone: Europe/Stockholm
+      properties:
+        applicable_from:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: ISO 8601 formatted datetime from when the tariff component becomes applicable, if any. If `null` or not included, applicable immediately.
+          examples:
+          - '2025-01-01T00:00:00+01:00'
+          title: Applicable From
+        applicable_to:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: ISO 8601 formatted datetime at which the tariff component ceases to be applicable (exclusive — the component does not apply at this instant). If `null` or not included, applicable until further notice.
+          examples:
+          - '2026-01-01T00:00:00+01:00'
+          title: Applicable To
+        cost:
+          $ref: '#/components/schemas/Dataset'
+          description: The pipeline's final output [Dataset](/api-reference/cost-of-energy/models/dataset), either a Registered Dataset or - more commonly - the result of the functions pipeline.
+        datasets:
+          description: Input datasets, these are all [Registered Datasets](/api-reference/cost-of-energy/models/dataset) that must be supplied to the function pipeline
+          items:
+            $ref: '#/components/schemas/Dataset'
+          title: Datasets
+          type: array
+        functions:
+          description: This is describes the core function pipeline - ordered [Functions](/api-reference/cost-of-energy/ops/overview) that transform the input dataset(s) to the final output cost dataset. Each step produces a named output [Dataset](/api-reference/cost-of-energy/models/dataset) that subsequent [Functions](/api-reference/cost-of-energy/ops/overview) may take as inputs or that become the final output
+          items:
+            discriminator:
+              mapping:
+                add: '#/components/schemas/Add'
+                aggregate: '#/components/schemas/Aggregate'
+                clip: '#/components/schemas/Clip'
+                constant: '#/components/schemas/Constant'
+                divide: '#/components/schemas/Divide'
+                lookup: '#/components/schemas/Lookup'
+                mask: '#/components/schemas/Mask'
+                multiply: '#/components/schemas/Multiply'
+                resample: '#/components/schemas/Resample'
+                select: '#/components/schemas/Select'
+                subtract: '#/components/schemas/Subtract'
+              propertyName: type
+            oneOf:
+            - $ref: '#/components/schemas/Constant'
+            - $ref: '#/components/schemas/Add'
+            - $ref: '#/components/schemas/Subtract'
+            - $ref: '#/components/schemas/Divide'
+            - $ref: '#/components/schemas/Multiply'
+            - $ref: '#/components/schemas/Aggregate'
+            - $ref: '#/components/schemas/Resample'
+            - $ref: '#/components/schemas/Select'
+            - $ref: '#/components/schemas/Mask'
+            - $ref: '#/components/schemas/Clip'
+            - $ref: '#/components/schemas/Lookup'
+          minItems: 1
+          title: Functions
+          type: array
+        name:
+          description: Name of the tariff component as given by the issuing [Party](/api-reference/core/models/party).
+          examples:
+          - Energiskatt
+          - Överföringsavgift
+          - Effektavgift
+          - Abonnemangsavgift
+          - Nätnytta
+          - Överuttagsavgift
+          title: Name
+          type: string
+        timezone:
+          description: Timezone in which time-dependent functions (filtering, grouping) are evaluated. Typically local time, but can also be a fixed UTC offset.
+          examples:
+          - Europe/Stockholm
+          - UTC+01:00
+          title: Timezone
+          type: string
+      required:
+      - cost
+      - datasets
+      - functions
+      - name
+      - timezone
+      title: TariffComponent
+      type: object
+    Aggregate:
+      description: Aggregate a dataset over a resolution window and apply a function.
+      example:
+        aggregation_function: sum
+        input:
+          id: energy
+          resolution: hourly
+          unit: kWh
+        output:
+          id: monthly-energy
+          resolution: monthly
+          unit: kWh
+        resolution: monthly
+        type: aggregate
+      properties:
+        aggregation_function:
+          $ref: '#/components/schemas/AggregationFunction'
+          description: Aggregation function to apply.
+        input:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) to aggregate'
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset), the result of applying the specified aggregation function to the input dataset in windows of the given resolution'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Window over which to aggregate.
+        type:
+          const: aggregate
+          default: aggregate
+          title: Type
+          type: string
+      required:
+      - aggregation_function
+      - input
+      - output
+      - resolution
+      title: Aggregate
+      type: object
+    Mask:
+      description: 'Conditional substitution: where condition matches, use replacement; otherwise keep input.
+
+
+        Works with temporal conditions only (month, day_of_week, time_of_day, exclude_holidays, and, or, not).'
+      example:
+        condition:
+          from_time: '22:00:00'
+          to_time: 06:00:00
+          type: time_of_day
+        input:
+          id: power
+          resolution: hourly
+          unit: kW
+        output:
+          id: weighted-power
+          resolution: hourly
+          unit: kW
+        replacement:
+          id: scaled-power
+          resolution: hourly
+          unit: kW
+        type: mask
+      properties:
+        condition:
+          discriminator:
+            mapping:
+              and: '#/components/schemas/AndCondition'
+              day_of_week: '#/components/schemas/DayOfWeekCondition'
+              exclude_holidays: '#/components/schemas/ExcludeHolidaysCondition'
+              month: '#/components/schemas/MonthCondition'
+              not: '#/components/schemas/NotCondition'
+              or: '#/components/schemas/OrCondition'
+              time_of_day: '#/components/schemas/TimeOfDayCondition'
+            propertyName: type
+          oneOf:
+          - $ref: '#/components/schemas/MonthCondition'
+          - $ref: '#/components/schemas/DayOfWeekCondition'
+          - $ref: '#/components/schemas/TimeOfDayCondition'
+          - $ref: '#/components/schemas/ExcludeHolidaysCondition'
+          - $ref: '#/components/schemas/AndCondition'
+          - $ref: '#/components/schemas/OrCondition'
+          - $ref: '#/components/schemas/NotCondition'
+          title: Condition
+        input:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) to be masked'
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        replacement:
+          anyOf:
+          - $ref: '#/components/schemas/Level'
+          - $ref: '#/components/schemas/Dataset'
+            description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) to or [Level](/api-reference/cost-of-energy/models/level) to use as replacement where condition matches the input'
+          title: Replacement
+        type:
+          const: mask
+          default: mask
+          title: Type
+          type: string
+      required:
+      - condition
+      - input
+      - output
+      - replacement
+      title: Mask
+      type: object
+    HighestCondition:
+      description: Keep the N highest values per resolution window.
+      example:
+        n: 3
+        resolution: monthly
+        type: highest
+      properties:
+        n:
+          description: Number of top values to keep per period.
+          exclusiveMinimum: 0.0
+          title: N
+          type: integer
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Period over which to select the N highest values.
+        type:
+          const: highest
+          default: highest
+          title: Type
+          type: string
+      required:
+      - n
+      - resolution
+      title: HighestCondition
+      type: object
+    Divide:
+      description: 'Element-wise division of numerator / denominator.
+
+
+        Numerator and denominator are required to have the same resolution.
+
+
+        The output dataset will have a unit that follows the following algebra:
+
+
+        **Unit algebra:**
+
+
+        - kW / kW = %
+
+
+        - kWh / hours = kW
+
+
+        - kWh / kW = hours
+
+
+        - any / % = same as numerator'
+      example:
+        denominator:
+          id: peak
+          resolution: yearly
+          unit: kW
+        numerator:
+          id: energy
+          resolution: yearly
+          unit: kWh
+        output:
+          id: hours
+          resolution: yearly
+          unit: hours
+        type: divide
+      properties:
+        denominator:
+          anyOf:
+          - $ref: '#/components/schemas/Level'
+          - $ref: '#/components/schemas/Dataset'
+            description: A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset).
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/level) that the numerator should be divided by'
+          title: Denominator
+        numerator:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) that should be divided by the denominator'
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        type:
+          const: divide
+          default: divide
+          title: Type
+          type: string
+      required:
+      - denominator
+      - numerator
+      - output
+      title: Divide
+      type: object
+    Tariff:
+      description: 'Represents a tariff - a rate plan - for a metering point, including eligibility criteria, availability period and one or more [Tariff Components](/api-reference/cost-of-energy/models/tariff-component), which describe the cost structure and how it''s changed over time.
+
+
+        These are long-lived, like "Fuse Tariff 20A", offered by some [Party acting as a System Operator](/api-reference/core/models/party).'
+      example:
+        available_from: '2024-01-01T00:00:00+01:00'
+        eligibility:
+          fuse_size:
+            unit: A
+            value: 20.0
+          metering_grid_area_ids:
+          - 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+          - 0199c317-25ec-7c00-b1a0-f6e5d4c3b2a1
+          other:
+          - offtake
+          - fuse_based
+          type: system_operator
+        id: 0199c317-25ec-7cf7-94cc-32a39f068433
+        name: Säkringsabonnemang - 20 A
+        summary: Fuse-based tariff for 20A with energy tax and monthly subscription fee.
+        tariff_components:
+        - applicable_from: '2026-01-01T00:00:00+01:00'
+          cost:
+            id: cost
+            resolution: quarter_hourly
+            unit: SEK
+          datasets:
+          - id: quarter-hourly-energy-offtake
+            resolution: quarter_hourly
+            unit: kWh
+          functions:
+          - left:
+              id: quarter-hourly-energy-offtake
+              resolution: quarter_hourly
+              unit: kWh
+            output:
+              id: cost
+              resolution: quarter_hourly
+              unit: SEK
+            right:
+              unit: SEK_per_kWh
+              value: 0.36
+            type: multiply
+          name: Energiskatt
+          timezone: Europe/Stockholm
+        - applicable_from: '2025-01-01T00:00:00+01:00'
+          cost:
+            id: cost
+            resolution: monthly
+            unit: SEK
+          datasets: []
+          functions:
+          - output:
+              id: cost
+              resolution: monthly
+              unit: SEK
+            resolution: monthly
+            type: constant
+            value:
+              unit: SEK
+              value: 187.5
+          name: Abonnemangsavgift
+          timezone: Europe/Stockholm
+      properties:
+        annotations:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Additional remarks, meant for human reading.
+          examples:
+          - Tariff needs to be actively requested.
+          title: Annotations
+        available_from:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: ISO 8601 formatted datetime from when the tariff becomes available, if any. If `null`, available immediately.
+          examples:
+          - '2024-01-01T00:00:00+01:00'
+          title: Available From
+        available_to:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: ISO 8601 formatted datetime at which the tariff ceases to be available (exclusive — the tariff is not available at this instant). If `null`, available until further notice.
+          examples:
+          - '2026-01-01T00:00:00+01:00'
+          title: Available To
+        eligibility:
+          description: Criteria the customer and metering point must meet.
+          discriminator:
+            mapping:
+              system_operator: '#/components/schemas/SystemOperatorEligibility'
+            propertyName: type
+          examples:
+          - fuse_size:
+              unit: A
+              value: 20.0
+            metering_grid_area_ids:
+            - 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+            - 0199c317-25ec-7c00-b1a0-f6e5d4c3b2a1
+            other:
+            - offtake
+            - fuse_based
+            type: system_operator
+          oneOf:
+          - $ref: '#/components/schemas/SystemOperatorEligibility'
+          title: Eligibility
+        id:
+          description: Unique identifier within the Engrate systems.
+          examples:
+          - 0199c317-25ec-7cf7-94cc-32a39f068433
+          title: Id
+          type: string
+        name:
+          description: Tariff name as given by the system operator.
+          examples:
+          - Säkringsabonnemang - 20 A
+          title: Name
+          type: string
+        summary:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Brief human-readable summary of the tariff and its tariff components.
+          examples:
+          - Fuse-based tariff for 20A with energy tax and monthly subscription fee.
+          title: Summary
+        tariff_components:
+          description: Tariff components applicable for this tariff.
+          examples:
+          - - applicable_from: '2025-01-01T00:00:00+01:00'
+              cost:
+                id: cost
+                resolution: hourly
+                unit: SEK
+              datasets:
+              - id: quarter-hourly-energy-offtake
+                resolution: quarter_hourly
+                unit: kWh
+              functions:
+              - aggregation_function: sum
+                input:
+                  id: quarter-hourly-energy-offtake
+                  resolution: quarter_hourly
+                  unit: kWh
+                output:
+                  id: hourly-energy
+                  resolution: hourly
+                  unit: kWh
+                resolution: hourly
+                type: aggregate
+              - left:
+                  id: hourly-energy
+                  resolution: hourly
+                  unit: kWh
+                output:
+                  id: cost
+                  resolution: hourly
+                  unit: SEK
+                right:
+                  unit: SEK_per_kWh
+                  value: 0.536
+                type: multiply
+              name: Energiskatt
+              timezone: Europe/Stockholm
+            - applicable_from: '2025-01-01T00:00:00+01:00'
+              cost:
+                id: cost
+                resolution: monthly
+                unit: SEK
+              datasets: []
+              functions:
+              - output:
+                  id: cost
+                  resolution: monthly
+                  unit: SEK
+                resolution: monthly
+                type: constant
+                value:
+                  unit: SEK
+                  value: 187.5
+              name: Abonnemangsavgift
+              timezone: Europe/Stockholm
+          items:
+            $ref: '#/components/schemas/TariffComponent'
+          title: Tariff Components
+          type: array
+      required:
+      - eligibility
+      - id
+      - name
+      - tariff_components
+      title: Tariff
+      type: object
+    CalculateTariffResponse:
+      example:
+        components:
+        - end_time: '2026-01-01T00:30:00+01:00'
+          name: Energiskatt
+          start_time: '2026-01-01T00:00:00+01:00'
+          time_series:
+          - name: cost
+            resolution: quarter_hourly
+            unit: SEK
+            values:
+            - 0.54
+            - 0.432
+      properties:
+        components:
+          description: Results per tariff component that is active within the requested period.
+          items:
+            $ref: '#/components/schemas/CalculateComponentResult'
+          title: Components
+          type: array
+      required:
+      - components
+      title: CalculateTariffResponse
+      type: object
+    LowestCondition:
+      description: Keep the N lowest values per resolution window.
+      example:
+        n: 3
+        resolution: monthly
+        type: lowest
+      properties:
+        n:
+          description: Number of bottom values to keep per period.
+          exclusiveMinimum: 0.0
+          title: N
+          type: integer
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Period over which to select the N lowest values.
+        type:
+          const: lowest
+          default: lowest
+          title: Type
+          type: string
+      required:
+      - n
+      - resolution
+      title: LowestCondition
+      type: object
+    Level:
+      description: Some floating point value and an associated [Unit](/api-reference/cost-of-energy/models/unit)
+      example:
+        unit: SEK_per_kW
+        value: 50.0
+      properties:
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: '[Unit](/api-reference/cost-of-energy/models/unit) the value is expressed in.'
+        value:
+          description: The level value.
+          examples:
+          - 1
+          - 10.0
+          - 20.0
+          title: Value
+          type: number
+      required:
+      - unit
+      - value
+      title: Level
+      type: object
+    ComponentRate:
+      description: A single tariff component's projected rate timeseries.
+      example:
+        component:
+          applicable_from: '2026-01-01T00:00:00+01:00'
+          name: Energiskatt
+        rate:
+          dataset_id: quarter-hourly-energy-offtake
+          intervals:
+          - end_time: '2027-01-01T00:00:00Z'
+            rate: 0.36
+            start_time: '2026-01-01T00:00:00Z'
+          unit: SEK_per_kWh
+      properties:
+        component:
+          $ref: '#/components/schemas/ComponentIdentity'
+          description: Identifying fields of the component this rate timeseries belongs to.
+        rate:
+          $ref: '#/components/schemas/RateTimeseries'
+          description: The component's projected rate timeseries.
+      required:
+      - component
+      - rate
+      title: ComponentRate
+      type: object
+    Specifier:
+      enum:
+      - offtake
+      - injection
+      - storage
+      - fuse_based
+      - low_voltage_grid
+      - high_voltage_grid
+      - regional_grid
+      - apartment
+      - house
+      - household
+      - business
+      title: Specifier
+      type: string
+    Select:
+      description: 'Keep only values matching a condition, removing all others.
+
+
+        The resulting dataset will have "absent" values or "holes". See [Datasets](/api-reference/cost-of-energy/models/dataset) for details on absent values.
+
+
+        Works with both temporal conditions (month, day_of_week, time_of_day, exclude_holidays, and, or, not) and value conditions (highest, lowest).'
+      example:
+        condition:
+          months:
+          - 1
+          - 2
+          - 3
+          - 11
+          - 12
+          type: month
+        input:
+          id: power
+          resolution: hourly
+          unit: kW
+        output:
+          id: filtered-power
+          resolution: hourly
+          unit: kW
+        type: select
+      properties:
+        condition:
+          discriminator:
+            mapping:
+              and: '#/components/schemas/AndCondition'
+              day_of_week: '#/components/schemas/DayOfWeekCondition'
+              exclude_holidays: '#/components/schemas/ExcludeHolidaysCondition'
+              highest: '#/components/schemas/HighestCondition'
+              lowest: '#/components/schemas/LowestCondition'
+              month: '#/components/schemas/MonthCondition'
+              not: '#/components/schemas/NotCondition'
+              or: '#/components/schemas/OrCondition'
+              time_of_day: '#/components/schemas/TimeOfDayCondition'
+            propertyName: type
+          oneOf:
+          - $ref: '#/components/schemas/MonthCondition'
+          - $ref: '#/components/schemas/DayOfWeekCondition'
+          - $ref: '#/components/schemas/TimeOfDayCondition'
+          - $ref: '#/components/schemas/ExcludeHolidaysCondition'
+          - $ref: '#/components/schemas/AndCondition'
+          - $ref: '#/components/schemas/OrCondition'
+          - $ref: '#/components/schemas/NotCondition'
+          - $ref: '#/components/schemas/HighestCondition'
+          - $ref: '#/components/schemas/LowestCondition'
+          title: Condition
+        input:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Dataset](/api-reference/cost-of-energy/models/dataset) to select from'
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        type:
+          const: select
+          default: select
+          title: Type
+          type: string
+      required:
+      - condition
+      - input
+      - output
+      title: Select
+      type: object
+    AggregationFunction:
+      description: '### Available aggregation functions
+
+
+        - **sum** — Add up all values.
+
+
+        - **mean** — Take the mean - average - of all values.
+
+
+        - **max** — Take the maximum value.
+
+
+        - **min** — Take the minimum value.'
+      enum:
+      - sum
+      - mean
+      - max
+      - min
+      title: AggregationFunction
+      type: string
+    Lookup:
+      description: 'Look up the matching tier level for a value based on discrete boundaries.
+
+
+        ### Example
+
+
+        Let''s say the highest power peak for a certain month (`monthly-power-peak`) is 150 kW. That means it falls into the second tier, since 150 kW >= `boundary` between the first and second tier (100 kW). The `monthly-fixed-fee` for that month becomes 5000 SEK (`level` of the matching tier).'
+      example:
+        boundaries:
+        - 100.0
+        levels:
+        - 3000.0
+        - 5000.0
+        output:
+          id: monthly-fixed-fee
+          resolution: monthly
+          unit: SEK
+        tier_selector:
+          id: monthly-power-peak
+          resolution: monthly
+          unit: kW
+        type: lookup
+        unit: SEK
+      properties:
+        boundaries:
+          description: 'Tier boundaries. N contiguous tiers have N-1 boundaries: [0, b1), [b1, b2), ..., [bN-1, ∞).'
+          examples:
+          - - 100.0
+          items:
+            type: number
+          minItems: 1
+          title: Boundaries
+          type: array
+        levels:
+          description: Level value for each of the N tiers.
+          examples:
+          - - 3000.0
+            - 5000.0
+          items:
+            type: number
+          minItems: 2
+          title: Levels
+          type: array
+        output:
+          $ref: '#/components/schemas/Dataset'
+          description: '[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result'
+        tier_selector:
+          $ref: '#/components/schemas/Dataset'
+          description: Reference used to select the matching tier. Each value in here is used to find a matching tier level to produce as output
+        type:
+          const: lookup
+          default: lookup
+          title: Type
+          type: string
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit shared by all level values.
+      required:
+      - boundaries
+      - levels
+      - output
+      - tier_selector
+      - unit
+      title: Lookup
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

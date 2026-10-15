@@ -1,0 +1,99 @@
+generated: '2026-10-15'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 6
+  own: 4
+  other_domain: 1
+  platform: 1
+  roles:
+  - api
+  - docs
+  - other
+  - portal
+  - source
+  - website
+hosts:
+- host: api.engrate.io
+  found_by:
+  - apis[]
+  - contract-discovery
+  types: []
+  serves:
+  - api
+  registrable_domain: engrate.io
+  role: api
+  relation: own
+- host: console.engrate.io
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types:
+  - DeveloperPortal
+  serves: []
+  registrable_domain: engrate.io
+  role: portal
+  relation: own
+- host: docs.engrate.io
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - site-links
+  - docs-index
+  - spec-found
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - ChangeLog
+  - Documentation
+  - APIReference
+  - GettingStarted
+  serves:
+  - docs
+  - spec
+  - cdn
+  - hosting
+  vendor: cloudflare
+  registrable_domain: engrate.io
+  role: docs
+  relation: own
+- host: engrate.io
+  found_by:
+  - pointer
+  - probed
+  - contract-discovery
+  - well-known
+  types:
+  - Website
+  - TermsOfService
+  - PrivacyPolicy
+  serves: []
+  registrable_domain: engrate.io
+  role: website
+  relation: own
+- host: github.com
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - GitHubOrganization
+  serves:
+  - docs
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: mintlify.com
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: mintlify.com
+  role: other
+  relation: other-domain

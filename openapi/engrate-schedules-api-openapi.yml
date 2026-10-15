@@ -1,0 +1,1180 @@
+openapi: 3.2.0
+info:
+  title: Engrate Schedules API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Schedules
+paths:
+  /schedule-management/v1/anomalies:
+    get:
+      description: 'List anomaly time series across all schedules. **Coming soon.**
+
+
+        Once available, this will enable the ''which TSO time series differ from what we sent'' use case without needing individual schedule UIDs, querying both DE and NL anomaly tables unless a market filter is applied.'
+      operationId: list_anomalies_schedule_management_v1_anomalies_get
+      parameters:
+      - description: 'Filter by TSO identifier. DE values: ''50HERTZ_DE_TSO'', ''DE-AMPRION-TSO'', ''TTG_DE'', ''DE-TRANSNETBWTSO''. NL value: ''TENNET_TSO''.'
+        in: query
+        name: tso
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'Filter by TSO identifier. DE values: ''50HERTZ_DE_TSO'', ''DE-AMPRION-TSO'', ''TTG_DE'', ''DE-TRANSNETBWTSO''. NL value: ''TENNET_TSO''.'
+          title: Tso
+      - description: Start date filter (YYYY-MM-DD), inclusive.
+        in: query
+        name: date_from
+        required: false
+        schema:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: Start date filter (YYYY-MM-DD), inclusive.
+          title: Date From
+      - description: End date filter (YYYY-MM-DD), inclusive.
+        in: query
+        name: date_to
+        required: false
+        schema:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: End date filter (YYYY-MM-DD), inclusive.
+          title: Date To
+      - description: 'Filter by market: ''DE'' or ''NL''. Omit to query both.'
+        in: query
+        name: market
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - DE
+            - NL
+            - germany
+            - netherlands
+            type: string
+          - type: 'null'
+          description: 'Filter by market: ''DE'' or ''NL''. Omit to query both.'
+          title: Market
+      responses:
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '501':
+          content:
+            application/json:
+              schema: {}
+          description: Coming soon.
+      summary: List Anomalies
+      tags:
+      - Schedules
+      x-mint:
+        content: <Note>**Coming soon.**</Note>
+  /schedule-management/v1/schedule-series/{version_uid}:
+    get:
+      description: List all Schedule Series within a schedule version.
+      operationId: get_schedule_series_schedule_management_v1_schedule_series__version_uid__get
+      parameters:
+      - description: Schedule version unique identifier.
+        in: path
+        name: version_uid
+        required: true
+        schema:
+          description: Schedule version unique identifier.
+          format: uuid
+          title: Version Uid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ScheduleSeriesResponse'
+                title: Response Get Schedule Series Schedule Management V1 Schedule Series  Version Uid  Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Schedule Series
+      tags:
+      - Schedules
+  /schedule-management/v1/schedules:
+    get:
+      description: 'List all Schedules for the authenticated organization.
+
+
+        Filters: - market: Filter by market (`DE` or `NL`; long forms `germany`/`netherlands` accepted) - tso: Filter by TSO (e.g., `50HERTZ_DE_TSO`) - date_from: Start date filter (YYYY-MM-DD), inclusive - date_to: End date filter (YYYY-MM-DD), inclusive
+
+
+        Results are ordered newest delivery date first.'
+      operationId: list_schedules_schedule_management_v1_schedules_get
+      parameters:
+      - description: Filter by market. Accepts `DE`, `NL`, `germany`, or `netherlands`.
+        in: query
+        name: market
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filter by market. Accepts `DE`, `NL`, `germany`, or `netherlands`.
+          title: Market
+      - description: 'Filter by TSO identifier. DE values: `50HERTZ_DE_TSO`, `DE-AMPRION-TSO`, `TTG_DE`, `DE-TRANSNETBWTSO`. NL value: `TENNET_TSO`.'
+        in: query
+        name: tso
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'Filter by TSO identifier. DE values: `50HERTZ_DE_TSO`, `DE-AMPRION-TSO`, `TTG_DE`, `DE-TRANSNETBWTSO`. NL value: `TENNET_TSO`.'
+          title: Tso
+      - description: Start date filter (YYYY-MM-DD), inclusive.
+        in: query
+        name: date_from
+        required: false
+        schema:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: Start date filter (YYYY-MM-DD), inclusive.
+          title: Date From
+      - description: End date filter (YYYY-MM-DD), inclusive.
+        in: query
+        name: date_to
+        required: false
+        schema:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: End date filter (YYYY-MM-DD), inclusive.
+          title: Date To
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ScheduleResponse'
+                title: Response List Schedules Schedule Management V1 Schedules Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Schedules
+      tags:
+      - Schedules
+    post:
+      description: 'Create a Schedule or replace the desired spec of an existing one.
+
+
+        Records the submitted time series as the schedule''s desired spec, keyed on organization, scheduling area (derived from `tso`), and delivery date. Re-posting the same key overwrites the spec (last write wins); the returned `uid`/`schedule_uid` identify the schedule either way.
+
+
+        The delivery date is taken from `date`, or derived from the first series timestamp (UTC -> market-local midnight) when omitted. Series data must cover the full delivery day on the 15-minute grid (96 intervals, 92 on the spring DST day, 100 on the fall DST day). Each series must describe its own flow, or the request returns 400: two production series, or two consumption series, cannot share an area; two internal series cannot share an area, `in_party` and `out_party`; two external or foreign series cannot share `in_area`, `out_area`, `in_party`, `out_party` and `market_agreement_id`. The legacy `test` flag is accepted but has no effect: this endpoint records the spec and does not submit to the TSO.'
+      operationId: create_schedule_schedule_management_v1_schedules_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreateRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleVersionResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create Schedule
+      tags:
+      - Schedules
+  /schedule-management/v1/schedules/{uid}:
+    get:
+      description: Get a specific Schedule by UID.
+      operationId: get_schedule_schedule_management_v1_schedules__uid__get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Schedule
+      tags:
+      - Schedules
+  /schedule-management/v1/schedules/{uid}/anomalies:
+    get:
+      description: 'List all anomaly time series records for a schedule. **Coming soon.**
+
+
+        Once available, this will return the full interval data from TSO AnomalyReport (ANO) messages, showing the counterparty''s values as seen by the TSO, for both DE and NL schedules.'
+      operationId: get_schedule_anomalies_schedule_management_v1_schedules__uid__anomalies_get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '501':
+          content:
+            application/json:
+              schema: {}
+          description: Coming soon.
+      summary: Get Schedule Anomalies
+      tags:
+      - Schedules
+      x-mint:
+        content: <Note>**Coming soon.**</Note>
+  /schedule-management/v1/schedules/{uid}/delivery-status:
+    get:
+      description: 'Get Delivery Status for a schedule. **Coming soon.**
+
+
+        Once available, this will return the AS4 delivery status for the TSO + delivery date combination, where the NRR (Non-Repudiation of Receipt) confirms the TSO received the message.'
+      operationId: get_delivery_status_schedule_management_v1_schedules__uid__delivery_status_get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '501':
+          content:
+            application/json:
+              schema: {}
+          description: Coming soon.
+      summary: Get Delivery Status
+      tags:
+      - Schedules
+      x-mint:
+        content: <Note>**Coming soon.**</Note>
+  /schedule-management/v1/schedules/{uid}/incoming-messages:
+    get:
+      description: 'List all incoming TSO messages for a schedule, newest first.
+
+
+        Returns metadata for each market message reconciled against this schedule — the responses received from the TSO (ACK / CNF / ANO and, for NL, RI / BAL documents).'
+      operationId: list_incoming_messages_schedule_management_v1_schedules__uid__incoming_messages_get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/IncomingMessageResponse'
+                title: Response List Incoming Messages Schedule Management V1 Schedules  Uid  Incoming Messages Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Incoming Messages
+      tags:
+      - Schedules
+  /schedule-management/v1/schedules/{uid}/reconciliation:
+    get:
+      description: 'Side-by-side reconciliation of our values vs counterparty values. **Coming soon.**
+
+
+        Once available, this will match ANO time series to our schedule series and compute per-interval deltas for reconciliation, for both DE and NL schedules (flagging DE counterparties with exchange priority).'
+      operationId: get_schedule_reconciliation_schedule_management_v1_schedules__uid__reconciliation_get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '501':
+          content:
+            application/json:
+              schema: {}
+          description: Coming soon.
+      summary: Get Schedule Reconciliation
+      tags:
+      - Schedules
+      x-mint:
+        content: <Note>**Coming soon.**</Note>
+  /schedule-management/v1/schedules/{uid}/versions:
+    get:
+      description: List all Schedule Versions for a schedule, newest version first.
+      operationId: list_schedule_versions_schedule_management_v1_schedules__uid__versions_get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ScheduleVersionResponse'
+                title: Response List Schedule Versions Schedule Management V1 Schedules  Uid  Versions Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Schedule Versions
+      tags:
+      - Schedules
+  /schedule-management/v1/schedules/{uid}/versions/{version_number}:
+    get:
+      description: 'Get a specific Schedule Version by version number. **Coming soon.**
+
+
+        Once available, this will return the schedule version identified by its 1-based version number, which increments with each re-submission for the same TSO + delivery date.'
+      operationId: get_schedule_version_schedule_management_v1_schedules__uid__versions__version_number__get
+      parameters:
+      - description: Schedule unique identifier.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Schedule unique identifier.
+          format: uuid
+          title: Uid
+          type: string
+      - description: Version number (1-based).
+        in: path
+        name: version_number
+        required: true
+        schema:
+          description: Version number (1-based).
+          title: Version Number
+          type: integer
+      responses:
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+        '501':
+          content:
+            application/json:
+              schema: {}
+          description: Coming soon.
+      summary: Get Schedule Version
+      tags:
+      - Schedules
+      x-mint:
+        content: <Note>**Coming soon.**</Note>
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ScheduleSeriesDataPoint:
+      description: 'One interval of a schedule series: a timestamp and its power amount.'
+      properties:
+        amount:
+          description: Power value for the interval, in MW.
+          examples:
+          - 10.5
+          title: Amount
+          type: number
+        ts:
+          description: ISO 8601 UTC start of the interval.
+          examples:
+          - '2026-03-25T23:00:00+00:00'
+          title: Ts
+          type: string
+      required:
+      - amount
+      - ts
+      title: ScheduleSeriesDataPoint
+      type: object
+    ScheduleCreateSeriesItem:
+      additionalProperties: false
+      description: Time series item within a create-schedule request.
+      properties:
+        data:
+          description: Interval data points (1-100), one per resolution slot of the delivery day.
+          items:
+            $ref: '#/components/schemas/ScheduleCreateDataPoint'
+          maxItems: 100
+          minItems: 1
+          title: Data
+          type: array
+        ids:
+          $ref: '#/components/schemas/ScheduleCreateSeriesIds'
+        type:
+          description: Series type.
+          enum:
+          - production
+          - consumption
+          - internal
+          - external
+          - foreign
+          title: Type
+          type: string
+      required:
+      - data
+      - ids
+      - type
+      title: ScheduleCreateSeriesItem
+      type: object
+    ScheduleSeriesIds:
+      description: EIC identifiers locating a series in the area/party exchange.
+      properties:
+        in_area:
+          description: EIC Y code of the receiving control area.
+          examples:
+          - 10YDE-VE-------2
+          title: In Area
+          type: string
+        in_party:
+          description: EIC X code of the receiving party (balance responsible party).
+          examples:
+          - 11XDE-EXAMPLE--A
+          title: In Party
+          type: string
+        out_area:
+          description: EIC Y code of the sending control area.
+          examples:
+          - 10YDE-VE-------2
+          title: Out Area
+          type: string
+        out_party:
+          description: EIC X code of the sending party (balance responsible party).
+          examples:
+          - 11XDE-EXAMPLE--B
+          title: Out Party
+          type: string
+      required:
+      - in_area
+      - in_party
+      - out_area
+      - out_party
+      title: ScheduleSeriesIds
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    ScheduleVersionSpec:
+      description: The full specification that was submitted with a schedule version, including market routing and all series.
+      properties:
+        market:
+          description: Target market (`DE` or `NL`).
+          examples:
+          - DE
+          title: Market
+          type: string
+        receiver_id:
+          description: EIC X code (DE) or EAN-13 (NL) identifying the TSO receiver.
+          examples:
+          - 10XDE-VE-TRANSMK
+          - '8716867999983'
+          title: Receiver Id
+          type: string
+        sender_id:
+          description: EIC X code identifying the schedule sender.
+          examples:
+          - 11XDE-SENDER---A
+          title: Sender Id
+          type: string
+        series:
+          description: The individual time series included in this version.
+          items:
+            $ref: '#/components/schemas/ScheduleVersionSeriesItem'
+          title: Series
+          type: array
+        tso:
+          description: TSO identifier the schedule was sent to.
+          examples:
+          - 50HERTZ_DE_TSO
+          title: Tso
+          type: string
+      required:
+      - market
+      - receiver_id
+      - sender_id
+      - series
+      - tso
+      title: ScheduleVersionSpec
+      type: object
+    ScheduleVersionSeriesItem:
+      description: Series reference within a [Schedule Version](/api-reference/schedule-management/models/schedule-version) spec.
+      properties:
+        in_area:
+          description: EIC Y code of the receiving control area.
+          examples:
+          - 10YDE-VE-------2
+          title: In Area
+          type: string
+        in_party:
+          description: EIC X code of the receiving party (balance responsible party).
+          examples:
+          - 11XDE-EXAMPLE--A
+          title: In Party
+          type: string
+        out_area:
+          description: EIC Y code of the sending control area.
+          examples:
+          - 10YDE-VE-------2
+          title: Out Area
+          type: string
+        out_party:
+          description: EIC X code of the sending party (balance responsible party).
+          examples:
+          - 11XDE-EXAMPLE--B
+          title: Out Party
+          type: string
+        time_series_uid:
+          description: Time series identifier used in the ESS/CIM document.
+          examples:
+          - TS-001
+          title: Time Series Uid
+          type: string
+        ts_version:
+          description: Per-series version number (`SendersTimeSeriesVersion` in ESS) — the version in which this series last changed.
+          examples:
+          - 1
+          - 2
+          title: Ts Version
+          type: integer
+        type:
+          description: 'Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.'
+          examples:
+          - internal
+          - external
+          - consumption
+          title: Type
+          type: string
+        uid:
+          description: Unique identifier for this series record.
+          examples:
+          - d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a
+          title: Uid
+          type: string
+      required:
+      - in_area
+      - in_party
+      - out_area
+      - out_party
+      - time_series_uid
+      - ts_version
+      - type
+      - uid
+      title: ScheduleVersionSeriesItem
+      type: object
+    ScheduleCreateDataPoint:
+      additionalProperties: false
+      description: Single interval data point in a submitted series.
+      properties:
+        amount:
+          description: Power in MW for this interval.
+          maximum: 99999.99
+          minimum: -99999.99
+          title: Amount
+          type: number
+        ts:
+          description: Interval start timestamp (ISO 8601, UTC).
+          format: date-time
+          title: Ts
+          type: string
+      required:
+      - amount
+      - ts
+      title: ScheduleCreateDataPoint
+      type: object
+    ScheduleCreateSeriesIds:
+      additionalProperties: false
+      description: Series party and area identifiers for a submitted series.
+      properties:
+        in_area:
+          description: EIC Y code of the receiving control area.
+          title: In Area
+          type: string
+        in_party:
+          description: Identifier of the receiving balance responsible party.
+          title: In Party
+          type: string
+        market_agreement_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Market agreement identifier; set for external/foreign series.
+          title: Market Agreement Id
+        out_area:
+          description: EIC Y code of the sending control area.
+          title: Out Area
+          type: string
+        out_party:
+          description: Identifier of the sending balance responsible party.
+          title: Out Party
+          type: string
+      required:
+      - in_area
+      - in_party
+      - out_area
+      - out_party
+      title: ScheduleCreateSeriesIds
+      type: object
+    ScheduleSeriesResponse:
+      description: A [Schedule Series](/api-reference/schedule-management/models/schedule-series) representing one time series within a schedule version (e.g. one internal or external trade).
+      example:
+        acceptance_level: cnf
+        created_ts: '2026-03-25T14:00:00+00:00'
+        last_modified_ts: '2026-03-25T14:05:00+00:00'
+        spec:
+          data:
+          - amount: 10.5
+            ts: '2026-03-25T23:00:00+00:00'
+          ids:
+            in_area: 10YDE-VE-------2
+            in_party: 11XDE-EXAMPLE--A
+            out_area: 10YDE-VE-------2
+            out_party: 11XDE-EXAMPLE--B
+          type: internal
+        status: cnf
+        time_series_uid: TS-001
+        uid: d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a
+        version: 1
+      properties:
+        acceptance_level:
+          description: 'Highest acceptance level reached by the parent version: empty string, `ack`, `ano`, `par`, or `cnf`.'
+          examples:
+          - cnf
+          - ack
+          - ''
+          title: Acceptance Level
+          type: string
+        created_ts:
+          description: ISO 8601 datetime when the parent version was created.
+          examples:
+          - '2026-03-25T14:00:00+00:00'
+          title: Created Ts
+          type: string
+        interval_statuses:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          description: Per-interval status map. Always `null` — market-access tracks status at version granularity, not per interval.
+          title: Interval Statuses
+        last_modified_ts:
+          description: ISO 8601 datetime of the parent version's most recent status change.
+          examples:
+          - '2026-03-25T14:05:00+00:00'
+          title: Last Modified Ts
+          type: string
+        spec:
+          $ref: '#/components/schemas/ScheduleSeriesSpec'
+          description: Full series specification including identifiers, type, and interval data.
+        status:
+          description: 'Processing status of the parent version. `created` before submission, then the verbatim market status: `submitted`, `ack_positive`, `ack_negative`, `ack_partial`, `icnf`, `dacnf`, `cnf`, `cnf_partial`, or `fcnf`.'
+          examples:
+          - cnf
+          - submitted
+          - ack_negative
+          title: Status
+          type: string
+        time_series_uid:
+          description: Time series identifier used in the ESS/CIM document.
+          examples:
+          - TS-001
+          title: Time Series Uid
+          type: string
+        uid:
+          description: Unique identifier for this series record.
+          examples:
+          - d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a
+          title: Uid
+          type: string
+        version:
+          description: Version number of the parent schedule version.
+          examples:
+          - 1
+          - 2
+          title: Version
+          type: integer
+      required:
+      - acceptance_level
+      - created_ts
+      - last_modified_ts
+      - spec
+      - status
+      - time_series_uid
+      - uid
+      - version
+      title: ScheduleSeriesResponse
+      type: object
+    ScheduleSeriesSpec:
+      description: 'Full series specification: identifiers, type, and interval data.'
+      properties:
+        data:
+          description: Interval data points, one per slot, ordered from the start of the delivery day.
+          items:
+            $ref: '#/components/schemas/ScheduleSeriesDataPoint'
+          title: Data
+          type: array
+        ids:
+          $ref: '#/components/schemas/ScheduleSeriesIds'
+          description: EIC identifiers for the series exchange.
+        type:
+          description: 'Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.'
+          examples:
+          - internal
+          - external
+          - production
+          title: Type
+          type: string
+      required:
+      - data
+      - ids
+      - type
+      title: ScheduleSeriesSpec
+      type: object
+    ScheduleResponse:
+      description: A [Schedule](/api-reference/schedule-management/models/schedule) header representing a single delivery-date submission to a TSO.
+      example:
+        created_ts: '2026-03-25T14:00:00+00:00'
+        date: '2026-03-26'
+        last_modified_ts: '2026-03-25T16:30:00+00:00'
+        market: DE
+        org_uid: 9b2e4d8f-1c3a-4f5e-8d7b-6a9e0f2c1b3d
+        tso: 50HERTZ_DE_TSO
+        uid: f47ac10b-58cc-4372-a567-0e02b2c3d479
+      properties:
+        created_ts:
+          description: ISO 8601 datetime when the schedule was created.
+          examples:
+          - '2026-03-25T14:00:00+00:00'
+          title: Created Ts
+          type: string
+        date:
+          description: Delivery date in ISO 8601 format (`YYYY-MM-DD`).
+          examples:
+          - '2026-03-26'
+          title: Date
+          type: string
+        last_modified_ts:
+          description: ISO 8601 datetime of the most recent modification.
+          examples:
+          - '2026-03-25T16:30:00+00:00'
+          title: Last Modified Ts
+          type: string
+        market:
+          description: Target market. `DE` for Germany, `NL` for the Netherlands.
+          examples:
+          - DE
+          - NL
+          title: Market
+          type: string
+        org_uid:
+          description: Organization that owns this schedule.
+          examples:
+          - 9b2e4d8f-1c3a-4f5e-8d7b-6a9e0f2c1b3d
+          title: Org Uid
+          type: string
+        tso:
+          description: Transmission System Operator identifier.
+          examples:
+          - 50HERTZ_DE_TSO
+          - DE-AMPRION-TSO
+          - TTG_DE
+          - DE-TRANSNETBWTSO
+          - TENNET_TSO
+          title: Tso
+          type: string
+        uid:
+          description: Unique identifier for this schedule.
+          examples:
+          - f47ac10b-58cc-4372-a567-0e02b2c3d479
+          title: Uid
+          type: string
+      required:
+      - created_ts
+      - date
+      - last_modified_ts
+      - market
+      - org_uid
+      - tso
+      - uid
+      title: ScheduleResponse
+      type: object
+    IncomingMessageResponse:
+      description: A message received from the TSO in response to a schedule submission (ACK, CNF, or ANO document).
+      properties:
+        created_ts:
+          description: ISO 8601 datetime when this message was received.
+          examples:
+          - '2026-03-25T14:05:00+00:00'
+          title: Created Ts
+          type: string
+        document_type:
+          description: Document kind. `ACK` (acknowledgement), `CNF` (confirmation), `ANO` (anomaly); NL also emits `RI` / `BAL`. `NA` when the kind cannot be derived for the message's broker.
+          examples:
+          - ACK
+          - CNF
+          - ANO
+          - NA
+          title: Document Type
+          type: string
+        message_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: The TSO's own identifier for this response message, taken verbatim from the message payload (CIM `mRID` / ESS `MessageIdentification`). Never a broker-assigned id.
+          examples:
+          - TSO-MSG-20260325-001
+          title: Message Id
+        original_message_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Identifier of our schedule submission this response refers to.
+          examples:
+          - MSG-20260325-001
+          title: Original Message Id
+        processing_status:
+          description: '`processed` once reconciled against the schedule, else `pending`.'
+          examples:
+          - processed
+          - pending
+          title: Processing Status
+          type: string
+        uid:
+          description: Unique identifier for this incoming message.
+          examples:
+          - '42'
+          title: Uid
+          type: string
+      required:
+      - created_ts
+      - document_type
+      - processing_status
+      - uid
+      title: IncomingMessageResponse
+      type: object
+    ScheduleCreateRequest:
+      additionalProperties: false
+      description: Request body for creating a schedule or a new spec for an existing one.
+      properties:
+        date:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: Delivery date (YYYY-MM-DD). If omitted, derived from the first timestamp in series data (UTC -> market-local midnight).
+          title: Date
+        market:
+          description: 'Electricity market: `DE`/`germany` or `NL`/`netherlands`.'
+          enum:
+          - DE
+          - NL
+          - germany
+          - netherlands
+          title: Market
+          type: string
+        receiver_id:
+          description: EIC X code (DE) or EAN-13 (NL) of the receiving TSO.
+          minLength: 1
+          title: Receiver Id
+          type: string
+        series:
+          description: Time series to submit (0-50). NL allows an empty list; DE requires at least one series.
+          items:
+            $ref: '#/components/schemas/ScheduleCreateSeriesItem'
+          maxItems: 50
+          title: Series
+          type: array
+        test:
+          default: false
+          description: Legacy gate-closure bypass flag. Accepted for wire compatibility; this endpoint records the desired spec and does not submit, so it has no effect.
+          title: Test
+          type: boolean
+        tso:
+          description: 'TSO identifier. DE: `50HERTZ_DE_TSO`, `DE-AMPRION-TSO`, `TTG_DE`, `DE-TRANSNETBWTSO`. NL: `TENNET_TSO`.'
+          minLength: 1
+          title: Tso
+          type: string
+      required:
+      - market
+      - receiver_id
+      - series
+      - tso
+      title: ScheduleCreateRequest
+      type: object
+    WarningItem:
+      description: A TSO warning returned in an ACK or CNF response (e.g. B45, A54).
+      properties:
+        code:
+          description: Warning reason code from the TSO response.
+          examples:
+          - B45
+          - A54
+          title: Code
+          type: string
+        text:
+          description: Human-readable warning description.
+          examples:
+          - Schedule values adjusted for DST transition
+          title: Text
+          type: string
+      required:
+      - code
+      - text
+      title: WarningItem
+      type: object
+    ScheduleVersionResponse:
+      description: A [Schedule Version](/api-reference/schedule-management/models/schedule-version) representing one submission attempt. Each re-submission creates a new version.
+      example:
+        acceptance_level: cnf
+        created_ts: '2026-03-25T14:00:00+00:00'
+        is_active: true
+        last_modified_ts: '2026-03-25T14:05:00+00:00'
+        message_id: MSG-20260325-001_v1
+        org_uid: 9b2e4d8f-1c3a-4f5e-8d7b-6a9e0f2c1b3d
+        schedule_uid: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        spec:
+          market: DE
+          receiver_id: 10XDE-VE-TRANSMK
+          sender_id: 11XDE-SENDER---A
+          series: []
+          tso: 50HERTZ_DE_TSO
+        status: cnf
+        uid: c8d7e6f5-4a3b-4c2d-9e1f-0a8b7c6d5e4f
+        version: 1
+      properties:
+        acceptance_level:
+          description: 'Highest acceptance level reached: empty string, `ack`, `ano`, `par`, or `cnf`.'
+          examples:
+          - cnf
+          - ack
+          - ''
+          title: Acceptance Level
+          type: string
+        created_ts:
+          description: ISO 8601 datetime when this version was created.
+          examples:
+          - '2026-03-25T14:00:00+00:00'
+          title: Created Ts
+          type: string
+        is_active:
+          default: true
+          description: 'Whether this is the active version: the latest version the TSO has accepted, the one it currently treats as binding. Rejected or not-yet-answered versions are not active, and a later rejected version never replaces an accepted earlier one.'
+          title: Is Active
+          type: boolean
+        last_modified_ts:
+          description: ISO 8601 datetime of the most recent status change.
+          examples:
+          - '2026-03-25T14:05:00+00:00'
+          title: Last Modified Ts
+          type: string
+        message_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: TSO document identification assigned to this version's message.
+          examples:
+          - MSG-20260325-001_v1
+          title: Message Id
+        nrr_received:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          description: Whether a Non-Repudiation of Receipt (NRR) delivery confirmation has been received from the TSO.
+          title: Nrr Received
+        org_uid:
+          description: Organization that owns this version.
+          examples:
+          - 9b2e4d8f-1c3a-4f5e-8d7b-6a9e0f2c1b3d
+          title: Org Uid
+          type: string
+        schedule_uid:
+          description: Parent [Schedule](/api-reference/schedule-management/models/schedule) identifier.
+          examples:
+          - f47ac10b-58cc-4372-a567-0e02b2c3d479
+          title: Schedule Uid
+          type: string
+        spec:
+          $ref: '#/components/schemas/ScheduleVersionSpec'
+          description: Full submission specification including market routing and series references.
+        status:
+          description: 'Processing status. `created` before submission, then the verbatim market status: `submitted`, `ack_positive`, `ack_negative`, `ack_partial`, `icnf`, `dacnf`, `cnf`, `cnf_partial`, or `fcnf`.'
+          examples:
+          - cnf
+          - submitted
+          - ack_negative
+          title: Status
+          type: string
+        transmission_report_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Mako365/AS4 transmission report identifier for delivery tracking.
+          examples:
+          - TR-20260325-001
+          title: Transmission Report Id
+        uid:
+          description: Unique identifier for this version.
+          examples:
+          - c8d7e6f5-4a3b-4c2d-9e1f-0a8b7c6d5e4f
+          title: Uid
+          type: string
+        version:
+          description: Sequential version number (1-based). Increments with each re-submission.
+          examples:
+          - 1
+          - 2
+          - 3
+          title: Version
+          type: integer
+        warnings:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/WarningItem'
+            type: array
+          - type: 'null'
+          description: TSO warnings from the ACK response, if any.
+          title: Warnings
+      required:
+      - acceptance_level
+      - created_ts
+      - last_modified_ts
+      - org_uid
+      - schedule_uid
+      - spec
+      - status
+      - uid
+      - version
+      title: ScheduleVersionResponse
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

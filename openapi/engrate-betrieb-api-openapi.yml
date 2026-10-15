@@ -1,0 +1,148 @@
+openapi: 3.2.0
+info:
+  title: Netzbetreiber-API (Referenzentwurf) Betrieb API
+  version: 2026-2.0.0
+  summary: Ressourcenorientierter Gegenentwurf zu locationBundleV1
+  description: '**Referenzentwurf — kein offizielles Dokument der Bundesnetzagentur, des BDEW oder der
+
+    Projektgruppe EDI@Energy.**
+
+
+    Dieser Entwurf ist ein Konsultationsbeitrag zu Mitteilung Nr.'
+  contact:
+    name: '[Unternehmen — Kontakt eintragen]'
+  license:
+    name: CC0-1.0
+    identifier: CC0-1.0
+servers:
+- url: https://{host}/nb/{basePath}
+  description: 'Endpunkt der Netzbetreiber-API. Host und Basispfad werden über den Verzeichnisdienst
+
+    aufgelöst; die API-Kennung ist `nb`.
+
+    '
+  variables:
+    host:
+      default: api.example-netzbetreiber.de
+    basePath:
+      default: 2026-2
+      description: 'Semester-Release. Zusätzlich steht der unveränderliche Pfad ohne Versionsangabe
+
+        zur Verfügung, der stets auf das aktuell verpflichtende Semester-Release zeigt,
+
+        sowie `v` für die Vorweg-Version.
+
+        '
+security:
+- oauth2:
+  - lokationsbuendel:lesen
+tags:
+- name: Betrieb
+  description: Umsetzungsstand und Betriebsinformationen.
+paths:
+  /versions:
+    get:
+      tags:
+      - Betrieb
+      operationId: getImplementationStatus
+      summary: Umsetzungsstand dieser API
+      description: 'Gibt maschinenlesbar zurück, welche Endpunkte und Ressourcen dieser Marktpartner
+
+        vollständig, teilweise oder nicht implementiert hat, sowie welches Semester-Release
+
+        und welche Vorweg-Version angeboten werden.
+
+
+        Diese Ressource beantwortet eine Frage, die heute nach jedem Format-Update erneut
+
+        durch Ausprobieren geklärt werden muss.'
+      security: []
+      responses:
+        '200':
+          description: Der Umsetzungsstand.
+          content:
+            application/vnd.edi-energy+json:
+              schema:
+                $ref: '#/components/schemas/ImplementationStatus'
+components:
+  schemas:
+    ImplementationStatus:
+      type: object
+      required:
+      - semesterRelease
+      - endpoints
+      properties:
+        semesterRelease:
+          type: string
+          description: Aktuell verpflichtendes Semester-Release.
+          examples:
+          - 2026-2
+        preReleaseVersion:
+          type: string
+          description: Angebotene Vorweg-Version, sofern vorhanden.
+          examples:
+          - 2026-2.5
+        endpoints:
+          type: array
+          items:
+            type: object
+            required:
+            - operationId
+            - state
+            properties:
+              operationId:
+                type: string
+              state:
+                type: string
+                enum:
+                - vollstaendig
+                - teilweise
+                - nichtImplementiert
+              note:
+                type: string
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'OAuth 2.0. Die Authentisierung des Clients am Authorization Server erfolgt in der
+
+        Ausbaustufe 1 über das Signaturzertifikat der Smart-Metering-PKI; die Architektur
+
+        ist so angelegt, dass sie später um OpenID Connect und föderierte Identitäten
+
+        (etwa europäische ID-Wallets) erweitert werden kann, ohne die Ressourcen-APIs zu
+
+        ändern.
+
+
+        Damit werden drei Anforderungen adressiert, die eine ausschließlich
+
+        zertifikatsbasierte Marktpartner-Authentisierung nicht abbilden kann:
+
+        Zugriff von Letztverbrauchern auf ihre eigenen Daten, übertragbare Berechtigungen
+
+        an Dritte und Anschlussfähigkeit an übergreifende Datenräume.
+
+        '
+      flows:
+        clientCredentials:
+          tokenUrl: https://authz.example-netzbetreiber.de/oauth2/token
+          scopes:
+            lokationsbuendel:lesen: Lokationsbündel und Lokationen lesen
+            lokationsbuendel:schreiben: Lokationsbündel ändern (nur verantwortlicher Netzbetreiber)
+            clearing:schreiben: Clearing-Fälle eröffnen und fortschreiben
+            netzbetreiberwechsel:schreiben: Übergabepakete anfordern
+            benachrichtigung:schreiben: Abonnements verwalten
+        authorizationCode:
+          authorizationUrl: https://authz.example-netzbetreiber.de/oauth2/authorize
+          tokenUrl: https://authz.example-netzbetreiber.de/oauth2/token
+          scopes:
+            lokationsbuendel:lesen: Lokationsbündel und Lokationen lesen
+    mtls:
+      type: mutualTLS
+      description: 'Alternativ zulässig für die reine Marktpartner-zu-Marktpartner-Kommunikation, mit
+
+        Zertifikaten der Smart-Metering-PKI in der Rolle „passiver EMT" gemäß den
+
+        Regelungen zum Übertragungsweg für API-Webdienste.
+
+        '

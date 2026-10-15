@@ -1,0 +1,61 @@
+{
+  "provider": "engrate",
+  "sources": [
+    "_original/engrate-netzbetreiber-api-openapi.yml",
+    "engrate-openapi.json"
+  ],
+  "outputs": [
+    "engrate-benachrichtigung-api-openapi.yml",
+    "engrate-betrieb-api-openapi.yml",
+    "engrate-clearing-api-openapi.yml",
+    "engrate-lokationen-api-openapi.yml",
+    "engrate-lokationsb-ndel-api-openapi.yml",
+    "engrate-netzbetreiberwechsel-api-openapi.yml",
+    "engrate-core-api-openapi.yml",
+    "engrate-cost-of-energy-api-openapi.yml",
+    "engrate-audit-logs-api-openapi.yml",
+    "engrate-geo-api-openapi.yml",
+    "engrate-holidays-api-openapi.yml",
+    "engrate-mabis-api-openapi.yml",
+    "engrate-nl-settlement-api-openapi.yml",
+    "engrate-profiles-api-openapi.yml",
+    "engrate-reference-api-openapi.yml",
+    "engrate-schedules-api-openapi.yml",
+    "engrate-status-request-api-openapi.yml",
+    "engrate-timeseries-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/engrate-openapi.json"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "engrate-netzbetreiber-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "engrate-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "engrate-openapi.json: tagged paths GET /core/v1/bidding-zones -> Core",
+    "engrate-openapi.json: tagged paths GET /core/v1/control-areas -> Core",
+    "engrate-openapi.json: tagged paths GET /core/v1/metering-grid-areas -> Core",
+    "engrate-openapi.json: tagged paths GET /core/v1/parties -> Core",
+    "engrate-openapi.json: tagged paths GET /core/v1/scheduling-areas -> Core",
+    "engrate-openapi.json: tagged paths POST /cost-of-energy/v1/calculate -> Cost Of Energy",
+    "engrate-openapi.json: tagged paths GET /cost-of-energy/v1/datasets -> Cost Of Energy",
+    "engrate-openapi.json: tagged paths GET /cost-of-energy/v1/tariffs -> Cost Of Energy",
+    "engrate-openapi.json: tagged paths GET /cost-of-energy/v1/tariffs/{tariff_id} -> Cost Of Energy",
+    "engrate-openapi.json: tagged paths GET /cost-of-energy/v1/tariffs/{tariff_id}/simplified -> Cost Of Energy",
+    "engrate-openapi.json: declared missing tag: Core",
+    "engrate-openapi.json: declared missing tag: Cost Of Energy",
+    "engrate-openapi.json: declared missing tag: audit-logs",
+    "engrate-openapi.json: declared missing tag: geo",
+    "engrate-openapi.json: declared missing tag: holidays",
+    "engrate-openapi.json: declared missing tag: mabis",
+    "engrate-openapi.json: declared missing tag: nl-settlement",
+    "engrate-openapi.json: declared missing tag: profiles",
+    "engrate-openapi.json: declared missing tag: reference",
+    "engrate-openapi.json: declared missing tag: schedules",
+    "engrate-openapi.json: declared missing tag: status-request",
+    "engrate-openapi.json: declared missing tag: timeseries",
+    "apis.yml register: written (+18 apis, 18 total)"
+  ],
+  "skipped": []
+}

@@ -1,0 +1,480 @@
+openapi: 3.2.0
+info:
+  title: Engrate Nl Settlement API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: nl-settlement
+paths:
+  /schedule-management/v1/nl/settlement/imbalance-reports:
+    get:
+      description: 'List NL imbalance reports for the organization.
+
+
+        Each report represents one day''s aggregated imbalance information received from TenneT. Reports contain time series for imbalance volumes, prices, settlement programs, and regulation state.
+
+
+        - **date_from / date_to**: Optional date range filter on `report_date`. - **200**: List of report headers.'
+      operationId: list_imbalance_reports_schedule_management_v1_nl_settlement_imbalance_reports_get
+      parameters:
+      - description: Include reports on or after this date.
+        in: query
+        name: date_from
+        required: false
+        schema:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: Include reports on or after this date.
+          title: Date From
+      - description: Include reports on or before this date.
+        in: query
+        name: date_to
+        required: false
+        schema:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: Include reports on or before this date.
+          title: Date To
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLImbalanceReportListResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Imbalance Reports
+      tags:
+      - nl-settlement
+  /schedule-management/v1/nl/settlement/imbalance-reports/{uid}:
+    get:
+      description: 'Get a single NL imbalance report with all its time series.
+
+
+        Returns the report header plus every time series (volumes, prices, regulation state, settlement programs) embedded in the document.
+
+
+        - **uid**: Report unique identifier. - **404** if no report exists with the given UID for this organization.'
+      operationId: get_imbalance_report_schedule_management_v1_nl_settlement_imbalance_reports__uid__get
+      parameters:
+      - description: Imbalance report UID.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Imbalance report UID.
+          format: uuid
+          title: Uid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLImbalanceReportDetailResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Imbalance Report
+      tags:
+      - nl-settlement
+  /schedule-management/v1/nl/settlement/imbalance-reports/{uid}/time-series:
+    get:
+      description: 'List time series for a specific imbalance report.
+
+
+        Returns all time series contained in the report, optionally filtered by business type. Each series contains quarter-hourly data points.
+
+
+        - **uid**: Report unique identifier. - **business_type**: Optional filter by business type code. - **404** if the report does not exist for this organization.'
+      operationId: list_report_time_series_schedule_management_v1_nl_settlement_imbalance_reports__uid__time_series_get
+      parameters:
+      - description: Imbalance report UID.
+        in: path
+        name: uid
+        required: true
+        schema:
+          description: Imbalance report UID.
+          format: uuid
+          title: Uid
+          type: string
+      - description: 'Filter by business type: `A02` (Domestic Settlement), `A03` (Foreign Settlement), `A14` (Imbalance Price), `A19` (Balance Responsible), `A20` (Imbalance Volume), `B22` (Regulation State).'
+        in: query
+        name: business_type
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'Filter by business type: `A02` (Domestic Settlement), `A03` (Foreign Settlement), `A14` (Imbalance Price), `A19` (Balance Responsible), `A20` (Imbalance Volume), `B22` (Regulation State).'
+          title: Business Type
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLImbalanceTimeSeriesListResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Report Time Series
+      tags:
+      - nl-settlement
+  /schedule-management/v1/nl/settlement/summary:
+    get:
+      description: 'Get aggregated NL imbalance settlement KPIs for a date range.
+
+
+        Computes report count, days covered, and per-business-type quantity totals across all reports in the given range.
+
+
+        - **date_from / date_to**: Required date range (inclusive). - **200**: Summary with business-type breakdowns.'
+      operationId: get_summary_schedule_management_v1_nl_settlement_summary_get
+      parameters:
+      - description: Start of the date range (inclusive).
+        in: query
+        name: date_from
+        required: true
+        schema:
+          description: Start of the date range (inclusive).
+          format: date
+          title: Date From
+          type: string
+      - description: End of the date range (inclusive).
+        in: query
+        name: date_to
+        required: true
+        schema:
+          description: End of the date range (inclusive).
+          format: date
+          title: Date To
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NLImbalanceSummaryResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Summary
+      tags:
+      - nl-settlement
+components:
+  schemas:
+    NLImbalanceReportResponse:
+      description: Imbalance report header as returned in list views.
+      properties:
+        created_ts:
+          description: Record creation timestamp.
+          format: date-time
+          title: Created Ts
+          type: string
+        doc_status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Document status code (e.g. A01=active, A02=withdrawn).
+          title: Doc Status
+        document_mrid:
+          description: TenneT document identifier (mRID).
+          title: Document Mrid
+          type: string
+        market_participant_ean:
+          description: BRP EAN-13 identifier.
+          title: Market Participant Ean
+          type: string
+        received_ts:
+          description: When the report was received.
+          format: date-time
+          title: Received Ts
+          type: string
+        report_date:
+          description: Report date.
+          format: date
+          title: Report Date
+          type: string
+        revision_number:
+          description: Document revision.
+          title: Revision Number
+          type: integer
+        uid:
+          description: Report UID.
+          title: Uid
+          type: string
+      required:
+      - created_ts
+      - document_mrid
+      - market_participant_ean
+      - received_ts
+      - report_date
+      - revision_number
+      - uid
+      title: NLImbalanceReportResponse
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    NLBusinessTypeTotalResponse:
+      description: Aggregated total for a single business type within a month.
+      properties:
+        business_type:
+          description: Business type code.
+          title: Business Type
+          type: string
+        series_count:
+          description: Number of time series contributing to the total.
+          title: Series Count
+          type: integer
+        total_quantity:
+          description: Sum of quantities across all reports.
+          title: Total Quantity
+          type: number
+      required:
+      - business_type
+      - series_count
+      - total_quantity
+      title: NLBusinessTypeTotalResponse
+      type: object
+    NLImbalanceSummaryResponse:
+      description: Aggregation of NL imbalance settlement data over a date range.
+      properties:
+        business_type_totals:
+          description: Per-business-type aggregated totals.
+          items:
+            $ref: '#/components/schemas/NLBusinessTypeTotalResponse'
+          title: Business Type Totals
+          type: array
+        date_from:
+          description: Start of the queried date range.
+          format: date
+          title: Date From
+          type: string
+        date_to:
+          description: End of the queried date range.
+          format: date
+          title: Date To
+          type: string
+        days_covered:
+          description: Number of distinct report dates.
+          title: Days Covered
+          type: integer
+        report_count:
+          description: Number of imbalance reports in the range.
+          title: Report Count
+          type: integer
+      required:
+      - date_from
+      - date_to
+      - days_covered
+      - report_count
+      title: NLImbalanceSummaryResponse
+      type: object
+    NLImbalanceTimeSeriesResponse:
+      description: 'Individual time series within an imbalance report.
+
+
+        Business types: A02 (Domestic Settlement), A03 (Foreign Settlement), A14 (Imbalance Price), A19 (Balance Responsible), A20 (Imbalance Volume), B22 (Regulation State).'
+      properties:
+        business_type:
+          description: Business type code (A02, A03, A14, A19, A20, B22).
+          title: Business Type
+          type: string
+        period_end:
+          description: Period end.
+          format: date-time
+          title: Period End
+          type: string
+        period_start:
+          description: Period start.
+          format: date-time
+          title: Period Start
+          type: string
+        point_count:
+          description: Number of data points in this series.
+          title: Point Count
+          type: integer
+        points:
+          description: Quarter-hourly data points.
+          items:
+            $ref: '#/components/schemas/NLImbalancePointResponse'
+          title: Points
+          type: array
+        reason_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Reason code, if present.
+          title: Reason Code
+        reason_text:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Reason description.
+          title: Reason Text
+        resolution:
+          description: Time resolution (e.g. PT15M).
+          title: Resolution
+          type: string
+        time_series_mrid:
+          description: TenneT time series identifier.
+          title: Time Series Mrid
+          type: string
+        total_quantity:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Sum of quantities across all points.
+          title: Total Quantity
+        uid:
+          description: Time series record UID.
+          title: Uid
+          type: string
+        version:
+          description: Time series version number.
+          title: Version
+          type: integer
+      required:
+      - business_type
+      - period_end
+      - period_start
+      - point_count
+      - resolution
+      - time_series_mrid
+      - uid
+      - version
+      title: NLImbalanceTimeSeriesResponse
+      type: object
+    NLImbalanceReportListResponse:
+      description: Wrapped list of imbalance reports.
+      properties:
+        items:
+          description: Imbalance reports.
+          items:
+            $ref: '#/components/schemas/NLImbalanceReportResponse'
+          title: Items
+          type: array
+      required:
+      - items
+      title: NLImbalanceReportListResponse
+      type: object
+    NLImbalanceReportDetailResponse:
+      description: Full imbalance report including all time series.
+      properties:
+        report:
+          $ref: '#/components/schemas/NLImbalanceReportResponse'
+          description: Report header.
+        time_series:
+          description: All time series in this report.
+          items:
+            $ref: '#/components/schemas/NLImbalanceTimeSeriesResponse'
+          title: Time Series
+          type: array
+      required:
+      - report
+      title: NLImbalanceReportDetailResponse
+      type: object
+    NLImbalancePointResponse:
+      description: Single quarter-hourly data point within an imbalance time series.
+      properties:
+        direction:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Direction indicator (A01=up, A02=down), if present.
+          title: Direction
+        position:
+          description: 1-based PTU position (1-96 for normal day).
+          title: Position
+          type: integer
+        price:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Price in EUR/MWh (for price series), or None.
+          title: Price
+        quantity:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Energy quantity in MWh, or None if unavailable.
+          title: Quantity
+      required:
+      - position
+      title: NLImbalancePointResponse
+      type: object
+    NLImbalanceTimeSeriesListResponse:
+      description: Wrapped list of time series for a report.
+      properties:
+        items:
+          description: Time series.
+          items:
+            $ref: '#/components/schemas/NLImbalanceTimeSeriesResponse'
+          title: Items
+          type: array
+      required:
+      - items
+      title: NLImbalanceTimeSeriesListResponse
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

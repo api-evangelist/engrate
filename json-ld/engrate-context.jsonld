@@ -1,0 +1,969 @@
+{
+  "@context": {
+    "@vocab": "https://engrate.io/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "engrate": "https://engrate.io/schema#",
+    "Add": "engrate:Add",
+    "inputs": {
+      "@id": "engrate:inputs",
+      "@container": "@list"
+    },
+    "output": {
+      "@id": "engrate:output",
+      "@type": "@id"
+    },
+    "type": {
+      "@id": "engrate:type",
+      "@type": "xsd:string"
+    },
+    "Aggregate": "engrate:Aggregate",
+    "aggregation_function": {
+      "@id": "engrate:aggregation_function",
+      "@type": "@id"
+    },
+    "input": {
+      "@id": "engrate:input",
+      "@type": "@id"
+    },
+    "resolution": {
+      "@id": "engrate:resolution",
+      "@type": "@id"
+    },
+    "AggregateAllocation": "engrate:AggregateAllocation",
+    "aggregator": {
+      "@id": "engrate:aggregator",
+      "@type": "@id"
+    },
+    "allocation_basis": {
+      "@id": "engrate:allocation_basis",
+      "@type": "@id"
+    },
+    "area_code": {
+      "@id": "engrate:area_code",
+      "@type": "xsd:string"
+    },
+    "area_kind": {
+      "@id": "engrate:area_kind",
+      "@type": "@id"
+    },
+    "balance_group": {
+      "@id": "engrate:balance_group"
+    },
+    "external_id": {
+      "@id": "engrate:external_id",
+      "@type": "xsd:string"
+    },
+    "flow_direction": {
+      "@id": "engrate:flow_direction",
+      "@type": "xsd:string"
+    },
+    "market_dimensions": {
+      "@id": "engrate:market_dimensions"
+    },
+    "market_meta": {
+      "@id": "engrate:market_meta"
+    },
+    "supplier": {
+      "@id": "engrate:supplier"
+    },
+    "AggregateAllocationPage": "engrate:AggregateAllocationPage",
+    "items": {
+      "@id": "engrate:items",
+      "@container": "@list"
+    },
+    "limit": {
+      "@id": "engrate:limit",
+      "@type": "xsd:integer"
+    },
+    "offset": {
+      "@id": "engrate:offset",
+      "@type": "xsd:integer"
+    },
+    "total": {
+      "@id": "engrate:total",
+      "@type": "xsd:integer"
+    },
+    "AggregateAllocationRecord": "engrate:AggregateAllocationRecord",
+    "finality": {
+      "@id": "engrate:finality",
+      "@type": "@id"
+    },
+    "isp_resolution_minutes": {
+      "@id": "engrate:isp_resolution_minutes",
+      "@type": "xsd:integer"
+    },
+    "isp_time": {
+      "@id": "engrate:isp_time",
+      "@type": "xsd:dateTime"
+    },
+    "known_at": {
+      "@id": "engrate:known_at",
+      "@type": "xsd:dateTime"
+    },
+    "quality": {
+      "@id": "engrate:quality",
+      "@type": "@id"
+    },
+    "volume_wh": {
+      "@id": "engrate:volume_wh",
+      "@type": "xsd:integer"
+    },
+    "AggregateAllocationsResponse": "engrate:AggregateAllocationsResponse",
+    "values": {
+      "@id": "engrate:values",
+      "@container": "@list"
+    },
+    "AggregationFunction": "engrate:AggregationFunction",
+    "AggregationObjectRequest": "engrate:AggregationObjectRequest",
+    "aggregation_subtypes": {
+      "@id": "engrate:aggregation_subtypes",
+      "@container": "@list"
+    },
+    "aggregation_type": {
+      "@id": "engrate:aggregation_type",
+      "@type": "xsd:string"
+    },
+    "date_from": {
+      "@id": "engrate:date_from",
+      "@type": "xsd:date"
+    },
+    "date_to": {
+      "@id": "engrate:date_to"
+    },
+    "dso": {
+      "@id": "engrate:dso"
+    },
+    "id": {
+      "@id": "engrate:id",
+      "@type": "xsd:string"
+    },
+    "receiver": {
+      "@id": "engrate:receiver"
+    },
+    "tso": {
+      "@id": "engrate:tso",
+      "@type": "xsd:string"
+    },
+    "AggregationObjectResponse": "engrate:AggregationObjectResponse",
+    "brp": {
+      "@id": "engrate:brp"
+    },
+    "mga": {
+      "@id": "engrate:mga"
+    },
+    "sender": {
+      "@id": "engrate:sender"
+    },
+    "status": {
+      "@id": "engrate:status",
+      "@type": "xsd:string"
+    },
+    "time_series_type": {
+      "@id": "engrate:time_series_type"
+    },
+    "AggregatorRole": "engrate:AggregatorRole",
+    "AllocationBasis": "engrate:AllocationBasis",
+    "AllocationQuality": "engrate:AllocationQuality",
+    "AllocationRecord": "engrate:AllocationRecord",
+    "accounting_point_id": {
+      "@id": "engrate:accounting_point_id",
+      "@type": "xsd:string"
+    },
+    "AllocationsResponse": "engrate:AllocationsResponse",
+    "AndCondition": "engrate:AndCondition",
+    "conditions": {
+      "@id": "engrate:conditions",
+      "@container": "@list"
+    },
+    "AreaKind": "engrate:AreaKind",
+    "AuditLogResponse": "engrate:AuditLogResponse",
+    "api_client_id": {
+      "@id": "engrate:api_client_id"
+    },
+    "created_ts": {
+      "@id": "engrate:created_ts",
+      "@type": "xsd:string"
+    },
+    "data": {
+      "@id": "engrate:data"
+    },
+    "org_uid": {
+      "@id": "engrate:org_uid"
+    },
+    "schedule_uid": {
+      "@id": "engrate:schedule_uid"
+    },
+    "schedule_version_uid": {
+      "@id": "engrate:schedule_version_uid"
+    },
+    "time_series_uid": {
+      "@id": "engrate:time_series_uid"
+    },
+    "uid": {
+      "@id": "engrate:uid",
+      "@type": "xsd:string"
+    },
+    "user_uid": {
+      "@id": "engrate:user_uid"
+    },
+    "version": {
+      "@id": "engrate:version",
+      "@type": "xsd:integer"
+    },
+    "BiddingZone": "engrate:BiddingZone",
+    "countries": {
+      "@id": "engrate:countries",
+      "@container": "@list"
+    },
+    "name": {
+      "@id": "engrate:name",
+      "@type": "xsd:string"
+    },
+    "short_name": {
+      "@id": "engrate:short_name",
+      "@type": "xsd:string"
+    },
+    "CalculateComponentResult": "engrate:CalculateComponentResult",
+    "end_time": {
+      "@id": "engrate:end_time",
+      "@type": "xsd:dateTime"
+    },
+    "start_time": {
+      "@id": "engrate:start_time",
+      "@type": "xsd:dateTime"
+    },
+    "time_series": {
+      "@id": "engrate:time_series",
+      "@container": "@list"
+    },
+    "CalculateTariffRequest": "engrate:CalculateTariffRequest",
+    "profiles": {
+      "@id": "engrate:profiles"
+    },
+    "tariff_id": {
+      "@id": "engrate:tariff_id",
+      "@type": "xsd:string"
+    },
+    "CalculateTariffResponse": "engrate:CalculateTariffResponse",
+    "components": {
+      "@id": "engrate:components",
+      "@container": "@list"
+    },
+    "CalculatedTimeSeries": "engrate:CalculatedTimeSeries",
+    "unit": {
+      "@id": "engrate:unit",
+      "@type": "@id"
+    },
+    "ClearingCalendarResponse": "engrate:ClearingCalendarResponse",
+    "bilanzierungsmonat": {
+      "@id": "engrate:bilanzierungsmonat",
+      "@type": "xsd:string"
+    },
+    "clearing_end_bg_szr": {
+      "@id": "engrate:clearing_end_bg_szr",
+      "@type": "xsd:string"
+    },
+    "clearing_end_bk_szr": {
+      "@id": "engrate:clearing_end_bk_szr",
+      "@type": "xsd:string"
+    },
+    "clearing_start_bg_szr": {
+      "@id": "engrate:clearing_start_bg_szr",
+      "@type": "xsd:string"
+    },
+    "clearing_start_bk_szr": {
+      "@id": "engrate:clearing_start_bk_szr",
+      "@type": "xsd:string"
+    },
+    "current_phase": {
+      "@id": "engrate:current_phase",
+      "@type": "xsd:string"
+    },
+    "erstaufschlag_bg_szr": {
+      "@id": "engrate:erstaufschlag_bg_szr",
+      "@type": "xsd:string"
+    },
+    "erstaufschlag_bk_szr": {
+      "@id": "engrate:erstaufschlag_bk_szr",
+      "@type": "xsd:string"
+    },
+    "final_deadline": {
+      "@id": "engrate:final_deadline",
+      "@type": "xsd:string"
+    },
+    "preliminary_deadline": {
+      "@id": "engrate:preliminary_deadline",
+      "@type": "xsd:string"
+    },
+    "ClearingPeriodCreateRequest": "engrate:ClearingPeriodCreateRequest",
+    "bilanzkreis_eic": {
+      "@id": "engrate:bilanzkreis_eic",
+      "@type": "xsd:string"
+    },
+    "objection_deadline": {
+      "@id": "engrate:objection_deadline"
+    },
+    "ClearingPeriodResponse": "engrate:ClearingPeriodResponse",
+    "last_modified_ts": {
+      "@id": "engrate:last_modified_ts",
+      "@type": "xsd:string"
+    },
+    "total_imbalance_cost_eur": {
+      "@id": "engrate:total_imbalance_cost_eur"
+    },
+    "total_imbalance_mwh": {
+      "@id": "engrate:total_imbalance_mwh"
+    },
+    "ClearingPeriodSummaryResponse": "engrate:ClearingPeriodSummaryResponse",
+    "clearing_period": {
+      "@id": "engrate:clearing_period",
+      "@type": "@id"
+    },
+    "deadline_type": {
+      "@id": "engrate:deadline_type"
+    },
+    "message_count": {
+      "@id": "engrate:message_count",
+      "@type": "xsd:integer"
+    },
+    "objection_count": {
+      "@id": "engrate:objection_count",
+      "@type": "xsd:integer"
+    },
+    "settlement_count": {
+      "@id": "engrate:settlement_count",
+      "@type": "xsd:integer"
+    },
+    "upcoming_deadline": {
+      "@id": "engrate:upcoming_deadline"
+    },
+    "ClearingSettlementResponse": "engrate:ClearingSettlementResponse",
+    "clearing_period_uid": {
+      "@id": "engrate:clearing_period_uid",
+      "@type": "xsd:string"
+    },
+    "date": {
+      "@id": "engrate:date",
+      "@type": "xsd:string"
+    },
+    "Clip": "engrate:Clip",
+    "maximum": {
+      "@id": "engrate:maximum"
+    },
+    "minimum": {
+      "@id": "engrate:minimum"
+    },
+    "ComponentIdentity": "engrate:ComponentIdentity",
+    "applicable_from": {
+      "@id": "engrate:applicable_from"
+    },
+    "applicable_to": {
+      "@id": "engrate:applicable_to"
+    },
+    "ComponentRate": "engrate:ComponentRate",
+    "component": {
+      "@id": "engrate:component",
+      "@type": "@id"
+    },
+    "rate": {
+      "@id": "engrate:rate",
+      "@type": "@id"
+    },
+    "Constant": "engrate:Constant",
+    "value": {
+      "@id": "engrate:value",
+      "@type": "@id"
+    },
+    "ControlArea": "engrate:ControlArea",
+    "ControlEnergyPriceDataPoint": "engrate:ControlEnergyPriceDataPoint",
+    "amount": {
+      "@id": "engrate:amount",
+      "@type": "xsd:decimal"
+    },
+    "ts": {
+      "@id": "engrate:ts",
+      "@type": "xsd:string"
+    },
+    "ControlEnergyPriceResponse": "engrate:ControlEnergyPriceResponse",
+    "month": {
+      "@id": "engrate:month",
+      "@type": "xsd:string"
+    },
+    "DailyImbalance": "engrate:DailyImbalance",
+    "actual_mwh": {
+      "@id": "engrate:actual_mwh",
+      "@type": "xsd:decimal"
+    },
+    "imbalance_mwh": {
+      "@id": "engrate:imbalance_mwh",
+      "@type": "xsd:decimal"
+    },
+    "scheduled_mwh": {
+      "@id": "engrate:scheduled_mwh",
+      "@type": "xsd:decimal"
+    },
+    "Dataset": "engrate:Dataset",
+    "DayOfWeekCondition": "engrate:DayOfWeekCondition",
+    "days": {
+      "@id": "engrate:days",
+      "@container": "@list"
+    },
+    "Divide": "engrate:Divide",
+    "denominator": {
+      "@id": "engrate:denominator"
+    },
+    "numerator": {
+      "@id": "engrate:numerator",
+      "@type": "@id"
+    },
+    "EnergyVolumeResponse": "engrate:EnergyVolumeResponse",
+    "aggregation_object_uid": {
+      "@id": "engrate:aggregation_object_uid"
+    },
+    "category": {
+      "@id": "engrate:category",
+      "@type": "xsd:string"
+    },
+    "data_status": {
+      "@id": "engrate:data_status",
+      "@type": "xsd:string"
+    },
+    "interval_count": {
+      "@id": "engrate:interval_count",
+      "@type": "xsd:integer"
+    },
+    "mabis_zp_id": {
+      "@id": "engrate:mabis_zp_id",
+      "@type": "xsd:string"
+    },
+    "message_date": {
+      "@id": "engrate:message_date",
+      "@type": "xsd:string"
+    },
+    "mscons_message_id": {
+      "@id": "engrate:mscons_message_id",
+      "@type": "xsd:string"
+    },
+    "period_end": {
+      "@id": "engrate:period_end",
+      "@type": "xsd:string"
+    },
+    "period_start": {
+      "@id": "engrate:period_start",
+      "@type": "xsd:string"
+    },
+    "total_kwh": {
+      "@id": "engrate:total_kwh",
+      "@type": "xsd:decimal"
+    },
+    "ExchangePriorityBalanceGroupResponse": "engrate:ExchangePriorityBalanceGroupResponse",
+    "eic_code": {
+      "@id": "engrate:eic_code",
+      "@type": "xsd:string"
+    },
+    "exchange_name": {
+      "@id": "engrate:exchange_name",
+      "@type": "xsd:string"
+    },
+    "has_exchange_priority": {
+      "@id": "engrate:has_exchange_priority",
+      "@type": "xsd:boolean"
+    },
+    "ExchangePriorityCheckResponse": "engrate:ExchangePriorityCheckResponse",
+    "ExcludeHolidaysCondition": "engrate:ExcludeHolidaysCondition",
+    "holidays": {
+      "@id": "engrate:holidays",
+      "@container": "@list"
+    },
+    "ExtraIdentifier": "engrate:ExtraIdentifier",
+    "kind": {
+      "@id": "engrate:kind",
+      "@type": "@id"
+    },
+    "Finality": "engrate:Finality",
+    "GeoJsonFeature": "engrate:GeoJsonFeature",
+    "geometry": {
+      "@id": "engrate:geometry"
+    },
+    "properties": {
+      "@id": "engrate:properties"
+    },
+    "GeoJsonFeatureCollection": "engrate:GeoJsonFeatureCollection",
+    "features": {
+      "@id": "engrate:features",
+      "@container": "@list"
+    },
+    "GeoJsonMultiPolygon": "engrate:GeoJsonMultiPolygon",
+    "coordinates": {
+      "@id": "engrate:coordinates",
+      "@container": "@list"
+    },
+    "GeoJsonPolygon": "engrate:GeoJsonPolygon",
+    "GetBiddingZonesResponse": "engrate:GetBiddingZonesResponse",
+    "bidding_zones": {
+      "@id": "engrate:bidding_zones",
+      "@container": "@list"
+    },
+    "GetControlAreasResponse": "engrate:GetControlAreasResponse",
+    "control_areas": {
+      "@id": "engrate:control_areas",
+      "@container": "@list"
+    },
+    "GetDatasetsResponse": "engrate:GetDatasetsResponse",
+    "datasets": {
+      "@id": "engrate:datasets",
+      "@container": "@list"
+    },
+    "GetMeteringGridAreasResponse": "engrate:GetMeteringGridAreasResponse",
+    "mgas": {
+      "@id": "engrate:mgas",
+      "@container": "@list"
+    },
+    "GetPartiesResponse": "engrate:GetPartiesResponse",
+    "parties": {
+      "@id": "engrate:parties",
+      "@container": "@list"
+    },
+    "GetSchedulingAreasResponse": "engrate:GetSchedulingAreasResponse",
+    "scheduling_areas": {
+      "@id": "engrate:scheduling_areas",
+      "@container": "@list"
+    },
+    "GetTariffsResponse": "engrate:GetTariffsResponse",
+    "tariffs": {
+      "@id": "engrate:tariffs",
+      "@container": "@list"
+    },
+    "HTTPValidationError": "engrate:HTTPValidationError",
+    "detail": {
+      "@id": "engrate:detail",
+      "@container": "@list"
+    },
+    "HighestCondition": "engrate:HighestCondition",
+    "n": {
+      "@id": "engrate:n",
+      "@type": "xsd:integer"
+    },
+    "Holiday": "engrate:Holiday",
+    "HolidayOccurrence": "engrate:HolidayOccurrence",
+    "holiday": {
+      "@id": "engrate:holiday",
+      "@type": "@id"
+    },
+    "timezone": {
+      "@id": "engrate:timezone",
+      "@type": "xsd:string"
+    },
+    "HolidaysResponse": "engrate:HolidaysResponse",
+    "Identifier": "engrate:Identifier",
+    "extra_ids": {
+      "@id": "engrate:extra_ids",
+      "@container": "@list"
+    },
+    "IdentifierKind": "engrate:IdentifierKind",
+    "ImbalanceResponse": "engrate:ImbalanceResponse",
+    "daily_imbalances": {
+      "@id": "engrate:daily_imbalances",
+      "@container": "@list"
+    },
+    "total_actual_mwh": {
+      "@id": "engrate:total_actual_mwh",
+      "@type": "xsd:decimal"
+    },
+    "total_scheduled_mwh": {
+      "@id": "engrate:total_scheduled_mwh",
+      "@type": "xsd:decimal"
+    },
+    "IncomingMessageResponse": "engrate:IncomingMessageResponse",
+    "document_type": {
+      "@id": "engrate:document_type",
+      "@type": "xsd:string"
+    },
+    "message_id": {
+      "@id": "engrate:message_id"
+    },
+    "original_message_id": {
+      "@id": "engrate:original_message_id"
+    },
+    "processing_status": {
+      "@id": "engrate:processing_status",
+      "@type": "xsd:string"
+    },
+    "InputProfile": "engrate:InputProfile",
+    "profile_id": {
+      "@id": "engrate:profile_id",
+      "@type": "xsd:string"
+    },
+    "InputTimeSeries": "engrate:InputTimeSeries",
+    "Level": "engrate:Level",
+    "Lookup": "engrate:Lookup",
+    "boundaries": {
+      "@id": "engrate:boundaries",
+      "@container": "@list"
+    },
+    "levels": {
+      "@id": "engrate:levels",
+      "@container": "@list"
+    },
+    "tier_selector": {
+      "@id": "engrate:tier_selector",
+      "@type": "@id"
+    },
+    "LowestCondition": "engrate:LowestCondition",
+    "Mask": "engrate:Mask",
+    "condition": {
+      "@id": "engrate:condition"
+    },
+    "replacement": {
+      "@id": "engrate:replacement"
+    },
+    "MeteringGridArea": "engrate:MeteringGridArea",
+    "scheduling_area_eic": {
+      "@id": "engrate:scheduling_area_eic",
+      "@type": "xsd:string"
+    },
+    "system_operator": {
+      "@id": "engrate:system_operator",
+      "@type": "@id"
+    },
+    "MeteringGridAreaUnionEntry": "engrate:MeteringGridAreaUnionEntry",
+    "geometry_granularity": {
+      "@id": "engrate:geometry_granularity",
+      "@type": "xsd:string"
+    },
+    "MonthCondition": "engrate:MonthCondition",
+    "months": {
+      "@id": "engrate:months",
+      "@container": "@list"
+    },
+    "MonthlyCostResponse": "engrate:MonthlyCostResponse",
+    "average_price_eur_mwh": {
+      "@id": "engrate:average_price_eur_mwh",
+      "@type": "xsd:decimal"
+    },
+    "missing_prices_count": {
+      "@id": "engrate:missing_prices_count",
+      "@type": "xsd:integer"
+    },
+    "total_cost_eur": {
+      "@id": "engrate:total_cost_eur",
+      "@type": "xsd:decimal"
+    },
+    "total_energy_mwh": {
+      "@id": "engrate:total_energy_mwh",
+      "@type": "xsd:decimal"
+    },
+    "tso_area": {
+      "@id": "engrate:tso_area",
+      "@type": "xsd:string"
+    },
+    "MonthlyEnergySummaryResponse": "engrate:MonthlyEnergySummaryResponse",
+    "total_mwh": {
+      "@id": "engrate:total_mwh",
+      "@type": "xsd:decimal"
+    },
+    "MonthlySummaryResponse": "engrate:MonthlySummaryResponse",
+    "cost": {
+      "@id": "engrate:cost"
+    },
+    "energy": {
+      "@id": "engrate:energy"
+    },
+    "Multiply": "engrate:Multiply",
+    "left": {
+      "@id": "engrate:left"
+    },
+    "right": {
+      "@id": "engrate:right"
+    },
+    "NLBusinessTypeTotalResponse": "engrate:NLBusinessTypeTotalResponse",
+    "business_type": {
+      "@id": "engrate:business_type",
+      "@type": "xsd:string"
+    },
+    "series_count": {
+      "@id": "engrate:series_count",
+      "@type": "xsd:integer"
+    },
+    "total_quantity": {
+      "@id": "engrate:total_quantity",
+      "@type": "xsd:decimal"
+    },
+    "NLImbalancePointResponse": "engrate:NLImbalancePointResponse",
+    "direction": {
+      "@id": "engrate:direction"
+    },
+    "position": {
+      "@id": "engrate:position",
+      "@type": "xsd:integer"
+    },
+    "price": {
+      "@id": "engrate:price"
+    },
+    "quantity": {
+      "@id": "engrate:quantity"
+    },
+    "NLImbalanceReportDetailResponse": "engrate:NLImbalanceReportDetailResponse",
+    "report": {
+      "@id": "engrate:report",
+      "@type": "@id"
+    },
+    "NLImbalanceReportListResponse": "engrate:NLImbalanceReportListResponse",
+    "NLImbalanceReportResponse": "engrate:NLImbalanceReportResponse",
+    "doc_status": {
+      "@id": "engrate:doc_status"
+    },
+    "document_mrid": {
+      "@id": "engrate:document_mrid",
+      "@type": "xsd:string"
+    },
+    "market_participant_ean": {
+      "@id": "engrate:market_participant_ean",
+      "@type": "xsd:string"
+    },
+    "received_ts": {
+      "@id": "engrate:received_ts",
+      "@type": "xsd:dateTime"
+    },
+    "report_date": {
+      "@id": "engrate:report_date",
+      "@type": "xsd:date"
+    },
+    "revision_number": {
+      "@id": "engrate:revision_number",
+      "@type": "xsd:integer"
+    },
+    "NLImbalanceSummaryResponse": "engrate:NLImbalanceSummaryResponse",
+    "business_type_totals": {
+      "@id": "engrate:business_type_totals",
+      "@container": "@list"
+    },
+    "days_covered": {
+      "@id": "engrate:days_covered",
+      "@type": "xsd:integer"
+    },
+    "report_count": {
+      "@id": "engrate:report_count",
+      "@type": "xsd:integer"
+    },
+    "NLImbalanceTimeSeriesListResponse": "engrate:NLImbalanceTimeSeriesListResponse",
+    "NLImbalanceTimeSeriesResponse": "engrate:NLImbalanceTimeSeriesResponse",
+    "point_count": {
+      "@id": "engrate:point_count",
+      "@type": "xsd:integer"
+    },
+    "points": {
+      "@id": "engrate:points",
+      "@container": "@list"
+    },
+    "reason_code": {
+      "@id": "engrate:reason_code"
+    },
+    "reason_text": {
+      "@id": "engrate:reason_text"
+    },
+    "time_series_mrid": {
+      "@id": "engrate:time_series_mrid",
+      "@type": "xsd:string"
+    },
+    "NotCondition": "engrate:NotCondition",
+    "ObjectionCreateRequest": "engrate:ObjectionCreateRequest",
+    "disputed_values": {
+      "@id": "engrate:disputed_values"
+    },
+    "objection_type": {
+      "@id": "engrate:objection_type",
+      "@type": "xsd:string"
+    },
+    "reason": {
+      "@id": "engrate:reason"
+    },
+    "ObjectionResponse": "engrate:ObjectionResponse",
+    "resolved_ts": {
+      "@id": "engrate:resolved_ts"
+    },
+    "submitted_ts": {
+      "@id": "engrate:submitted_ts"
+    },
+    "tso_response": {
+      "@id": "engrate:tso_response"
+    },
+    "OrCondition": "engrate:OrCondition",
+    "Party": "engrate:Party",
+    "description": {
+      "@id": "engrate:description"
+    },
+    "logo_url": {
+      "@id": "engrate:logo_url"
+    },
+    "website_url": {
+      "@id": "engrate:website_url"
+    },
+    "PeriodicAmount": "engrate:PeriodicAmount",
+    "range": {
+      "@id": "engrate:range",
+      "@type": "@id"
+    },
+    "ProfileListItem": "engrate:ProfileListItem",
+    "scope": {
+      "@id": "engrate:scope",
+      "@type": "xsd:string"
+    },
+    "tags": {
+      "@id": "engrate:tags",
+      "@container": "@list"
+    },
+    "ProfileListResponse": "engrate:ProfileListResponse",
+    "ProfileRequestBody": "engrate:ProfileRequestBody",
+    "ProfileResponse": "engrate:ProfileResponse",
+    "created_at": {
+      "@id": "engrate:created_at",
+      "@type": "xsd:dateTime"
+    },
+    "Range": "engrate:Range",
+    "RateInterval": "engrate:RateInterval",
+    "RateTimeseries": "engrate:RateTimeseries",
+    "dataset_id": {
+      "@id": "engrate:dataset_id",
+      "@type": "xsd:string"
+    },
+    "intervals": {
+      "@id": "engrate:intervals",
+      "@container": "@list"
+    },
+    "Resample": "engrate:Resample",
+    "Resolution": "engrate:Resolution",
+    "ScheduleCreateDataPoint": "engrate:ScheduleCreateDataPoint",
+    "ScheduleCreateRequest": "engrate:ScheduleCreateRequest",
+    "market": {
+      "@id": "engrate:market",
+      "@type": "xsd:string"
+    },
+    "receiver_id": {
+      "@id": "engrate:receiver_id",
+      "@type": "xsd:string"
+    },
+    "series": {
+      "@id": "engrate:series",
+      "@container": "@list"
+    },
+    "test": {
+      "@id": "engrate:test",
+      "@type": "xsd:boolean"
+    },
+    "ScheduleCreateSeriesIds": "engrate:ScheduleCreateSeriesIds",
+    "in_area": {
+      "@id": "engrate:in_area",
+      "@type": "xsd:string"
+    },
+    "in_party": {
+      "@id": "engrate:in_party",
+      "@type": "xsd:string"
+    },
+    "market_agreement_id": {
+      "@id": "engrate:market_agreement_id"
+    },
+    "out_area": {
+      "@id": "engrate:out_area",
+      "@type": "xsd:string"
+    },
+    "out_party": {
+      "@id": "engrate:out_party",
+      "@type": "xsd:string"
+    },
+    "ScheduleCreateSeriesItem": "engrate:ScheduleCreateSeriesItem",
+    "ids": {
+      "@id": "engrate:ids",
+      "@type": "@id"
+    },
+    "ScheduleResponse": "engrate:ScheduleResponse",
+    "ScheduleSeriesDataPoint": "engrate:ScheduleSeriesDataPoint",
+    "ScheduleSeriesIds": "engrate:ScheduleSeriesIds",
+    "ScheduleSeriesResponse": "engrate:ScheduleSeriesResponse",
+    "acceptance_level": {
+      "@id": "engrate:acceptance_level",
+      "@type": "xsd:string"
+    },
+    "interval_statuses": {
+      "@id": "engrate:interval_statuses"
+    },
+    "spec": {
+      "@id": "engrate:spec",
+      "@type": "@id"
+    },
+    "ScheduleSeriesSpec": "engrate:ScheduleSeriesSpec",
+    "ScheduleVersionResponse": "engrate:ScheduleVersionResponse",
+    "is_active": {
+      "@id": "engrate:is_active",
+      "@type": "xsd:boolean"
+    },
+    "nrr_received": {
+      "@id": "engrate:nrr_received"
+    },
+    "transmission_report_id": {
+      "@id": "engrate:transmission_report_id"
+    },
+    "warnings": {
+      "@id": "engrate:warnings"
+    },
+    "ScheduleVersionSeriesItem": "engrate:ScheduleVersionSeriesItem",
+    "ts_version": {
+      "@id": "engrate:ts_version",
+      "@type": "xsd:integer"
+    },
+    "ScheduleVersionSpec": "engrate:ScheduleVersionSpec",
+    "sender_id": {
+      "@id": "engrate:sender_id",
+      "@type": "xsd:string"
+    },
+    "SchedulingArea": "engrate:SchedulingArea",
+    "Select": "engrate:Select",
+    "SettlementMessageResponse": "engrate:SettlementMessageResponse",
+    "error_message": {
+      "@id": "engrate:error_message"
+    },
+    "message_type": {
+      "@id": "engrate:message_type",
+      "@type": "xsd:string"
+    },
+    "reference_id": {
+      "@id": "engrate:reference_id",
+      "@type": "xsd:string"
+    },
+    "sent_ts": {
+      "@id": "engrate:sent_ts"
+    },
+    "SimplifiedTariffResponse": "engrate:SimplifiedTariffResponse",
+    "component_rates": {
+      "@id": "engrate:component_rates",
+      "@container": "@list"
+    },
+    "dataset_rates": {
+      "@id": "engrate:dataset_rates",
+      "@container": "@list"
+    },
+    "unprojectable_components": {
+      "@id": "engrate:unprojectable_components",
+      "@container": "@list"
+    },
+    "Specifier": "engrate:Specifier",
+    "StatusRequestCreate": "engrate:StatusRequestCreate",
+    "StatusRequestResponse": "engrate:StatusRequestResponse",
+    "next_allowed_at": {
+      "@id": "engrate:next_allowed_at"
+    },
+    "sent_at": {
+      "@id": "engrate:sent_at"
+    },
+    "Subtract": "engrate:Subtract"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Engrate API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Engrate's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-15) from openapi/engrate-openapi.json.",
+  "dcterms:created": "2026-10-15",
+  "dcterms:source": [
+    "openapi/engrate-openapi.json"
+  ]
+}

@@ -1,0 +1,31 @@
+generated: '2026-10-15'
+method: generated
+generator: extract-docs-artifacts.py skills (local)
+source: openapi/engrate-openapi.json
+skills:
+- file: skills/engrate-create-and-validate-clearing-period.md
+  name: engrate-create-and-validate-clearing-period
+  api: openapi/engrate-openapi.json
+  operations:
+  - create_clearing_period_schedule_management_v1_mabis_clearing_periods_post
+  - validate_clearing_data_schedule_management_v1_mabis_clearing_periods__uid__validate_get
+  - calculate_imbalance_schedule_management_v1_mabis_clearing_periods__uid__imbalance_get
+- file: skills/engrate-engr-ate-create-schedule-workflow.md
+  name: engrate-engr-ate-create-schedule-workflow
+  api: openapi/engrate-openapi.json
+  operations:
+  - create_schedule_schedule_management_v1_schedules_post
+  - get_schedule_schedule_management_v1_schedules__uid__get
+- file: skills/engrate-calculate-tariff-cost.md
+  name: engrate-calculate-tariff-cost
+  api: openapi/engrate-openapi.json
+  operations:
+  - list_tariffs_cost_of_energy_v1_tariffs_get
+  - get_tariff_cost_of_energy_v1_tariffs__tariff_id__get
+  - calculate_tariff_cost_of_energy_v1_calculate_post
+- file: skills/engrate-engrave-create-and-retrieve-profile.md
+  name: engrate-engrave-create-and-retrieve-profile
+  api: openapi/engrate-openapi.json
+  operations:
+  - create_profile_cost_of_energy_v1_profiles_post
+  - get_profile_cost_of_energy_v1_profiles__profile_id__get

@@ -1,0 +1,530 @@
+openapi: 3.2.0
+info:
+  title: Engrate Profiles API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Profiles
+paths:
+  /cost-of-energy/v1/profiles:
+    get:
+      description: List all profiles visible to the caller. Returns global profiles (available to everyone) plus any profiles owned by the caller's organization.
+      operationId: list_profiles_cost_of_energy_v1_profiles_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileListResponse'
+          description: Successful Response
+      summary: List profiles
+      tags:
+      - Profiles
+    post:
+      description: Create a new profile owned by the caller's organization. The number of values must match the expected count for the given time range and resolution.
+      operationId: create_profile_cost_of_energy_v1_profiles_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequestBody'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+          description: Successful Response
+        '422':
+          description: Validation error — value count mismatch or exceeds maximum.
+      summary: Create a profile
+      tags:
+      - Profiles
+  /cost-of-energy/v1/profiles/{profile_id}:
+    delete:
+      description: Delete a profile.
+      operationId: delete_profile_cost_of_energy_v1_profiles__profile_id__delete
+      parameters:
+      - in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          title: Profile Id
+          type: string
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete a profile
+      tags:
+      - Profiles
+    get:
+      description: Retrieve a profile by ID including its full timeseries values. Optionally downsample the returned values to a coarser resolution.
+      operationId: get_profile_cost_of_energy_v1_profiles__profile_id__get
+      parameters:
+      - in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          title: Profile Id
+          type: string
+      - description: Cap the resolution of the returned timeseries. If the profile's resolution is finer, values are downsampled to the target. If already at or coarser, returned as-is.
+        in: query
+        name: max_resolution
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/Resolution'
+          - type: 'null'
+          description: Cap the resolution of the returned timeseries. If the profile's resolution is finer, values are downsampled to the target. If already at or coarser, returned as-is.
+          title: Max Resolution
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get a profile
+      tags:
+      - Profiles
+    put:
+      description: Replace the contents of an existing profile.
+      operationId: update_profile_cost_of_energy_v1_profiles__profile_id__put
+      parameters:
+      - in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          title: Profile Id
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequestBody'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+          description: Successful Response
+        '422':
+          description: Validation error — value count mismatch or exceeds maximum.
+      summary: Update a profile
+      tags:
+      - Profiles
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ProfileListResponse:
+      description: Response containing available profiles.
+      example:
+        profiles:
+        - description: Nord Pool day-ahead prices for SE3.
+          end_time: '2026-02-01T00:00:00+01:00'
+          id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+          name: Hourly spot price SE3 2026
+          resolution: hourly
+          scope: org
+          start_time: '2026-01-01T00:00:00+01:00'
+          tags:
+          - spot-price
+          - SE3
+          unit: SEK/kWh
+      properties:
+        profiles:
+          items:
+            $ref: '#/components/schemas/ProfileListItem'
+          title: Profiles
+          type: array
+      required:
+      - profiles
+      title: ProfileListResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    ProfileRequestBody:
+      description: Request body for creating or updating a profile.
+      example:
+        description: Nord Pool day-ahead prices for SE3.
+        end_time: '2025-01-01T03:00:00+01:00'
+        name: Hourly spot price SE3 2025
+        resolution: hourly
+        start_time: '2025-01-01T00:00:00+01:00'
+        tags:
+        - spot-price
+        - SE3
+        unit: SEK/kWh
+        values:
+        - 0.45
+        - 0.52
+        - 0.38
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional description.
+          title: Description
+        end_time:
+          description: End of the timeseries period (exclusive).
+          format: date-time
+          title: End Time
+          type: string
+        name:
+          description: Human-readable name.
+          title: Name
+          type: string
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Temporal resolution of the values.
+        start_time:
+          description: Start of the timeseries period (inclusive).
+          format: date-time
+          title: Start Time
+          type: string
+        tags:
+          description: Tags for categorizing and filtering profiles.
+          items:
+            type: string
+          title: Tags
+          type: array
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit of measurement for the values.
+        values:
+          description: Timeseries values aligned to the resolution and time range. Length must match the expected number of intervals. `null` entries represent missing data points.
+          items:
+            anyOf:
+            - type: number
+            - type: 'null'
+          maxItems: 35136
+          title: Values
+          type: array
+      required:
+      - end_time
+      - name
+      - resolution
+      - start_time
+      - unit
+      - values
+      title: ProfileRequestBody
+      type: object
+    ProfileListItem:
+      description: Summary of a profile returned in list responses.
+      example:
+        description: Nord Pool day-ahead prices for SE3.
+        end_time: '2026-02-01T00:00:00+01:00'
+        id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        name: Hourly spot price SE3 2026
+        resolution: hourly
+        scope: org
+        start_time: '2026-01-01T00:00:00+01:00'
+        tags:
+        - spot-price
+        - SE3
+        unit: SEK/kWh
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional description.
+          title: Description
+        end_time:
+          description: End of the timeseries period (exclusive).
+          format: date-time
+          title: End Time
+          type: string
+        id:
+          description: Unique identifier for the profile.
+          format: uuid
+          title: Id
+          type: string
+        name:
+          description: Human-readable name.
+          title: Name
+          type: string
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Temporal resolution of the values.
+        scope:
+          description: Whether this is a global profile or owned by your organization.
+          enum:
+          - global
+          - org
+          title: Scope
+          type: string
+        start_time:
+          description: Start of the timeseries period (inclusive).
+          format: date-time
+          title: Start Time
+          type: string
+        tags:
+          description: Tags for categorizing and filtering profiles.
+          items:
+            type: string
+          title: Tags
+          type: array
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit of measurement for the values.
+      required:
+      - end_time
+      - id
+      - name
+      - resolution
+      - scope
+      - start_time
+      - tags
+      - unit
+      title: ProfileListItem
+      type: object
+    Unit:
+      description: 'Units indicate, well, the unit of values. These are used in places like [Datasets](/api-reference/cost-of-energy/models/dataset) and [Levels](/api-reference/cost-of-energy/models/level) to indicate the unit the data is in.
+
+
+        ### Available units
+
+
+        - **A** — Current in Amperes
+
+
+        - **kV** — Voltage in kilo volts
+
+
+        - **kW** — Power in kilo watts
+
+
+        - **kWh** — Energy in kilo watt hours
+
+
+        - **hours** — Time in hours
+
+
+        - **SEK** — Monetary amount in SEK
+
+
+        - **NOK** — Monetary amount in NOK
+
+
+        - **EUR** — Monetary amount in EUR
+
+
+        - **SEK_per_kWh** — Monetary rate in SEK per kWh
+
+
+        - **SEK_per_kW** — Monetary rate in SEK per kW
+
+
+        - **NOK_per_kWh** — Monetary rate in NOK per kWh
+
+
+        - **NOK_per_kW** — Monetary rate in NOK per kW
+
+
+        - **EUR_per_kWh** — Monetary rate in EUR per kWh
+
+
+        - **EUR_per_kW** — Monetary rate in EUR per kW
+
+
+        - **%** — Percentage, as a float, where 1.0 represents 100%'
+      enum:
+      - A
+      - kV
+      - kW
+      - kWh
+      - hours
+      - SEK
+      - NOK
+      - EUR
+      - SEK_per_kWh
+      - SEK_per_kW
+      - NOK_per_kWh
+      - NOK_per_kW
+      - EUR_per_kWh
+      - EUR_per_kW
+      - '%'
+      title: Unit
+      type: string
+    ProfileResponse:
+      description: Full profile including timeseries values.
+      example:
+        created_at: '2026-01-02T12:00:00Z'
+        description: Nord Pool day-ahead prices for SE3.
+        end_time: '2025-01-01T03:00:00+01:00'
+        id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        name: Hourly spot price SE3 2025
+        resolution: hourly
+        scope: org
+        start_time: '2025-01-01T00:00:00+01:00'
+        tags:
+        - spot-price
+        - SE3
+        unit: SEK/kWh
+        values:
+        - 0.45
+        - 0.52
+        - 0.38
+      properties:
+        created_at:
+          description: Timestamp when the profile was created.
+          format: date-time
+          title: Created At
+          type: string
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Optional description.
+          title: Description
+        end_time:
+          description: End of the timeseries period (exclusive).
+          format: date-time
+          title: End Time
+          type: string
+        id:
+          description: Unique identifier for the profile.
+          format: uuid
+          title: Id
+          type: string
+        name:
+          description: Human-readable name.
+          title: Name
+          type: string
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+          description: Temporal resolution of the values. May differ from native resolution if downsampled.
+        scope:
+          description: Whether this is a global profile or owned by an organization.
+          enum:
+          - global
+          - org
+          title: Scope
+          type: string
+        start_time:
+          description: Start of the timeseries period (inclusive).
+          format: date-time
+          title: Start Time
+          type: string
+        tags:
+          description: Tags for categorizing and filtering profiles.
+          items:
+            type: string
+          title: Tags
+          type: array
+        unit:
+          $ref: '#/components/schemas/Unit'
+          description: Unit of measurement for the values.
+        values:
+          description: Timeseries values aligned to the resolution and time range. `null` entries represent missing data points.
+          items:
+            anyOf:
+            - type: number
+            - type: 'null'
+          title: Values
+          type: array
+      required:
+      - created_at
+      - end_time
+      - id
+      - name
+      - resolution
+      - scope
+      - start_time
+      - tags
+      - unit
+      - values
+      title: ProfileResponse
+      type: object
+    Resolution:
+      description: 'Temporal resolution
+
+
+        ### Available resolutions
+
+
+        - **quarter_hourly** — 15-minute resolution
+
+
+        - **hourly** — 60-minute resolution
+
+
+        - **daily** — Daily resolution in *calendar* days, not necessarily exactly 24 hours, depending on daylight savings etc
+
+
+        - **weekly** — Weekly resolution in *calendar* weeks, not necessarily exactly 24 * 7 hours, depending on daylight savings etc
+
+
+        - **monthly** — Monthly resolution in *calendar* months, taking into account things like daylight savings and leap year calculations
+
+
+        - **yearly** — Annual resolution in *calendar* years, taking into account things like daylight savings and leap year calculations'
+      enum:
+      - quarter_hourly
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - yearly
+      title: Resolution
+      type: string
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

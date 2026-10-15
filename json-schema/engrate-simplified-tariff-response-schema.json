@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-simplified-tariff-response-schema.json",
+  "title": "SimplifiedTariffResponse",
+  "description": "Indicative, simplified view of a [Tariff](/api-reference/cost-of-energy/models/tariff)'s rates over a time range.",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/engrate-openapi.json#/components/schemas/SimplifiedTariffResponse",
+  "properties": {
+    "component_rates": {
+      "description": "Per-component rate timeseries, for components that can be projected onto a per-kWh or per-kW rate. Empty if the tariff has no projectable components.",
+      "items": {
+        "$ref": "#/$defs/ComponentRate"
+      },
+      "title": "Component Rates",
+      "type": "array"
+    },
+    "dataset_rates": {
+      "description": "Summed rate timeseries per `(dataset_id, unit)` group, across all projectable components contributing to that group. Empty if the tariff has no projectable components.",
+      "items": {
+        "$ref": "#/$defs/RateTimeseries"
+      },
+      "title": "Dataset Rates",
+      "type": "array"
+    },
+    "unprojectable_components": {
+      "description": "Tariff components present on the tariff that could not be projected onto a rate timeseries. Listed by name and applicability window only; see [Get Tariff](/api-reference/cost-of-energy/get-tariff) for full component definitions.",
+      "items": {
+        "$ref": "#/$defs/ComponentIdentity"
+      },
+      "title": "Unprojectable Components",
+      "type": "array"
+    }
+  },
+  "required": [
+    "component_rates",
+    "dataset_rates",
+    "unprojectable_components"
+  ],
+  "type": "object",
+  "$defs": {
+    "ComponentIdentity": {
+      "description": "Identifies a tariff component by its issuing-party name and applicability window. See [Tariff Component](/api-reference/cost-of-energy/models/tariff-component) for the full definition.",
+      "properties": {
+        "applicable_from": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "ISO 8601 formatted datetime from when the tariff component becomes applicable, if any. If `null` or not included, applicable immediately.",
+          "title": "Applicable From"
+        },
+        "applicable_to": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "ISO 8601 formatted datetime at which the tariff component ceases to be applicable (exclusive — the component does not apply at this instant). If `null` or not included, applicable until further notice.",
+          "title": "Applicable To"
+        },
+        "name": {
+          "description": "Name of the tariff component as given by the issuing [Party](/api-reference/core/models/party).",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ComponentIdentity",
+      "type": "object"
+    },
+    "ComponentRate": {
+      "description": "A single tariff component's projected rate timeseries.",
+      "properties": {
+        "component": {
+          "$ref": "#/$defs/ComponentIdentity",
+          "description": "Identifying fields of the component this rate timeseries belongs to."
+        },
+        "rate": {
+          "$ref": "#/$defs/RateTimeseries",
+          "description": "The component's projected rate timeseries."
+        }
+      },
+      "required": [
+        "component",
+        "rate"
+      ],
+      "title": "ComponentRate",
+      "type": "object"
+    },
+    "RateInterval": {
+      "description": "A flat-rate slice of a Rate Timeseries, spanning the half-open UTC range `[start_time, end_time)`.",
+      "properties": {
+        "end_time": {
+          "description": "ISO 8601 formatted UTC datetime at which this interval ends (exclusive).",
+          "format": "date-time",
+          "title": "End Time",
+          "type": "string"
+        },
+        "rate": {
+          "description": "Flat rate that applies across this interval, expressed in the parent timeseries' unit.",
+          "title": "Rate",
+          "type": "number"
+        },
+        "start_time": {
+          "description": "ISO 8601 formatted UTC datetime at which this interval begins (inclusive).",
+          "format": "date-time",
+          "title": "Start Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "end_time",
+        "rate",
+        "start_time"
+      ],
+      "title": "RateInterval",
+      "type": "object"
+    },
+    "RateTimeseries": {
+      "description": "A single rate timeseries for one input dataset and unit, made up of chronologically ordered, non-overlapping flat-rate Rate Intervals.",
+      "properties": {
+        "dataset_id": {
+          "description": "Identifier of the [Dataset](/api-reference/cost-of-energy/models/dataset) this timeseries' rates apply to.",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "intervals": {
+          "description": "Chronologically ordered, non-overlapping flat-rate intervals covering the requested range exactly.",
+          "items": {
+            "$ref": "#/$defs/RateInterval"
+          },
+          "title": "Intervals",
+          "type": "array"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "SEK_per_kWh",
+                "NOK_per_kWh",
+                "EUR_per_kWh"
+              ],
+              "type": "string"
+            },
+            {
+              "enum": [
+                "SEK_per_kW",
+                "NOK_per_kW",
+                "EUR_per_kW"
+              ],
+              "type": "string"
+            }
+          ],
+          "description": "Unit of the rates in this timeseries — a monetary rate per energy (`SEK_per_kWh`, `NOK_per_kWh`, `EUR_per_kWh`) or per power (`SEK_per_kW`, `NOK_per_kW`, `EUR_per_kW`).",
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "intervals",
+        "unit"
+      ],
+      "title": "RateTimeseries",
+      "type": "object"
+    }
+  }
+}

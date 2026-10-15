@@ -1,0 +1,387 @@
+openapi: 3.2.0
+info:
+  title: Engrate Geo API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Geo
+paths:
+  /core/v1/geo:
+    get:
+      description: 'Get GeoJSON data for electricity grid entities.
+
+
+        Returns a standard GeoJSON FeatureCollection in WGS84. The properties field contains the normal data fields for the entity returned, plus a `type` field indicating the entity type.
+
+
+        This currently supports Metering Grid Area.
+
+
+        Multiple values for the same filter are OR-ed; different filters are AND-ed.'
+      operationId: get_geodata_core_v1_geo_get
+      parameters:
+      - description: Filter by ISO 3166-1 alpha-2 country code(s)
+        in: query
+        name: country
+        required: false
+        schema:
+          default: []
+          description: Filter by ISO 3166-1 alpha-2 country code(s)
+          items:
+            type: string
+          title: Country
+          type: array
+      - description: Filter by Metering Grid Area UUID(s)
+        in: query
+        name: metering_grid_area_id
+        required: false
+        schema:
+          default: []
+          description: Filter by Metering Grid Area UUID(s)
+          items:
+            format: uuid
+            type: string
+          title: Metering Grid Area Id
+          type: array
+      - description: Filter by Metering Grid Area [Extra Identifier](/api-reference/core/models/extra-identifier)(s) (EIC code, SE MGA code, etc.)
+        in: query
+        name: metering_grid_area_extra_id
+        required: false
+        schema:
+          default: []
+          description: Filter by Metering Grid Area [Extra Identifier](/api-reference/core/models/extra-identifier)(s) (EIC code, SE MGA code, etc.)
+          items:
+            type: string
+          title: Metering Grid Area Extra Id
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJsonFeatureCollection'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Geodata
+      tags:
+      - Geo
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    GeoJsonFeature:
+      description: A single [GeoJSON Feature](https://datatracker.ietf.org/doc/html/rfc7946).
+      example:
+        geometry:
+          coordinates:
+          - - - - 18.07
+                - 59.33
+              - - 18.08
+                - 59.33
+              - - 18.08
+                - 59.34
+              - - 18.07
+                - 59.33
+          type: MultiPolygon
+        id: 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+        properties:
+          extra_ids:
+          - kind: eic
+            value: 46Y000000000016G
+          - kind: se.mga_code
+            value: STO
+          geometry_granularity: mga
+          id: 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+          name: Stockholm
+          scheduling_area_eic: 10Y1001A1001A47J
+          system_operator:
+            extra_ids:
+            - kind: eic
+              value: 46X000000000245K
+            id: 0199c317-25ec-7cf7-94cc-32a39f068433
+          type: metering-grid-area
+        type: Feature
+      properties:
+        geometry:
+          discriminator:
+            mapping:
+              MultiPolygon: '#/components/schemas/GeoJsonMultiPolygon'
+              Polygon: '#/components/schemas/GeoJsonPolygon'
+            propertyName: type
+          oneOf:
+          - $ref: '#/components/schemas/GeoJsonPolygon'
+          - $ref: '#/components/schemas/GeoJsonMultiPolygon'
+          title: Geometry
+        id:
+          description: Id for the underlying entity this geometry represents
+          title: Id
+          type: string
+        properties:
+          description: Properties for the entity type this geometry represents, currently always [MeteringGridArea](/api-reference/core/models/metering-grid-area), but this may change in the future, use the 'type' discriminator field to check the entity type.
+          discriminator:
+            mapping:
+              metering-grid-area: '#/components/schemas/MeteringGridAreaUnionEntry'
+            propertyName: type
+          oneOf:
+          - $ref: '#/components/schemas/MeteringGridAreaUnionEntry'
+          title: Properties
+        type:
+          const: Feature
+          default: Feature
+          title: Type
+          type: string
+      required:
+      - geometry
+      - id
+      - properties
+      title: GeoJsonFeature
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    Identifier:
+      example:
+        extra_ids:
+        - kind: eic
+          value: 46X000000000245K
+        id: 0199c317-25ec-7cf7-94cc-32a39f068433
+      properties:
+        extra_ids:
+          description: '[Extra Identifiers](/api-reference/core/models/extra-identifier) used to reference this same entity'
+          items:
+            $ref: '#/components/schemas/ExtraIdentifier'
+          title: Extra Ids
+          type: array
+        id:
+          description: Unique identifier assigned by Engrate
+          format: uuid
+          title: Id
+          type: string
+      required:
+      - extra_ids
+      - id
+      title: Identifier
+      type: object
+    MeteringGridAreaUnionEntry:
+      description: '[MeteringGridArea](/api-reference/core/models/metering-grid-area) with an extra ''type'' field, used in tagged unions'
+      example:
+        extra_ids:
+        - kind: eic
+          value: 46Y000000000016G
+        - kind: se.mga_code
+          value: STO
+        id: 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+        name: Stockholm
+        scheduling_area_eic: 10Y1001A1001A47J
+        system_operator:
+          extra_ids:
+          - kind: eic
+            value: 46X000000000245K
+          id: 0199c317-25ec-7cf7-94cc-32a39f068433
+      properties:
+        extra_ids:
+          description: '[Extra Identifiers](/api-reference/core/models/extra-identifier) for this MGA'
+          items:
+            $ref: '#/components/schemas/ExtraIdentifier'
+          title: Extra Ids
+          type: array
+        geometry_granularity:
+          default: mga
+          description: Whether the accompanying geometry is the true MGA boundary ('mga') or the shared DSO concession territory standing in for it ('dso', used where a DSO operates several MGAs but only a single concession-area polygon is published).
+          enum:
+          - mga
+          - dso
+          title: Geometry Granularity
+          type: string
+        id:
+          description: Unique identifier for the MGA
+          format: uuid
+          title: Id
+          type: string
+        name:
+          description: Name of the metering grid area
+          title: Name
+          type: string
+        scheduling_area_eic:
+          description: EIC code for the Scheduling Area this Metering Grid Area belongs to
+          title: Scheduling Area Eic
+          type: string
+        system_operator:
+          $ref: '#/components/schemas/Identifier'
+          description: The [Party](/api-reference/core/models/party) that operates this MGA
+        type:
+          const: metering-grid-area
+          default: metering-grid-area
+          title: Type
+          type: string
+      required:
+      - extra_ids
+      - id
+      - name
+      - scheduling_area_eic
+      - system_operator
+      title: MeteringGridAreaUnionEntry
+      type: object
+    GeoJsonFeatureCollection:
+      description: Standard [GeoJSON FeatureCollection](https://datatracker.ietf.org/doc/html/rfc7946) with typed properties.
+      properties:
+        features:
+          items:
+            $ref: '#/components/schemas/GeoJsonFeature'
+          title: Features
+          type: array
+        type:
+          const: FeatureCollection
+          default: FeatureCollection
+          title: Type
+          type: string
+      required:
+      - features
+      title: GeoJsonFeatureCollection
+      type: object
+    ExtraIdentifier:
+      description: 'Extra identifiers are used to attach things like EIC ids, VAT numbers, jurisdiction-specific identifiers, etc.
+
+
+        For example, Metering Grid Area''s in parts of Europe are assigned an local jurisdiction EIC code; for those MGAs, the Engrate system will store the EIC as an extra identifier. However some jurisdictions have not yet switched to EIC codes, instead they rely on older local identification schemes. Swedish MGAs, as an example, use a local code assigned by the Swedish TSO.
+
+
+        Because the local schemes are subject to collisions - two TSOs assigning the same numerical code to different things, as they do not coordinate id assignment - we also track an identifier "kind".'
+      example:
+        kind: eic
+        value: 46X000000000245K
+      properties:
+        kind:
+          $ref: '#/components/schemas/IdentifierKind'
+          description: The kind of identifier
+        value:
+          description: The identifier value
+          title: Value
+          type: string
+      required:
+      - kind
+      - value
+      title: ExtraIdentifier
+      type: object
+    GeoJsonPolygon:
+      description: A [GeoJSON Polygon](https://datatracker.ietf.org/doc/html/rfc7946).
+      example:
+        coordinates:
+        - - - 18.07
+            - 59.33
+          - - 18.08
+            - 59.33
+          - - 18.08
+            - 59.34
+          - - 18.07
+            - 59.33
+        type: Polygon
+      properties:
+        coordinates:
+          description: Array of linear rings. Each ring is an array of [longitude, latitude] positions.
+          items:
+            items:
+              items:
+                type: number
+              type: array
+            type: array
+          title: Coordinates
+          type: array
+        type:
+          const: Polygon
+          title: Type
+          type: string
+      required:
+      - coordinates
+      - type
+      title: GeoJsonPolygon
+      type: object
+    IdentifierKind:
+      enum:
+      - eic
+      - vat
+      - gln
+      - se.ediel
+      - se.mga_code
+      - no.mga_code
+      - esett.mga_type
+      title: IdentifierKind
+      type: string
+    GeoJsonMultiPolygon:
+      description: A [GeoJSON MultiPolygon](https://datatracker.ietf.org/doc/html/rfc7946).
+      example:
+        coordinates:
+        - - - - 18.07
+              - 59.33
+            - - 18.08
+              - 59.33
+            - - 18.08
+              - 59.34
+            - - 18.07
+              - 59.33
+        type: MultiPolygon
+      properties:
+        coordinates:
+          description: Array of polygons, each containing an array of linear rings.
+          items:
+            items:
+              items:
+                items:
+                  type: number
+                type: array
+              type: array
+            type: array
+          title: Coordinates
+          type: array
+        type:
+          const: MultiPolygon
+          title: Type
+          type: string
+      required:
+      - coordinates
+      - type
+      title: GeoJsonMultiPolygon
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

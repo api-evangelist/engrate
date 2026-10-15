@@ -1,0 +1,1299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-tariff-schema.json",
+  "title": "Tariff",
+  "description": "Represents a tariff - a rate plan - for a metering point, including eligibility criteria, availability period and one or more [Tariff Components](/api-reference/cost-of-energy/models/tariff-component), which describe the cost structure and how it's changed over time.\n\nThese are long-lived, like \"Fuse Tariff 20A\", offered by some [Party acting as a System Operator](/api-reference/core/models/party).",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/engrate-openapi.json#/components/schemas/Tariff",
+  "properties": {
+    "annotations": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Additional remarks, meant for human reading.",
+      "title": "Annotations"
+    },
+    "available_from": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ISO 8601 formatted datetime from when the tariff becomes available, if any. If `null`, available immediately.",
+      "title": "Available From"
+    },
+    "available_to": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ISO 8601 formatted datetime at which the tariff ceases to be available (exclusive — the tariff is not available at this instant). If `null`, available until further notice.",
+      "title": "Available To"
+    },
+    "eligibility": {
+      "description": "Criteria the customer and metering point must meet.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SystemOperatorEligibility"
+        }
+      ],
+      "title": "Eligibility"
+    },
+    "id": {
+      "description": "Unique identifier within the Engrate systems.",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "description": "Tariff name as given by the system operator.",
+      "title": "Name",
+      "type": "string"
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Brief human-readable summary of the tariff and its tariff components.",
+      "title": "Summary"
+    },
+    "tariff_components": {
+      "description": "Tariff components applicable for this tariff.",
+      "items": {
+        "$ref": "#/$defs/TariffComponent"
+      },
+      "title": "Tariff Components",
+      "type": "array"
+    }
+  },
+  "required": [
+    "eligibility",
+    "id",
+    "name",
+    "tariff_components"
+  ],
+  "type": "object",
+  "$defs": {
+    "Add": {
+      "description": "Element-wise addition of two or more operands.\n\nAll operands are required to have the same resolution.",
+      "properties": {
+        "inputs": {
+          "description": "Operands to sum.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Level"
+              },
+              {
+                "$ref": "#/$defs/Dataset",
+                "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+              }
+            ],
+            "description": "Either a [Dataset](/api-reference/cost-of-energy/models/dataset) or a literal level value."
+          },
+          "minItems": 2,
+          "title": "Inputs",
+          "type": "array"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "type": {
+          "const": "add",
+          "default": "add",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "inputs",
+        "output"
+      ],
+      "title": "Add",
+      "type": "object"
+    },
+    "Aggregate": {
+      "description": "Aggregate a dataset over a resolution window and apply a function.",
+      "properties": {
+        "aggregation_function": {
+          "$ref": "#/$defs/AggregationFunction",
+          "description": "Aggregation function to apply."
+        },
+        "input": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) to aggregate"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset), the result of applying the specified aggregation function to the input dataset in windows of the given resolution"
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "Window over which to aggregate."
+        },
+        "type": {
+          "const": "aggregate",
+          "default": "aggregate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "aggregation_function",
+        "input",
+        "output",
+        "resolution"
+      ],
+      "title": "Aggregate",
+      "type": "object"
+    },
+    "AggregationFunction": {
+      "description": "### Available aggregation functions\n\n- **sum** — Add up all values.\n\n- **mean** — Take the mean - average - of all values.\n\n- **max** — Take the maximum value.\n\n- **min** — Take the minimum value.",
+      "enum": [
+        "sum",
+        "mean",
+        "max",
+        "min"
+      ],
+      "title": "AggregationFunction",
+      "type": "string"
+    },
+    "AndCondition": {
+      "description": "Condition that applies when all sub-conditions are met",
+      "properties": {
+        "conditions": {
+          "description": "Sub-conditions to be ANDed together",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MonthCondition"
+              },
+              {
+                "$ref": "#/$defs/DayOfWeekCondition"
+              },
+              {
+                "$ref": "#/$defs/TimeOfDayCondition"
+              },
+              {
+                "$ref": "#/$defs/ExcludeHolidaysCondition"
+              },
+              {
+                "$ref": "#/$defs/AndCondition"
+              },
+              {
+                "$ref": "#/$defs/OrCondition"
+              },
+              {
+                "$ref": "#/$defs/NotCondition"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Conditions",
+          "type": "array"
+        },
+        "type": {
+          "const": "and",
+          "default": "and",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "conditions"
+      ],
+      "title": "AndCondition",
+      "type": "object"
+    },
+    "Clip": {
+      "description": "Clip values to a min/max range.",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) to be clipped"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Level"
+                },
+                {
+                  "$ref": "#/$defs/Dataset",
+                  "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+                }
+              ],
+              "description": "Either a [Dataset](/api-reference/cost-of-energy/models/dataset) or a literal level value."
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Level"
+                },
+                {
+                  "$ref": "#/$defs/Dataset",
+                  "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+                }
+              ],
+              "description": "Either a [Dataset](/api-reference/cost-of-energy/models/dataset) or a literal level value."
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "type": {
+          "const": "clip",
+          "default": "clip",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "Clip",
+      "type": "object"
+    },
+    "Constant": {
+      "description": "Emit a constant value at a given resolution.",
+      "properties": {
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "Cadence at which the constant is emitted."
+        },
+        "type": {
+          "const": "constant",
+          "default": "constant",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Level",
+          "description": "The constant [Level](/api-reference/cost-of-energy/models/level) to emit."
+        }
+      },
+      "required": [
+        "output",
+        "resolution",
+        "value"
+      ],
+      "title": "Constant",
+      "type": "object"
+    },
+    "Dataset": {
+      "description": "A named timeseries with known resolution and unit.\n\nUsed both for describing registered datasets (see below) as well as for naming the intermediate results that get created by each step in a function pipeline.\n\n## Absent values\n\nAll datasets in this API are fixed resolution. For an hourly dataset, there is some \"slot\" for each hour's value. However, some operations - [Select](api-reference/cost-of-energy/ops/select) for instance - can remove values from datasets, leaving \"holes\" or absent values behind. This is used for instance to select only weekends or certain times of year, \"clearing\" the rest of the dataset.\n\nWe leave it up to users of the API to decide how they wish to represent absent values. A common strategy is to use `NaN` to represent absent values, another common option is bit masking.",
+      "properties": {
+        "id": {
+          "description": "Identifier for this dataset. For registered datasets this is a globally unique slug; for intermediate pipeline results it is a local reference name.",
+          "title": "Id",
+          "type": "string"
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "Temporal resolution of the timeseries."
+        },
+        "unit": {
+          "$ref": "#/$defs/Unit",
+          "description": "Unit of the timeseries."
+        }
+      },
+      "required": [
+        "id",
+        "resolution",
+        "unit"
+      ],
+      "title": "Dataset",
+      "type": "object"
+    },
+    "DayOfWeekCondition": {
+      "description": "Condition that only applies on the specified days of the week.",
+      "properties": {
+        "days": {
+          "items": {
+            "description": "Day of week (1=Monday, 7=Sunday, ISO 8601)",
+            "maximum": 7.0,
+            "minimum": 1.0,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Days",
+          "type": "array"
+        },
+        "type": {
+          "const": "day_of_week",
+          "default": "day_of_week",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "days"
+      ],
+      "title": "DayOfWeekCondition",
+      "type": "object"
+    },
+    "Divide": {
+      "description": "Element-wise division of numerator / denominator.\n\nNumerator and denominator are required to have the same resolution.\n\nThe output dataset will have a unit that follows the following algebra:\n\n**Unit algebra:**\n\n- kW / kW = %\n\n- kWh / hours = kW\n\n- kWh / kW = hours\n\n- any / % = same as numerator",
+      "properties": {
+        "denominator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "$ref": "#/$defs/Dataset",
+              "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+            }
+          ],
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/level) that the numerator should be divided by",
+          "title": "Denominator"
+        },
+        "numerator": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) that should be divided by the denominator"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "type": {
+          "const": "divide",
+          "default": "divide",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "denominator",
+        "numerator",
+        "output"
+      ],
+      "title": "Divide",
+      "type": "object"
+    },
+    "ExcludeHolidaysCondition": {
+      "description": "Condition that applies on all days except the specified holidays",
+      "properties": {
+        "holidays": {
+          "description": "One or more holidays",
+          "items": {
+            "$ref": "#/$defs/Holiday"
+          },
+          "minItems": 1,
+          "title": "Holidays",
+          "type": "array"
+        },
+        "type": {
+          "const": "exclude_holidays",
+          "default": "exclude_holidays",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "holidays"
+      ],
+      "title": "ExcludeHolidaysCondition",
+      "type": "object"
+    },
+    "HighestCondition": {
+      "description": "Keep the N highest values per resolution window.",
+      "properties": {
+        "n": {
+          "description": "Number of top values to keep per period.",
+          "exclusiveMinimum": 0.0,
+          "title": "N",
+          "type": "integer"
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "Period over which to select the N highest values."
+        },
+        "type": {
+          "const": "highest",
+          "default": "highest",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "n",
+        "resolution"
+      ],
+      "title": "HighestCondition",
+      "type": "object"
+    },
+    "Holiday": {
+      "description": "Public holiday\n\n### Available holidays\n\n- **no/forste_nyttarsdag** — January 1st.\n\n- **no/skjartorsdag** — The Thursday before Easter Sunday (moveable).\n\n- **no/langfredag** — The Friday before Easter Sunday (moveable).\n\n- **no/forste_paskedag** — Easter Sunday (moveable).\n\n- **no/andre_paskedag** — The Monday after Easter Sunday (moveable).\n\n- **no/arbeidernes_dag** — May 1st.\n\n- **no/kristi_himmelfartsdag** — Ascension Day, the Thursday 39 days after Easter (moveable).\n\n- **no/grunnlovsdag** — May 17th.\n\n- **no/forste_pinsedag** — Whit Sunday / Pentecost (moveable).\n\n- **no/andre_pinsedag** — Whit Monday (moveable).\n\n- **no/forste_juledag** — December 25th.\n\n- **no/andre_juledag** — December 26th.\n\n- **se/nyarsdagen** — January 1st.\n\n- **se/trettondagsafton** — January 5th (Epiphany Eve).\n\n- **se/trettondedag_jul** — January 6th (Epiphany).\n\n- **se/skartorsdagen** — The Thursday before Easter Sunday (moveable).\n\n- **se/langfredagen** — The Friday before Easter Sunday (moveable).\n\n- **se/paskafton** — The Saturday before Easter Sunday — Easter Eve (moveable).\n\n- **se/paskdagen** — Easter Sunday (moveable).\n\n- **se/annandag_pask** — The Monday after Easter Sunday (moveable).\n\n- **se/forsta_maj** — May 1st.\n\n- **se/kristi_himmelsfard** — Ascension Day, the Thursday 39 days after Easter (moveable).\n\n- **se/pingstafton** — Whitsun Eve, the Saturday before Pentecost (moveable).\n\n- **se/nationaldagen** — June 6th.\n\n- **se/midsommarafton** — The Friday before Midsummer Day (moveable).\n\n- **se/allhelgonaafton** — The Friday between October 30th and November 5th — All Saints' Eve.\n\n- **se/julafton** — December 24th.\n\n- **se/juldagen** — December 25th.\n\n- **se/annandag_jul** — December 26th.\n\n- **se/nyarsafton** — December 31st.",
+      "enum": [
+        "no/forste_nyttarsdag",
+        "no/skjartorsdag",
+        "no/langfredag",
+        "no/forste_paskedag",
+        "no/andre_paskedag",
+        "no/arbeidernes_dag",
+        "no/kristi_himmelfartsdag",
+        "no/grunnlovsdag",
+        "no/forste_pinsedag",
+        "no/andre_pinsedag",
+        "no/forste_juledag",
+        "no/andre_juledag",
+        "se/nyarsdagen",
+        "se/trettondagsafton",
+        "se/trettondedag_jul",
+        "se/skartorsdagen",
+        "se/langfredagen",
+        "se/paskafton",
+        "se/paskdagen",
+        "se/annandag_pask",
+        "se/forsta_maj",
+        "se/kristi_himmelsfard",
+        "se/pingstafton",
+        "se/nationaldagen",
+        "se/midsommarafton",
+        "se/allhelgonaafton",
+        "se/julafton",
+        "se/juldagen",
+        "se/annandag_jul",
+        "se/nyarsafton"
+      ],
+      "title": "Holiday",
+      "type": "string"
+    },
+    "Level": {
+      "description": "Some floating point value and an associated [Unit](/api-reference/cost-of-energy/models/unit)",
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/Unit",
+          "description": "[Unit](/api-reference/cost-of-energy/models/unit) the value is expressed in."
+        },
+        "value": {
+          "description": "The level value.",
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ],
+      "title": "Level",
+      "type": "object"
+    },
+    "Lookup": {
+      "description": "Look up the matching tier level for a value based on discrete boundaries.\n\n### Example\n\nLet's say the highest power peak for a certain month (`monthly-power-peak`) is 150 kW. That means it falls into the second tier, since 150 kW >= `boundary` between the first and second tier (100 kW). The `monthly-fixed-fee` for that month becomes 5000 SEK (`level` of the matching tier).",
+      "properties": {
+        "boundaries": {
+          "description": "Tier boundaries. N contiguous tiers have N-1 boundaries: [0, b1), [b1, b2), ..., [bN-1, ∞).",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Boundaries",
+          "type": "array"
+        },
+        "levels": {
+          "description": "Level value for each of the N tiers.",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "title": "Levels",
+          "type": "array"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "tier_selector": {
+          "$ref": "#/$defs/Dataset",
+          "description": "Reference used to select the matching tier. Each value in here is used to find a matching tier level to produce as output"
+        },
+        "type": {
+          "const": "lookup",
+          "default": "lookup",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "$ref": "#/$defs/Unit",
+          "description": "Unit shared by all level values."
+        }
+      },
+      "required": [
+        "boundaries",
+        "levels",
+        "output",
+        "tier_selector",
+        "unit"
+      ],
+      "title": "Lookup",
+      "type": "object"
+    },
+    "LowestCondition": {
+      "description": "Keep the N lowest values per resolution window.",
+      "properties": {
+        "n": {
+          "description": "Number of bottom values to keep per period.",
+          "exclusiveMinimum": 0.0,
+          "title": "N",
+          "type": "integer"
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "Period over which to select the N lowest values."
+        },
+        "type": {
+          "const": "lowest",
+          "default": "lowest",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "n",
+        "resolution"
+      ],
+      "title": "LowestCondition",
+      "type": "object"
+    },
+    "Mask": {
+      "description": "Conditional substitution: where condition matches, use replacement; otherwise keep input.\n\nWorks with temporal conditions only (month, day_of_week, time_of_day, exclude_holidays, and, or, not).",
+      "properties": {
+        "condition": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/MonthCondition"
+            },
+            {
+              "$ref": "#/$defs/DayOfWeekCondition"
+            },
+            {
+              "$ref": "#/$defs/TimeOfDayCondition"
+            },
+            {
+              "$ref": "#/$defs/ExcludeHolidaysCondition"
+            },
+            {
+              "$ref": "#/$defs/AndCondition"
+            },
+            {
+              "$ref": "#/$defs/OrCondition"
+            },
+            {
+              "$ref": "#/$defs/NotCondition"
+            }
+          ],
+          "title": "Condition"
+        },
+        "input": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) to be masked"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "replacement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "$ref": "#/$defs/Dataset",
+              "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+            }
+          ],
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) to or [Level](/api-reference/cost-of-energy/models/level) to use as replacement where condition matches the input",
+          "title": "Replacement"
+        },
+        "type": {
+          "const": "mask",
+          "default": "mask",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "condition",
+        "input",
+        "output",
+        "replacement"
+      ],
+      "title": "Mask",
+      "type": "object"
+    },
+    "MonthCondition": {
+      "description": "Condition that only applies in the specified months.",
+      "properties": {
+        "months": {
+          "items": {
+            "description": "Month number (1=January, 12=December)",
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Months",
+          "type": "array"
+        },
+        "type": {
+          "const": "month",
+          "default": "month",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "months"
+      ],
+      "title": "MonthCondition",
+      "type": "object"
+    },
+    "Multiply": {
+      "description": "Element-wise multiplication of two operands.\n\nLeft and right opererands are required to have the same resolution.\n\nThe output dataset will have a unit that follows the following algebra:\n\n**Unit algebra (commutative):**\n\n- kW * SEK_per_kW = SEK\n\n- kWh * SEK_per_kWh = SEK\n\n- kW * hours = kWh\n\n- % * any = same as the other operand (dimensionless scaling)",
+      "properties": {
+        "left": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "$ref": "#/$defs/Dataset",
+              "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+            }
+          ],
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/level) to multiply",
+          "title": "Left"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Product](/api-reference/cost-of-energy/models/dataset) of element-wise multiplication of the left and right operands"
+        },
+        "right": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "$ref": "#/$defs/Dataset",
+              "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+            }
+          ],
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/level) to multiply",
+          "title": "Right"
+        },
+        "type": {
+          "const": "multiply",
+          "default": "multiply",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "left",
+        "output",
+        "right"
+      ],
+      "title": "Multiply",
+      "type": "object"
+    },
+    "NotCondition": {
+      "description": "Condition that applies when the sub condition doesn't apply",
+      "properties": {
+        "condition": {
+          "description": "Sub-condition to be inversed",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/MonthCondition"
+            },
+            {
+              "$ref": "#/$defs/DayOfWeekCondition"
+            },
+            {
+              "$ref": "#/$defs/TimeOfDayCondition"
+            },
+            {
+              "$ref": "#/$defs/ExcludeHolidaysCondition"
+            },
+            {
+              "$ref": "#/$defs/AndCondition"
+            },
+            {
+              "$ref": "#/$defs/OrCondition"
+            },
+            {
+              "$ref": "#/$defs/NotCondition"
+            }
+          ],
+          "title": "Condition"
+        },
+        "type": {
+          "const": "not",
+          "default": "not",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "condition"
+      ],
+      "title": "NotCondition",
+      "type": "object"
+    },
+    "OrCondition": {
+      "description": "Condition that applies when any sub-conditions is met",
+      "properties": {
+        "conditions": {
+          "description": "Sub-conditions to be ORed together",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MonthCondition"
+              },
+              {
+                "$ref": "#/$defs/DayOfWeekCondition"
+              },
+              {
+                "$ref": "#/$defs/TimeOfDayCondition"
+              },
+              {
+                "$ref": "#/$defs/ExcludeHolidaysCondition"
+              },
+              {
+                "$ref": "#/$defs/AndCondition"
+              },
+              {
+                "$ref": "#/$defs/OrCondition"
+              },
+              {
+                "$ref": "#/$defs/NotCondition"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Conditions",
+          "type": "array"
+        },
+        "type": {
+          "const": "or",
+          "default": "or",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "conditions"
+      ],
+      "title": "OrCondition",
+      "type": "object"
+    },
+    "PeriodicAmount": {
+      "description": "An [amount](/api-reference/cost-of-energy/models/unit) accumulated over a [period](/api-reference/cost-of-energy/models/resolution), constrained to a [Range](/api-reference/cost-of-energy/models/range) — for example, an annual energy offtake of at least 100 000 kWh.",
+      "properties": {
+        "range": {
+          "$ref": "#/$defs/Range",
+          "description": "Bounds the accumulated amount must fall within."
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "The period over which the amount is accumulated."
+        }
+      },
+      "required": [
+        "range",
+        "resolution"
+      ],
+      "title": "PeriodicAmount",
+      "type": "object"
+    },
+    "Range": {
+      "properties": {
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Maximum level, if any.",
+          "title": "Maximum"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Minimum level, if any.",
+          "title": "Minimum"
+        },
+        "unit": {
+          "$ref": "#/$defs/Unit",
+          "description": "Unit of the level."
+        }
+      },
+      "required": [
+        "unit"
+      ],
+      "title": "Range",
+      "type": "object"
+    },
+    "Resample": {
+      "description": "Resample a coarse-resolution series to a finer resolution.\n\nThe resampling strategy depends on the unit type:\n\n**Rate units** (kW, SEK/kWh, etc.) are **forward-filled**: each sub-period inherits its parent period's value unchanged.\n\n**Amount units** (SEK, NOK, kWh, hours) are **distributed proportionally**: each sub-period receives a share of the parent value weighted by the number of quarter-hour periods it contains relative to the parent period.",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) to resample"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Resulting Dataset](/api-reference/cost-of-energy/models/dataset) after resampling the input to the specified resolution"
+        },
+        "resolution": {
+          "$ref": "#/$defs/Resolution",
+          "description": "Target resolution to resample into (must be finer than input)."
+        },
+        "type": {
+          "const": "resample",
+          "default": "resample",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input",
+        "output",
+        "resolution"
+      ],
+      "title": "Resample",
+      "type": "object"
+    },
+    "Resolution": {
+      "description": "Temporal resolution\n\n### Available resolutions\n\n- **quarter_hourly** — 15-minute resolution\n\n- **hourly** — 60-minute resolution\n\n- **daily** — Daily resolution in *calendar* days, not necessarily exactly 24 hours, depending on daylight savings etc\n\n- **weekly** — Weekly resolution in *calendar* weeks, not necessarily exactly 24 * 7 hours, depending on daylight savings etc\n\n- **monthly** — Monthly resolution in *calendar* months, taking into account things like daylight savings and leap year calculations\n\n- **yearly** — Annual resolution in *calendar* years, taking into account things like daylight savings and leap year calculations",
+      "enum": [
+        "quarter_hourly",
+        "hourly",
+        "daily",
+        "weekly",
+        "monthly",
+        "yearly"
+      ],
+      "title": "Resolution",
+      "type": "string"
+    },
+    "Select": {
+      "description": "Keep only values matching a condition, removing all others.\n\nThe resulting dataset will have \"absent\" values or \"holes\". See [Datasets](/api-reference/cost-of-energy/models/dataset) for details on absent values.\n\nWorks with both temporal conditions (month, day_of_week, time_of_day, exclude_holidays, and, or, not) and value conditions (highest, lowest).",
+      "properties": {
+        "condition": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/MonthCondition"
+            },
+            {
+              "$ref": "#/$defs/DayOfWeekCondition"
+            },
+            {
+              "$ref": "#/$defs/TimeOfDayCondition"
+            },
+            {
+              "$ref": "#/$defs/ExcludeHolidaysCondition"
+            },
+            {
+              "$ref": "#/$defs/AndCondition"
+            },
+            {
+              "$ref": "#/$defs/OrCondition"
+            },
+            {
+              "$ref": "#/$defs/NotCondition"
+            },
+            {
+              "$ref": "#/$defs/HighestCondition"
+            },
+            {
+              "$ref": "#/$defs/LowestCondition"
+            }
+          ],
+          "title": "Condition"
+        },
+        "input": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) to select from"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Output Dataset](/api-reference/cost-of-energy/models/dataset) produced by this function, a local name used by subsequent functions to reference this result"
+        },
+        "type": {
+          "const": "select",
+          "default": "select",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "condition",
+        "input",
+        "output"
+      ],
+      "title": "Select",
+      "type": "object"
+    },
+    "Specifier": {
+      "enum": [
+        "offtake",
+        "injection",
+        "storage",
+        "fuse_based",
+        "low_voltage_grid",
+        "high_voltage_grid",
+        "regional_grid",
+        "apartment",
+        "house",
+        "household",
+        "business"
+      ],
+      "title": "Specifier",
+      "type": "string"
+    },
+    "Subtract": {
+      "description": "Element-wise computation of ``left - right``.\n\nLeft and right are required to have the same resolution.",
+      "properties": {
+        "left": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "$ref": "#/$defs/Dataset",
+              "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+            }
+          ],
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/dataset) to subtract from - if you want to get fancy this is called the 'minuend'.",
+          "title": "Left"
+        },
+        "output": {
+          "$ref": "#/$defs/Dataset",
+          "description": "[Difference](/api-reference/cost-of-energy/models/dataset) produced by subtracting the right operand from the left operand"
+        },
+        "right": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "$ref": "#/$defs/Dataset",
+              "description": "A [Dataset](/api-reference/cost-of-energy/models/dataset), either one produced earlier in the same function pipeline, or a well-known [Registered Dataset](/api-reference/cost-of-energy/models/dataset)."
+            }
+          ],
+          "description": "[Dataset](/api-reference/cost-of-energy/models/dataset) or [Level](/api-reference/cost-of-energy/models/dataset) to subtract with - if you want to get fancy this is called the 'subtrahend'.",
+          "title": "Right"
+        },
+        "type": {
+          "const": "subtract",
+          "default": "subtract",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "left",
+        "output",
+        "right"
+      ],
+      "title": "Subtract",
+      "type": "object"
+    },
+    "SystemOperatorEligibility": {
+      "description": "Criteria defining the characteristics a customer and their metering point need to have to be eligible for a system operator tariff.",
+      "properties": {
+        "energy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PeriodicAmount"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Energy-volume-over-a-period characteristics, if any — e.g. an annual offtake of at least 100 000 kWh. Always expressed in kWh."
+        },
+        "fuse_size": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Fuse-size characteristics, if any.",
+          "title": "Fuse Size"
+        },
+        "metering_grid_area_ids": {
+          "description": "Unique identifiers of the [Metering Grid Areas](/api-reference/core/models/metering-grid-area) where this tariff is available.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Metering Grid Area Ids",
+          "type": "array"
+        },
+        "other": {
+          "description": "Other characteristics, specified as a list of specifiers.",
+          "items": {
+            "$ref": "#/$defs/Specifier"
+          },
+          "title": "Other",
+          "type": "array"
+        },
+        "power": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Power characteristics, if any.",
+          "title": "Power"
+        },
+        "type": {
+          "const": "system_operator",
+          "default": "system_operator",
+          "title": "Type",
+          "type": "string"
+        },
+        "voltage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "$ref": "#/$defs/Level"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Voltage characteristics, if any.",
+          "title": "Voltage"
+        }
+      },
+      "required": [
+        "metering_grid_area_ids"
+      ],
+      "title": "SystemOperatorEligibility",
+      "type": "object"
+    },
+    "TariffComponent": {
+      "description": "Describes some component of the cost of energy of a [Tariff](/api-reference/cost-of-energy/models/tariff), like peak tariffs, taxes, fixed monthly fees etc.\n\nTariff components describe how to transform some [Datasets](/api-reference/cost-of-energy/models/dataset) through a series of Functions, arriving at a cost dataset.\n\nWhen tariffs are changed, as they frequently are, a new Tariff Component is created, and the applicable_from/applicable_to fields are set to represent when the switch-over occurred.\n\nThis allows you to model historic cost as well as upcoming transitions to new tariffs.",
+      "properties": {
+        "applicable_from": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "ISO 8601 formatted datetime from when the tariff component becomes applicable, if any. If `null` or not included, applicable immediately.",
+          "title": "Applicable From"
+        },
+        "applicable_to": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "ISO 8601 formatted datetime at which the tariff component ceases to be applicable (exclusive — the component does not apply at this instant). If `null` or not included, applicable until further notice.",
+          "title": "Applicable To"
+        },
+        "cost": {
+          "$ref": "#/$defs/Dataset",
+          "description": "The pipeline's final output [Dataset](/api-reference/cost-of-energy/models/dataset), either a Registered Dataset or - more commonly - the result of the functions pipeline."
+        },
+        "datasets": {
+          "description": "Input datasets, these are all [Registered Datasets](/api-reference/cost-of-energy/models/dataset) that must be supplied to the function pipeline",
+          "items": {
+            "$ref": "#/$defs/Dataset"
+          },
+          "title": "Datasets",
+          "type": "array"
+        },
+        "functions": {
+          "description": "This is describes the core function pipeline - ordered [Functions](/api-reference/cost-of-energy/ops/overview) that transform the input dataset(s) to the final output cost dataset. Each step produces a named output [Dataset](/api-reference/cost-of-energy/models/dataset) that subsequent [Functions](/api-reference/cost-of-energy/ops/overview) may take as inputs or that become the final output",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Constant"
+              },
+              {
+                "$ref": "#/$defs/Add"
+              },
+              {
+                "$ref": "#/$defs/Subtract"
+              },
+              {
+                "$ref": "#/$defs/Divide"
+              },
+              {
+                "$ref": "#/$defs/Multiply"
+              },
+              {
+                "$ref": "#/$defs/Aggregate"
+              },
+              {
+                "$ref": "#/$defs/Resample"
+              },
+              {
+                "$ref": "#/$defs/Select"
+              },
+              {
+                "$ref": "#/$defs/Mask"
+              },
+              {
+                "$ref": "#/$defs/Clip"
+              },
+              {
+                "$ref": "#/$defs/Lookup"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Functions",
+          "type": "array"
+        },
+        "name": {
+          "description": "Name of the tariff component as given by the issuing [Party](/api-reference/core/models/party).",
+          "title": "Name",
+          "type": "string"
+        },
+        "timezone": {
+          "description": "Timezone in which time-dependent functions (filtering, grouping) are evaluated. Typically local time, but can also be a fixed UTC offset.",
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cost",
+        "datasets",
+        "functions",
+        "name",
+        "timezone"
+      ],
+      "title": "TariffComponent",
+      "type": "object"
+    },
+    "TimeOfDayCondition": {
+      "description": "Condition that only applies within the specified time-of-day range.",
+      "properties": {
+        "from_time": {
+          "description": "Start of the time period (inclusive).",
+          "format": "time",
+          "title": "From Time",
+          "type": "string"
+        },
+        "to_time": {
+          "description": "End of the time period (exclusive).",
+          "format": "time",
+          "title": "To Time",
+          "type": "string"
+        },
+        "type": {
+          "const": "time_of_day",
+          "default": "time_of_day",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_time",
+        "to_time"
+      ],
+      "title": "TimeOfDayCondition",
+      "type": "object"
+    },
+    "Unit": {
+      "description": "Units indicate, well, the unit of values. These are used in places like [Datasets](/api-reference/cost-of-energy/models/dataset) and [Levels](/api-reference/cost-of-energy/models/level) to indicate the unit the data is in.\n\n### Available units\n\n- **A** — Current in Amperes\n\n- **kV** — Voltage in kilo volts\n\n- **kW** — Power in kilo watts\n\n- **kWh** — Energy in kilo watt hours\n\n- **hours** — Time in hours\n\n- **SEK** — Monetary amount in SEK\n\n- **NOK** — Monetary amount in NOK\n\n- **EUR** — Monetary amount in EUR\n\n- **SEK_per_kWh** — Monetary rate in SEK per kWh\n\n- **SEK_per_kW** — Monetary rate in SEK per kW\n\n- **NOK_per_kWh** — Monetary rate in NOK per kWh\n\n- **NOK_per_kW** — Monetary rate in NOK per kW\n\n- **EUR_per_kWh** — Monetary rate in EUR per kWh\n\n- **EUR_per_kW** — Monetary rate in EUR per kW\n\n- **%** — Percentage, as a float, where 1.0 represents 100%",
+      "enum": [
+        "A",
+        "kV",
+        "kW",
+        "kWh",
+        "hours",
+        "SEK",
+        "NOK",
+        "EUR",
+        "SEK_per_kWh",
+        "SEK_per_kW",
+        "NOK_per_kWh",
+        "NOK_per_kW",
+        "EUR_per_kWh",
+        "EUR_per_kW",
+        "%"
+      ],
+      "title": "Unit",
+      "type": "string"
+    }
+  }
+}

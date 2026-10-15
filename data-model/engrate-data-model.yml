@@ -1,0 +1,953 @@
+generated: '2026-10-15'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/engrate-openapi.json
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 117
+  entities_in_spec: 117
+  relationships: 147
+entities:
+- name: Add
+  fields: 3
+  description: Element-wise addition of two or more operands.
+- name: Aggregate
+  fields: 5
+  description: Aggregate a dataset over a resolution window and apply a function.
+- name: AggregateAllocation
+  fields: 10
+  description: An aggregate allocation and its aggregation dimensions. A null or absent dimension includes the accounting
+    points of all values.
+- name: AggregateAllocationPage
+  fields: 4
+- name: AggregateAllocationRecord
+  fields: 8
+  description: A volume for one aggregate timeseries and one Imbalance Settlement Period (ISP).
+- name: AggregateAllocationsResponse
+  fields: 1
+- name: AggregationObjectRequest
+  fields: 8
+  description: Request model for aggregation object response.
+- name: AggregationObjectResponse
+  fields: 13
+  description: Response model for aggregation objects.
+- name: AllocationRecord
+  fields: 7
+  description: A volume allocated to some Accounting Point for one Imbalance Settlement Period (ISP).
+- name: AllocationsResponse
+  fields: 1
+- name: AndCondition
+  fields: 2
+  description: Condition that applies when all sub-conditions are met
+- name: AuditLogResponse
+  fields: 11
+  description: An audit log entry recording a state change or action.
+- name: BiddingZone
+  fields: 4
+  description: A Bidding Zone (also called a price area) is a core domain concept in the European energy market.
+- name: CalculateComponentResult
+  fields: 4
+- name: CalculateTariffRequest
+  fields: 5
+- name: CalculateTariffResponse
+  fields: 1
+- name: CalculatedTimeSeries
+  fields: 4
+  description: A named time series returned from a calculation, with explicit resolution and unit.
+- name: ClearingCalendarResponse
+  fields: 10
+  description: MaBiS clearing calendar for a settlement month.
+- name: ClearingPeriodCreateRequest
+  fields: 5
+  description: Request to create a clearing period.
+- name: ClearingPeriodResponse
+  fields: 12
+  description: A [Clearing Period](/api-reference/settlement-management/models/clearing-period) representing one
+    settlement month for a balance group.
+- name: ClearingPeriodSummaryResponse
+  fields: 8
+  description: Summary view for a clearing period including counts, totals, and the next deadline.
+- name: ClearingSettlementResponse
+  fields: 6
+  description: A [Clearing Settlement](/api-reference/settlement-management/models/clearing-settlement) representing
+    one day's settlement data within a clearing period, containing raw MSCONS interval values.
+- name: Clip
+  fields: 5
+  description: Clip values to a min/max range.
+- name: ComponentIdentity
+  fields: 3
+  description: Identifies a tariff component by its issuing-party name and applicability window. See [Tariff Component](/api-reference/cost-of-energy/models/tariff-component)
+    for the full definition.
+- name: ComponentRate
+  fields: 2
+  description: A single tariff component's projected rate timeseries.
+- name: Constant
+  fields: 4
+  description: Emit a constant value at a given resolution.
+- name: ControlArea
+  fields: 4
+  description: A Control Area is a core domain concept in the European energy market.
+- name: ControlEnergyPriceDataPoint
+  fields: 2
+  description: Single price data point.
+- name: ControlEnergyPriceResponse
+  fields: 3
+  description: Response model for control energy prices (reBAP).
+- name: DailyImbalance
+  fields: 4
+  description: Imbalance summary for a single day within a clearing period.
+- name: Dataset
+  fields: 3
+  description: A named timeseries with known resolution and unit.
+- name: DayOfWeekCondition
+  fields: 2
+  description: Condition that only applies on the specified days of the week.
+- name: Divide
+  fields: 4
+  description: Element-wise division of numerator / denominator.
+- name: EnergyVolumeResponse
+  fields: 14
+  description: Response model for energy volume records.
+- name: ExchangePriorityBalanceGroupResponse
+  fields: 3
+  description: A balance group that has exchange priority (Börsenvorrang) per Bilanzkreisvertrag clause 12.b.
+- name: ExchangePriorityCheckResponse
+  fields: 3
+  description: Result of checking whether a specific EIC code has exchange priority (Börsenvorrang).
+- name: ExcludeHolidaysCondition
+  fields: 2
+  description: Condition that applies on all days except the specified holidays
+- name: ExtraIdentifier
+  fields: 2
+  description: Extra identifiers are used to attach things like EIC ids, VAT numbers, jurisdiction-specific identifiers,
+    etc.
+- name: GeoJsonFeature
+  fields: 4
+  description: A single [GeoJSON Feature](https://datatracker.ietf.org/doc/html/rfc7946).
+- name: GeoJsonFeatureCollection
+  fields: 2
+  description: Standard [GeoJSON FeatureCollection](https://datatracker.ietf.org/doc/html/rfc7946) with typed properties.
+- name: GeoJsonMultiPolygon
+  fields: 2
+  description: A [GeoJSON MultiPolygon](https://datatracker.ietf.org/doc/html/rfc7946).
+- name: GeoJsonPolygon
+  fields: 2
+  description: A [GeoJSON Polygon](https://datatracker.ietf.org/doc/html/rfc7946).
+- name: GetBiddingZonesResponse
+  fields: 1
+- name: GetControlAreasResponse
+  fields: 1
+- name: GetDatasetsResponse
+  fields: 1
+- name: GetMeteringGridAreasResponse
+  fields: 1
+- name: GetPartiesResponse
+  fields: 1
+- name: GetSchedulingAreasResponse
+  fields: 1
+- name: GetTariffsResponse
+  fields: 1
+- name: HTTPValidationError
+  fields: 1
+- name: HighestCondition
+  fields: 3
+  description: Keep the N highest values per resolution window.
+- name: HolidayOccurrence
+  fields: 3
+  description: A single occurrence of a holiday on a calendar date.
+- name: HolidaysResponse
+  fields: 1
+  description: Holidays in the requested range.
+- name: Identifier
+  fields: 2
+- name: ImbalanceResponse
+  fields: 6
+  description: Aggregated imbalance calculation for an entire clearing period, broken down by day.
+- name: IncomingMessageResponse
+  fields: 6
+  description: A message received from the TSO in response to a schedule submission (ACK, CNF, or ANO document).
+- name: InputProfile
+  fields: 2
+  description: A reference to a persisted profile to use as input for a dataset.
+- name: InputTimeSeries
+  fields: 2
+  description: A time series of data for a registered dataset that is input for a tariff component.
+- name: Level
+  fields: 2
+  description: Some floating point value and an associated [Unit](/api-reference/cost-of-energy/models/unit)
+- name: Lookup
+  fields: 6
+  description: Look up the matching tier level for a value based on discrete boundaries.
+- name: LowestCondition
+  fields: 3
+  description: Keep the N lowest values per resolution window.
+- name: Mask
+  fields: 5
+  description: 'Conditional substitution: where condition matches, use replacement; otherwise keep input.'
+- name: MeteringGridArea
+  fields: 5
+  description: A Metering Grid Area (MGA) is a core domain concept in the European energy market.
+- name: MeteringGridAreaUnionEntry
+  fields: 7
+  description: '[MeteringGridArea](/api-reference/core/models/metering-grid-area) with an extra ''type'' field,
+    used in tagged unions'
+- name: MonthCondition
+  fields: 2
+  description: Condition that only applies in the specified months.
+- name: MonthlyCostResponse
+  fields: 9
+  description: Response model for monthly cost calculation.
+- name: MonthlyEnergySummaryResponse
+  fields: 11
+  description: Response model for monthly energy summary.
+- name: MonthlySummaryResponse
+  fields: 2
+  description: Combined monthly summary with energy and cost.
+- name: Multiply
+  fields: 4
+  description: Element-wise multiplication of two operands.
+- name: NLBusinessTypeTotalResponse
+  fields: 3
+  description: Aggregated total for a single business type within a month.
+- name: NLImbalancePointResponse
+  fields: 4
+  description: Single quarter-hourly data point within an imbalance time series.
+- name: NLImbalanceReportDetailResponse
+  fields: 2
+  description: Full imbalance report including all time series.
+- name: NLImbalanceReportListResponse
+  fields: 1
+  description: Wrapped list of imbalance reports.
+- name: NLImbalanceReportResponse
+  fields: 8
+  description: Imbalance report header as returned in list views.
+- name: NLImbalanceSummaryResponse
+  fields: 5
+  description: Aggregation of NL imbalance settlement data over a date range.
+- name: NLImbalanceTimeSeriesListResponse
+  fields: 1
+  description: Wrapped list of time series for a report.
+- name: NLImbalanceTimeSeriesResponse
+  fields: 12
+  description: Individual time series within an imbalance report.
+- name: NotCondition
+  fields: 2
+  description: Condition that applies when the sub condition doesn't apply
+- name: ObjectionCreateRequest
+  fields: 3
+  description: Request to create an objection.
+- name: ObjectionResponse
+  fields: 11
+  description: An [Objection](/api-reference/settlement-management/models/objection) (Einspruch) filed against settlement
+    data within a clearing period.
+- name: OrCondition
+  fields: 2
+  description: Condition that applies when any sub-conditions is met
+- name: Party
+  fields: 7
+  description: Represents a "Market Party" of some kind. Normally this is some legal person - a corporation, government
+    entity, NGO etc - that serves some role in the electrical system.
+- name: PeriodicAmount
+  fields: 2
+  description: An [amount](/api-reference/cost-of-energy/models/unit) accumulated over a [period](/api-reference/cost-of-energy/models/resolution),
+    constrained to a [Range](/api-reference/cost-of-energy/models/range
+- name: ProfileListItem
+  fields: 9
+  description: Summary of a profile returned in list responses.
+- name: ProfileListResponse
+  fields: 1
+  description: Response containing available profiles.
+- name: ProfileRequestBody
+  fields: 8
+  description: Request body for creating or updating a profile.
+- name: ProfileResponse
+  fields: 11
+  description: Full profile including timeseries values.
+- name: Range
+  fields: 3
+- name: RateInterval
+  fields: 3
+  description: A flat-rate slice of a Rate Timeseries, spanning the half-open UTC range `[start_time, end_time)`.
+- name: RateTimeseries
+  fields: 3
+  description: A single rate timeseries for one input dataset and unit, made up of chronologically ordered, non-overlapping
+    flat-rate Rate Intervals.
+- name: Resample
+  fields: 4
+  description: Resample a coarse-resolution series to a finer resolution.
+- name: ScheduleCreateDataPoint
+  fields: 2
+  description: Single interval data point in a submitted series.
+- name: ScheduleCreateRequest
+  fields: 6
+  description: Request body for creating a schedule or a new spec for an existing one.
+- name: ScheduleCreateSeriesIds
+  fields: 5
+  description: Series party and area identifiers for a submitted series.
+- name: ScheduleCreateSeriesItem
+  fields: 3
+  description: Time series item within a create-schedule request.
+- name: ScheduleResponse
+  fields: 7
+  description: A [Schedule](/api-reference/schedule-management/models/schedule) header representing a single delivery-date
+    submission to a TSO.
+- name: ScheduleSeriesDataPoint
+  fields: 2
+  description: 'One interval of a schedule series: a timestamp and its power amount.'
+- name: ScheduleSeriesIds
+  fields: 4
+  description: EIC identifiers locating a series in the area/party exchange.
+- name: ScheduleSeriesResponse
+  fields: 9
+  description: A [Schedule Series](/api-reference/schedule-management/models/schedule-series) representing one time
+    series within a schedule version (e.g. one internal or external trade).
+- name: ScheduleSeriesSpec
+  fields: 3
+  description: 'Full series specification: identifiers, type, and interval data.'
+- name: ScheduleVersionResponse
+  fields: 14
+  description: A [Schedule Version](/api-reference/schedule-management/models/schedule-version) representing one
+    submission attempt. Each re-submission creates a new version.
+- name: ScheduleVersionSeriesItem
+  fields: 8
+  description: Series reference within a [Schedule Version](/api-reference/schedule-management/models/schedule-version)
+    spec.
+- name: ScheduleVersionSpec
+  fields: 5
+  description: The full specification that was submitted with a schedule version, including market routing and all
+    series.
+- name: SchedulingArea
+  fields: 4
+  description: A Scheduling Area is a core domain concept in the European energy market.
+- name: Select
+  fields: 4
+  description: Keep only values matching a condition, removing all others.
+- name: SettlementMessageResponse
+  fields: 10
+  description: An EDIFACT message exchanged during the settlement process (MSCONS, PRICAT, UTILMD, IFTSTA, etc.).
+- name: SimplifiedTariffResponse
+  fields: 3
+  description: Indicative, simplified view of a [Tariff](/api-reference/cost-of-energy/models/tariff)'s rates over
+    a time range.
+- name: StatusRequestCreate
+  fields: 3
+  description: Request body for sending a status request to TSO.
+- name: StatusRequestResponse
+  fields: 5
+  description: Response from a status request submission to a TSO.
+- name: Subtract
+  fields: 4
+  description: Element-wise computation of ``left - right``.
+- name: SystemOperatorEligibility
+  fields: 7
+  description: Criteria defining the characteristics a customer and their metering point need to have to be eligible
+    for a system operator tariff.
+- name: Tariff
+  fields: 8
+  description: Represents a tariff - a rate plan - for a metering point, including eligibility criteria, availability
+    period and one or more [Tariff Components](/api-reference/cost-of-energy/models/tariff-component)
+- name: TariffComponent
+  fields: 7
+  description: Describes some component of the cost of energy of a [Tariff](/api-reference/cost-of-energy/models/tariff),
+    like peak tariffs, taxes, fixed monthly fees etc.
+- name: TimeOfDayCondition
+  fields: 3
+  description: Condition that only applies within the specified time-of-day range.
+- name: ValidationError
+  fields: 5
+- name: ValidationResponse
+  fields: 8
+  description: Validation result for a clearing period, checking data completeness and consistency.
+- name: WarningItem
+  fields: 2
+  description: A TSO warning returned in an ACK or CNF response (e.g. B45, A54).
+relationships:
+- from: Add
+  to: Level
+  type: has_many
+  via: inputs
+- from: Add
+  to: Dataset
+  type: has_many
+  via: inputs
+- from: Add
+  to: Dataset
+  type: has_one
+  via: output
+- from: Aggregate
+  to: Dataset
+  type: has_one
+  via: input
+- from: Aggregate
+  to: Dataset
+  type: has_one
+  via: output
+- from: AggregateAllocationPage
+  to: AggregateAllocation
+  type: has_many
+  via: items
+- from: AggregateAllocationsResponse
+  to: AggregateAllocationRecord
+  type: has_many
+  via: values
+- from: AllocationsResponse
+  to: AllocationRecord
+  type: has_many
+  via: values
+- from: AndCondition
+  to: MonthCondition
+  type: has_many
+  via: conditions
+- from: AndCondition
+  to: DayOfWeekCondition
+  type: has_many
+  via: conditions
+- from: AndCondition
+  to: TimeOfDayCondition
+  type: has_many
+  via: conditions
+- from: AndCondition
+  to: ExcludeHolidaysCondition
+  type: has_many
+  via: conditions
+- from: AndCondition
+  to: OrCondition
+  type: has_many
+  via: conditions
+- from: AndCondition
+  to: NotCondition
+  type: has_many
+  via: conditions
+- from: CalculateComponentResult
+  to: CalculatedTimeSeries
+  type: has_many
+  via: time_series
+- from: CalculateTariffRequest
+  to: Tariff
+  type: belongs_to
+  via: tariff_id
+- from: CalculateTariffResponse
+  to: CalculateComponentResult
+  type: has_many
+  via: components
+- from: ClearingPeriodSummaryResponse
+  to: ClearingPeriodResponse
+  type: has_one
+  via: clearing_period
+- from: Clip
+  to: Dataset
+  type: has_one
+  via: input
+- from: Clip
+  to: Level
+  type: has_one
+  via: maximum
+- from: Clip
+  to: Dataset
+  type: has_one
+  via: maximum
+- from: Clip
+  to: Level
+  type: has_one
+  via: minimum
+- from: Clip
+  to: Dataset
+  type: has_one
+  via: minimum
+- from: Clip
+  to: Dataset
+  type: has_one
+  via: output
+- from: ComponentRate
+  to: ComponentIdentity
+  type: has_one
+  via: component
+- from: ComponentRate
+  to: RateTimeseries
+  type: has_one
+  via: rate
+- from: Constant
+  to: Dataset
+  type: has_one
+  via: output
+- from: Constant
+  to: Level
+  type: has_one
+  via: value
+- from: ControlEnergyPriceResponse
+  to: ControlEnergyPriceDataPoint
+  type: has_many
+  via: data
+- from: Divide
+  to: Level
+  type: has_one
+  via: denominator
+- from: Divide
+  to: Dataset
+  type: has_one
+  via: denominator
+- from: Divide
+  to: Dataset
+  type: has_one
+  via: numerator
+- from: Divide
+  to: Dataset
+  type: has_one
+  via: output
+- from: GeoJsonFeature
+  to: GeoJsonPolygon
+  type: has_one
+  via: geometry
+- from: GeoJsonFeature
+  to: GeoJsonMultiPolygon
+  type: has_one
+  via: geometry
+- from: GeoJsonFeature
+  to: MeteringGridAreaUnionEntry
+  type: has_one
+  via: properties
+- from: GeoJsonFeatureCollection
+  to: GeoJsonFeature
+  type: has_many
+  via: features
+- from: GetBiddingZonesResponse
+  to: BiddingZone
+  type: has_many
+  via: bidding_zones
+- from: GetControlAreasResponse
+  to: ControlArea
+  type: has_many
+  via: control_areas
+- from: GetDatasetsResponse
+  to: Dataset
+  type: has_many
+  via: datasets
+- from: GetMeteringGridAreasResponse
+  to: MeteringGridArea
+  type: has_many
+  via: mgas
+- from: GetPartiesResponse
+  to: Party
+  type: has_many
+  via: parties
+- from: GetSchedulingAreasResponse
+  to: SchedulingArea
+  type: has_many
+  via: scheduling_areas
+- from: GetTariffsResponse
+  to: Tariff
+  type: has_many
+  via: tariffs
+- from: HTTPValidationError
+  to: ValidationError
+  type: has_many
+  via: detail
+- from: HolidaysResponse
+  to: HolidayOccurrence
+  type: has_many
+  via: holidays
+- from: Identifier
+  to: ExtraIdentifier
+  type: has_many
+  via: extra_ids
+- from: ImbalanceResponse
+  to: DailyImbalance
+  type: has_many
+  via: daily_imbalances
+- from: Lookup
+  to: Dataset
+  type: has_one
+  via: output
+- from: Lookup
+  to: Dataset
+  type: has_one
+  via: tier_selector
+- from: Mask
+  to: MonthCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: DayOfWeekCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: TimeOfDayCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: ExcludeHolidaysCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: AndCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: OrCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: NotCondition
+  type: has_one
+  via: condition
+- from: Mask
+  to: Dataset
+  type: has_one
+  via: input
+- from: Mask
+  to: Dataset
+  type: has_one
+  via: output
+- from: Mask
+  to: Level
+  type: has_one
+  via: replacement
+- from: Mask
+  to: Dataset
+  type: has_one
+  via: replacement
+- from: MeteringGridArea
+  to: ExtraIdentifier
+  type: has_many
+  via: extra_ids
+- from: MeteringGridArea
+  to: Identifier
+  type: has_one
+  via: system_operator
+- from: MeteringGridAreaUnionEntry
+  to: ExtraIdentifier
+  type: has_many
+  via: extra_ids
+- from: MeteringGridAreaUnionEntry
+  to: Identifier
+  type: has_one
+  via: system_operator
+- from: MonthlySummaryResponse
+  to: MonthlyCostResponse
+  type: has_one
+  via: cost
+- from: MonthlySummaryResponse
+  to: MonthlyEnergySummaryResponse
+  type: has_one
+  via: energy
+- from: Multiply
+  to: Level
+  type: has_one
+  via: left
+- from: Multiply
+  to: Dataset
+  type: has_one
+  via: left
+- from: Multiply
+  to: Dataset
+  type: has_one
+  via: output
+- from: Multiply
+  to: Level
+  type: has_one
+  via: right
+- from: Multiply
+  to: Dataset
+  type: has_one
+  via: right
+- from: NLImbalanceReportDetailResponse
+  to: NLImbalanceReportResponse
+  type: has_one
+  via: report
+- from: NLImbalanceReportDetailResponse
+  to: NLImbalanceTimeSeriesResponse
+  type: has_many
+  via: time_series
+- from: NLImbalanceReportListResponse
+  to: NLImbalanceReportResponse
+  type: has_many
+  via: items
+- from: NLImbalanceSummaryResponse
+  to: NLBusinessTypeTotalResponse
+  type: has_many
+  via: business_type_totals
+- from: NLImbalanceTimeSeriesListResponse
+  to: NLImbalanceTimeSeriesResponse
+  type: has_many
+  via: items
+- from: NLImbalanceTimeSeriesResponse
+  to: NLImbalancePointResponse
+  type: has_many
+  via: points
+- from: NotCondition
+  to: MonthCondition
+  type: has_one
+  via: condition
+- from: NotCondition
+  to: DayOfWeekCondition
+  type: has_one
+  via: condition
+- from: NotCondition
+  to: TimeOfDayCondition
+  type: has_one
+  via: condition
+- from: NotCondition
+  to: ExcludeHolidaysCondition
+  type: has_one
+  via: condition
+- from: NotCondition
+  to: AndCondition
+  type: has_one
+  via: condition
+- from: NotCondition
+  to: OrCondition
+  type: has_one
+  via: condition
+- from: OrCondition
+  to: MonthCondition
+  type: has_many
+  via: conditions
+- from: OrCondition
+  to: DayOfWeekCondition
+  type: has_many
+  via: conditions
+- from: OrCondition
+  to: TimeOfDayCondition
+  type: has_many
+  via: conditions
+- from: OrCondition
+  to: ExcludeHolidaysCondition
+  type: has_many
+  via: conditions
+- from: OrCondition
+  to: AndCondition
+  type: has_many
+  via: conditions
+- from: OrCondition
+  to: NotCondition
+  type: has_many
+  via: conditions
+- from: Party
+  to: ExtraIdentifier
+  type: has_many
+  via: extra_ids
+- from: PeriodicAmount
+  to: Range
+  type: has_one
+  via: range
+- from: ProfileListResponse
+  to: ProfileListItem
+  type: has_many
+  via: profiles
+- from: RateTimeseries
+  to: Dataset
+  type: belongs_to
+  via: dataset_id
+- from: RateTimeseries
+  to: RateInterval
+  type: has_many
+  via: intervals
+- from: Resample
+  to: Dataset
+  type: has_one
+  via: input
+- from: Resample
+  to: Dataset
+  type: has_one
+  via: output
+- from: ScheduleCreateRequest
+  to: ScheduleCreateSeriesItem
+  type: has_many
+  via: series
+- from: ScheduleCreateSeriesItem
+  to: ScheduleCreateDataPoint
+  type: has_many
+  via: data
+- from: ScheduleCreateSeriesItem
+  to: ScheduleCreateSeriesIds
+  type: has_one
+  via: ids
+- from: ScheduleSeriesResponse
+  to: ScheduleSeriesSpec
+  type: has_one
+  via: spec
+- from: ScheduleSeriesSpec
+  to: ScheduleSeriesDataPoint
+  type: has_many
+  via: data
+- from: ScheduleSeriesSpec
+  to: ScheduleSeriesIds
+  type: has_one
+  via: ids
+- from: ScheduleVersionResponse
+  to: ScheduleVersionSpec
+  type: has_one
+  via: spec
+- from: ScheduleVersionSpec
+  to: ScheduleVersionSeriesItem
+  type: has_many
+  via: series
+- from: Select
+  to: MonthCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: DayOfWeekCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: TimeOfDayCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: ExcludeHolidaysCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: AndCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: OrCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: NotCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: HighestCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: LowestCondition
+  type: has_one
+  via: condition
+- from: Select
+  to: Dataset
+  type: has_one
+  via: input
+- from: Select
+  to: Dataset
+  type: has_one
+  via: output
+- from: SimplifiedTariffResponse
+  to: ComponentRate
+  type: has_many
+  via: component_rates
+- from: SimplifiedTariffResponse
+  to: RateTimeseries
+  type: has_many
+  via: dataset_rates
+- from: SimplifiedTariffResponse
+  to: ComponentIdentity
+  type: has_many
+  via: unprojectable_components
+- from: Subtract
+  to: Level
+  type: has_one
+  via: left
+- from: Subtract
+  to: Dataset
+  type: has_one
+  via: left
+- from: Subtract
+  to: Dataset
+  type: has_one
+  via: output
+- from: Subtract
+  to: Level
+  type: has_one
+  via: right
+- from: Subtract
+  to: Dataset
+  type: has_one
+  via: right
+- from: SystemOperatorEligibility
+  to: PeriodicAmount
+  type: has_one
+  via: energy
+- from: SystemOperatorEligibility
+  to: Range
+  type: has_one
+  via: fuse_size
+- from: SystemOperatorEligibility
+  to: Level
+  type: has_one
+  via: fuse_size
+- from: SystemOperatorEligibility
+  to: MeteringGridArea
+  type: belongs_to
+  via: metering_grid_area_ids
+- from: SystemOperatorEligibility
+  to: Range
+  type: has_one
+  via: power
+- from: SystemOperatorEligibility
+  to: Level
+  type: has_one
+  via: power
+- from: SystemOperatorEligibility
+  to: Range
+  type: has_one
+  via: voltage
+- from: SystemOperatorEligibility
+  to: Level
+  type: has_one
+  via: voltage
+- from: Tariff
+  to: SystemOperatorEligibility
+  type: has_one
+  via: eligibility
+- from: Tariff
+  to: TariffComponent
+  type: has_many
+  via: tariff_components
+- from: TariffComponent
+  to: Dataset
+  type: has_one
+  via: cost
+- from: TariffComponent
+  to: Dataset
+  type: has_many
+  via: datasets
+- from: TariffComponent
+  to: Constant
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Add
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Subtract
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Divide
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Multiply
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Aggregate
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Resample
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Select
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Mask
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Clip
+  type: has_many
+  via: functions
+- from: TariffComponent
+  to: Lookup
+  type: has_many
+  via: functions

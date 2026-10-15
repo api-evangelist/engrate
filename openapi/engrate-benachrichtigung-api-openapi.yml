@@ -1,0 +1,443 @@
+openapi: 3.2.0
+info:
+  title: Netzbetreiber-API (Referenzentwurf) Benachrichtigung API
+  version: 2026-2.0.0
+  summary: Ressourcenorientierter Gegenentwurf zu locationBundleV1
+  description: '**Referenzentwurf — kein offizielles Dokument der Bundesnetzagentur, des BDEW oder der
+
+    Projektgruppe EDI@Energy.**
+
+
+    Dieser Entwurf ist ein Konsultationsbeitrag zu Mitteilung Nr.'
+  contact:
+    name: '[Unternehmen — Kontakt eintragen]'
+  license:
+    name: CC0-1.0
+    identifier: CC0-1.0
+servers:
+- url: https://{host}/nb/{basePath}
+  description: 'Endpunkt der Netzbetreiber-API. Host und Basispfad werden über den Verzeichnisdienst
+
+    aufgelöst; die API-Kennung ist `nb`.
+
+    '
+  variables:
+    host:
+      default: api.example-netzbetreiber.de
+    basePath:
+      default: 2026-2
+      description: 'Semester-Release. Zusätzlich steht der unveränderliche Pfad ohne Versionsangabe
+
+        zur Verfügung, der stets auf das aktuell verpflichtende Semester-Release zeigt,
+
+        sowie `v` für die Vorweg-Version.
+
+        '
+security:
+- oauth2:
+  - lokationsbuendel:lesen
+tags:
+- name: Benachrichtigung
+  description: Abonnement von Änderungsereignissen.
+paths:
+  /subscriptions:
+    get:
+      tags:
+      - Benachrichtigung
+      operationId: listSubscriptions
+      summary: Eigene Abonnements auflisten
+      responses:
+        '200':
+          description: Die Abonnements des aufrufenden Marktpartners.
+          content:
+            application/vnd.edi-energy+json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionList'
+    post:
+      tags:
+      - Benachrichtigung
+      operationId: createSubscription
+      summary: Änderungsbenachrichtigung abonnieren
+      description: 'Registriert den aufrufenden Marktpartner für Benachrichtigungen über Änderungen an
+
+        Lokationsbündeln, für die er berechtigt ist.
+
+
+        Die Benachrichtigung enthält **nicht** die geänderten Daten, sondern nur die
+
+        Information, dass eine Änderung vorliegt, und die URL der betroffenen Ressource.
+
+        Der Berechtigte ruft die Daten zu einem für ihn passenden Zeitpunkt und in der von
+
+        ihm benötigten Granularität ab.
+
+
+        Der Konsultationsbeitrag vom Oktober 2025 empfiehlt, dass Berechtigte sich selbst
+
+        registrieren, bei Wegfall der Berechtigung jedoch automatisch de-registriert und
+
+        darüber benachrichtigt werden. Dieser Entwurf folgt dem: Das Abonnement wird
+
+        serverseitig beendet und ein abschließendes Ereignis `subscriptionRevoked`
+
+        zugestellt.'
+      security:
+      - oauth2:
+        - benachrichtigung:schreiben
+      requestBody:
+        required: true
+        content:
+          application/vnd.edi-energy+json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionWrite'
+      responses:
+        '201':
+          description: Das Abonnement wurde eingerichtet.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri-reference
+          content:
+            application/vnd.edi-energy+json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionDocument'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      callbacks:
+        locationBundleChanged:
+          '{$request.body#/callbackUrl}':
+            post:
+              operationId: onLocationBundleChanged
+              summary: Änderungsereignis (vom Server an den Abonnenten)
+              description: 'Leichtgewichtiges Ereignis. Enthält bewusst keine Fachdaten — nur Typ,
+
+                Zeitpunkt und die URL der geänderten Ressource.
+
+                '
+              requestBody:
+                required: true
+                content:
+                  application/vnd.edi-energy+json:
+                    schema:
+                      $ref: '#/components/schemas/ChangeEvent'
+              responses:
+                '204':
+                  description: Ereignis entgegengenommen.
+  /subscriptions/{subscriptionId}:
+    parameters:
+    - name: subscriptionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      tags:
+      - Benachrichtigung
+      operationId: getSubscription
+      summary: Abonnement abrufen
+      responses:
+        '200':
+          description: Das Abonnement.
+          content:
+            application/vnd.edi-energy+json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionDocument'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Benachrichtigung
+      operationId: deleteSubscription
+      summary: Abonnement beenden
+      security:
+      - oauth2:
+        - benachrichtigung:schreiben
+      responses:
+        '204':
+          description: Das Abonnement wurde beendet.
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    Problem:
+      type: object
+      description: 'Fehlermeldung nach RFC 9457 (Problem Details for HTTP APIs).
+
+
+        Die konsultierte Fassung definiert für keine Operation einen Response-Body — auch
+
+        nicht für `400` und `422`. Ein Empfänger kann einen Validierungsfehler dort nicht
+
+        maschinenlesbar zurückmelden; inhaltliche Fehler müssen den Umweg über einen
+
+        neuen Aufruf in Gegenrichtung nehmen.
+
+        '
+      required:
+      - type
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+          examples:
+          - tag:edi-energy.de:api:error:validation
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+        errors:
+          type: array
+          description: Einzelne Verstöße mit Fundstelle.
+          items:
+            type: object
+            required:
+            - pointer
+            - message
+            properties:
+              pointer:
+                type: string
+                description: JSON-Pointer nach RFC 6901 auf die betroffene Stelle.
+                examples:
+                - /timeSlices/0/members/2/metering/configurationId
+              message:
+                type: string
+              code:
+                type: string
+    NeloId:
+      type: string
+      pattern: ^E[A-Z\d]{9}\d$
+      description: Netzlokations-ID.
+      examples:
+      - E1234848431
+    ChangeEvent:
+      type: object
+      required:
+      - type
+      - eventId
+      - occurredAt
+      - resource
+      description: 'Das Änderungsereignis trägt bewusst **keine** Fachdaten. Es informiert darüber,
+
+        dass etwas vorliegt, und nennt die URL. Der Abonnent ruft die Daten zu einem für
+
+        ihn passenden Zeitpunkt und in der von ihm benötigten Granularität ab.
+
+
+        Damit steigt die Wahrscheinlichkeit, dass die Daten zum Zeitpunkt ihrer
+
+        tatsächlichen Nutzung aktuell sind — und der Benachrichtigungsdienst kann auf
+
+        seine Kernaufgabe zugeschnitten werden, statt eine 1:N-Verteilung über eine
+
+        Punkt-zu-Punkt-Architektur nachzubilden.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - locationBundleChanged
+          - clearingCaseOpened
+          - clearingCaseResolved
+          - subscriptionRevoked
+        eventId:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        resource:
+          $ref: '#/components/schemas/Link'
+          description: URL der betroffenen Ressource.
+        etag:
+          type: string
+          description: '`ETag` des neuen Stands. Ein Abonnent, der diesen Stand bereits kennt, kann den
+
+            Abruf überspringen.
+
+            '
+    MaloId:
+      type: string
+      pattern: ^\d{11}$
+      description: Identifiziert die Marktlokation oder Tranche.
+      examples:
+      - '57685676748'
+    ListLinks:
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/Link'
+        next:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          description: Nächste Seite. Fehlt, wenn keine weiteren Elemente vorliegen.
+        prev:
+          $ref: '#/components/schemas/Link'
+    Subscription:
+      type: object
+      required:
+      - type
+      - subscriptionId
+      - callbackUrl
+      - eventTypes
+      - state
+      properties:
+        type:
+          const: Abonnement
+        subscriptionId:
+          type: string
+          format: uuid
+        href:
+          type: string
+          format: uri-reference
+        callbackUrl:
+          type: string
+          format: uri
+        eventTypes:
+          type: array
+          items:
+            type: string
+        state:
+          type: string
+          enum:
+          - aktiv
+          - ausgesetzt
+          - beendet
+        createdAt:
+          type: string
+          format: date-time
+    SubscriptionDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          $ref: '#/components/schemas/Subscription'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+    SubscriptionWrite:
+      type: object
+      required:
+      - callbackUrl
+      - eventTypes
+      properties:
+        callbackUrl:
+          type: string
+          format: uri
+          description: Endpunkt des Abonnenten, an den Ereignisse zugestellt werden.
+        eventTypes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+            - locationBundleChanged
+            - clearingCaseOpened
+            - clearingCaseResolved
+            - subscriptionRevoked
+        filter:
+          type: object
+          description: Optionale Einschränkung auf bestimmte Lokationen.
+          properties:
+            marketLocations:
+              type: array
+              items:
+                $ref: '#/components/schemas/MaloId'
+            networkLocations:
+              type: array
+              items:
+                $ref: '#/components/schemas/NeloId'
+    SubscriptionList:
+      type: object
+      required:
+      - data
+      - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        links:
+          $ref: '#/components/schemas/ListLinks'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          format: uri-reference
+          description: URL der referenzierten Ressource.
+        title:
+          type: string
+  responses:
+    NotFound:
+      description: Ressource nicht vorhanden.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    BadRequest:
+      description: Fehlerhafte Anfrage.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: 'OAuth 2.0. Die Authentisierung des Clients am Authorization Server erfolgt in der
+
+        Ausbaustufe 1 über das Signaturzertifikat der Smart-Metering-PKI; die Architektur
+
+        ist so angelegt, dass sie später um OpenID Connect und föderierte Identitäten
+
+        (etwa europäische ID-Wallets) erweitert werden kann, ohne die Ressourcen-APIs zu
+
+        ändern.
+
+
+        Damit werden drei Anforderungen adressiert, die eine ausschließlich
+
+        zertifikatsbasierte Marktpartner-Authentisierung nicht abbilden kann:
+
+        Zugriff von Letztverbrauchern auf ihre eigenen Daten, übertragbare Berechtigungen
+
+        an Dritte und Anschlussfähigkeit an übergreifende Datenräume.
+
+        '
+      flows:
+        clientCredentials:
+          tokenUrl: https://authz.example-netzbetreiber.de/oauth2/token
+          scopes:
+            lokationsbuendel:lesen: Lokationsbündel und Lokationen lesen
+            lokationsbuendel:schreiben: Lokationsbündel ändern (nur verantwortlicher Netzbetreiber)
+            clearing:schreiben: Clearing-Fälle eröffnen und fortschreiben
+            netzbetreiberwechsel:schreiben: Übergabepakete anfordern
+            benachrichtigung:schreiben: Abonnements verwalten
+        authorizationCode:
+          authorizationUrl: https://authz.example-netzbetreiber.de/oauth2/authorize
+          tokenUrl: https://authz.example-netzbetreiber.de/oauth2/token
+          scopes:
+            lokationsbuendel:lesen: Lokationsbündel und Lokationen lesen
+    mtls:
+      type: mutualTLS
+      description: 'Alternativ zulässig für die reine Marktpartner-zu-Marktpartner-Kommunikation, mit
+
+        Zertifikaten der Smart-Metering-PKI in der Rolle „passiver EMT" gemäß den
+
+        Regelungen zum Übertragungsweg für API-Webdienste.
+
+        '

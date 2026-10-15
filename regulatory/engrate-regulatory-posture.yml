@@ -1,0 +1,25 @@
+generated: '2026-10-15'
+method: probed
+source:
+  - url: https://engrate.io/legal/privacy-policy
+    http_status: 200
+    fetched: true
+signals:
+  data_subject_request:
+    url: https://engrate.io/legal/privacy-policy
+    section: Data Retention and User Rights
+    note: Provides data subject rights for GDPR compliance.
+    evidence:
+      - quote: "Under GDPR, you have rights of access, rectification, erasure, restriction, objection, portability, and withdrawal of consent."
+  data_retention:
+    url: https://engrate.io/legal/privacy-policy
+    section: Data Retention and User Rights
+    note: States retention policy and compliance with legal requirements.
+    evidence:
+      - quote: "Data is retained for the minimum period necessary to fulfil the purposes for which it was collected, unless a longer retention period is required by law."
+  incident_notification:
+    url: https://engrate.io/legal/privacy-policy
+    section: Data Breach Procedures
+    note: Describes breach notification timeline and actions.
+    evidence:
+      - quote: "In the event of a data breach, Engrate will notify you and the relevant authorities within 72 hours where required, take immediate steps to mitigate the breach, and provide regular updates on response efforts."

@@ -1,0 +1,159 @@
+openapi: 3.2.0
+info:
+  title: Engrate Reference API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Reference
+paths:
+  /schedule-management/v1/reference/exchange-priority-balance-groups:
+    get:
+      description: 'List all balance groups with exchange priority (Börsenvorrang).
+
+
+        These balance groups have priority per clause 12.b of the Bilanzkreisvertrag. When scheduling conflicts occur (ANO), the exchange party''s values may be imposed by the TSO.'
+      operationId: list_exchange_priority_balance_groups_schedule_management_v1_reference_exchange_priority_balance_groups_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExchangePriorityBalanceGroupResponse'
+                title: Response List Exchange Priority Balance Groups Schedule Management V1 Reference Exchange Priority Balance Groups Get
+                type: array
+          description: Successful Response
+      summary: List Exchange Priority Balance Groups
+      tags:
+      - Reference
+  /schedule-management/v1/reference/exchange-priority-check/{eic_code}:
+    get:
+      description: 'Check if a specific balance group has exchange priority.
+
+
+        Useful for the UI to flag counterparties with Börsenvorrang when displaying ANO reconciliation data.
+
+
+        Args: eic_code: EIC code of the balance group to check.'
+      operationId: check_exchange_priority_schedule_management_v1_reference_exchange_priority_check__eic_code__get
+      parameters:
+      - description: EIC X code of the balance group to check.
+        in: path
+        name: eic_code
+        required: true
+        schema:
+          description: EIC X code of the balance group to check.
+          title: Eic Code
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangePriorityCheckResponse'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Check Exchange Priority
+      tags:
+      - Reference
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ExchangePriorityBalanceGroupResponse:
+      description: A balance group that has exchange priority (Börsenvorrang) per Bilanzkreisvertrag clause 12.b.
+      properties:
+        eic_code:
+          description: EIC X code of the exchange balance group.
+          examples:
+          - 11XEPEXSPOT----W
+          title: Eic Code
+          type: string
+        exchange_name:
+          description: Name of the energy exchange (e.g. EPEX SPOT, EEX).
+          examples:
+          - EPEX SPOT SE
+          title: Exchange Name
+          type: string
+        has_exchange_priority:
+          default: true
+          description: Always `true` for entries in this list.
+          title: Has Exchange Priority
+          type: boolean
+      required:
+      - eic_code
+      - exchange_name
+      title: ExchangePriorityBalanceGroupResponse
+      type: object
+    ExchangePriorityCheckResponse:
+      description: Result of checking whether a specific EIC code has exchange priority (Börsenvorrang).
+      properties:
+        eic_code:
+          description: The EIC code that was checked.
+          examples:
+          - 11XEPEXSPOT----W
+          title: Eic Code
+          type: string
+        exchange_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Name of the exchange, if the EIC code belongs to a known exchange.
+          examples:
+          - EPEX SPOT SE
+          title: Exchange Name
+        has_exchange_priority:
+          description: Whether this balance group has exchange priority.
+          title: Has Exchange Priority
+          type: boolean
+      required:
+      - eic_code
+      - has_exchange_priority
+      title: ExchangePriorityCheckResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey

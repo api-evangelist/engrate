@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-schedule-series-response-schema.json",
+  "title": "ScheduleSeriesResponse",
+  "description": "A [Schedule Series](/api-reference/schedule-management/models/schedule-series) representing one time series within a schedule version (e.g. one internal or external trade).",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/engrate-openapi.json#/components/schemas/ScheduleSeriesResponse",
+  "properties": {
+    "acceptance_level": {
+      "description": "Highest acceptance level reached by the parent version: empty string, `ack`, `ano`, `par`, or `cnf`.",
+      "title": "Acceptance Level",
+      "type": "string"
+    },
+    "created_ts": {
+      "description": "ISO 8601 datetime when the parent version was created.",
+      "title": "Created Ts",
+      "type": "string"
+    },
+    "interval_statuses": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Per-interval status map. Always `null` — market-access tracks status at version granularity, not per interval.",
+      "title": "Interval Statuses"
+    },
+    "last_modified_ts": {
+      "description": "ISO 8601 datetime of the parent version's most recent status change.",
+      "title": "Last Modified Ts",
+      "type": "string"
+    },
+    "spec": {
+      "$ref": "#/$defs/ScheduleSeriesSpec",
+      "description": "Full series specification including identifiers, type, and interval data."
+    },
+    "status": {
+      "description": "Processing status of the parent version. `created` before submission, then the verbatim market status: `submitted`, `ack_positive`, `ack_negative`, `ack_partial`, `icnf`, `dacnf`, `cnf`, `cnf_partial`, or `fcnf`.",
+      "title": "Status",
+      "type": "string"
+    },
+    "time_series_uid": {
+      "description": "Time series identifier used in the ESS/CIM document.",
+      "title": "Time Series Uid",
+      "type": "string"
+    },
+    "uid": {
+      "description": "Unique identifier for this series record.",
+      "title": "Uid",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version number of the parent schedule version.",
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "acceptance_level",
+    "created_ts",
+    "last_modified_ts",
+    "spec",
+    "status",
+    "time_series_uid",
+    "uid",
+    "version"
+  ],
+  "type": "object",
+  "$defs": {
+    "ScheduleSeriesDataPoint": {
+      "description": "One interval of a schedule series: a timestamp and its power amount.",
+      "properties": {
+        "amount": {
+          "description": "Power value for the interval, in MW.",
+          "title": "Amount",
+          "type": "number"
+        },
+        "ts": {
+          "description": "ISO 8601 UTC start of the interval.",
+          "title": "Ts",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "ts"
+      ],
+      "title": "ScheduleSeriesDataPoint",
+      "type": "object"
+    },
+    "ScheduleSeriesIds": {
+      "description": "EIC identifiers locating a series in the area/party exchange.",
+      "properties": {
+        "in_area": {
+          "description": "EIC Y code of the receiving control area.",
+          "title": "In Area",
+          "type": "string"
+        },
+        "in_party": {
+          "description": "EIC X code of the receiving party (balance responsible party).",
+          "title": "In Party",
+          "type": "string"
+        },
+        "out_area": {
+          "description": "EIC Y code of the sending control area.",
+          "title": "Out Area",
+          "type": "string"
+        },
+        "out_party": {
+          "description": "EIC X code of the sending party (balance responsible party).",
+          "title": "Out Party",
+          "type": "string"
+        }
+      },
+      "required": [
+        "in_area",
+        "in_party",
+        "out_area",
+        "out_party"
+      ],
+      "title": "ScheduleSeriesIds",
+      "type": "object"
+    },
+    "ScheduleSeriesSpec": {
+      "description": "Full series specification: identifiers, type, and interval data.",
+      "properties": {
+        "data": {
+          "description": "Interval data points, one per slot, ordered from the start of the delivery day.",
+          "items": {
+            "$ref": "#/$defs/ScheduleSeriesDataPoint"
+          },
+          "title": "Data",
+          "type": "array"
+        },
+        "ids": {
+          "$ref": "#/$defs/ScheduleSeriesIds",
+          "description": "EIC identifiers for the series exchange."
+        },
+        "type": {
+          "description": "Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "data",
+        "ids",
+        "type"
+      ],
+      "title": "ScheduleSeriesSpec",
+      "type": "object"
+    }
+  }
+}

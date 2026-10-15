@@ -1,0 +1,9 @@
+generated: '2026-10-15'
+method: probed
+generator: harvest-sibling-contracts.py
+source: https://raw.githubusercontent.com/engrate/mako-api-referenzentwurf/main/openapi/netzbetreiber-api.yaml
+found_on: https://github.com/engrate/mako-api-referenzentwurf
+operations: gh:netzbetreiber-api.yaml
+version: 3.1.0
+ownership: sibling of a contract the pass accepted on the same host; URL names the
+  provider

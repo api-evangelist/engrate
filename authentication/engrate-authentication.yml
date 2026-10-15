@@ -1,0 +1,16 @@
+generated: '2026-10-15'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.engrate.io/guides/authentication.md
+sources:
+- https://docs.engrate.io/guides/authentication.md
+- https://docs.engrate.io/guides/cost-of-energy-quickstart.md
+description: Authentication using API keys
+schemes:
+- type: apiKey
+  name: API Key
+  evidence: This guide explains how to authenticate with our API using API keys.
+  location: header
+  header: authorization
+  how_to_obtain: Create an API key at https://console.engrate.io
+docs: https://docs.engrate.io/guides/authentication.md

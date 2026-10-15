@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-objection-response-schema.json",
+  "title": "ObjectionResponse",
+  "description": "An [Objection](/api-reference/settlement-management/models/objection) (Einspruch) filed against settlement data within a clearing period.",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/engrate-openapi.json#/components/schemas/ObjectionResponse",
+  "properties": {
+    "clearing_period_uid": {
+      "description": "Parent [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.",
+      "title": "Clearing Period Uid",
+      "type": "string"
+    },
+    "created_ts": {
+      "description": "ISO 8601 datetime when this objection was created.",
+      "title": "Created Ts",
+      "type": "string"
+    },
+    "disputed_values": {
+      "additionalProperties": true,
+      "description": "Free-form data describing the disputed values (dates, intervals, amounts).",
+      "title": "Disputed Values",
+      "type": "object"
+    },
+    "last_modified_ts": {
+      "description": "ISO 8601 datetime of the most recent status change.",
+      "title": "Last Modified Ts",
+      "type": "string"
+    },
+    "objection_type": {
+      "description": "Objection category: `volume`, `price`, `metering_point`, `allocation`, `timing`, or `other`.",
+      "title": "Objection Type",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Human-readable reason for the objection.",
+      "title": "Reason"
+    },
+    "resolved_ts": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ISO 8601 datetime when the objection was resolved (accepted or rejected).",
+      "title": "Resolved Ts"
+    },
+    "status": {
+      "description": "Objection status: `draft`, `submitted`, `accepted`, `rejected`, or `withdrawn`.",
+      "title": "Status",
+      "type": "string"
+    },
+    "submitted_ts": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ISO 8601 datetime when the objection was submitted to the TSO.",
+      "title": "Submitted Ts"
+    },
+    "tso_response": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "TSO response text, if the objection has been reviewed.",
+      "title": "Tso Response"
+    },
+    "uid": {
+      "description": "Unique identifier for this objection.",
+      "title": "Uid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "clearing_period_uid",
+    "created_ts",
+    "disputed_values",
+    "last_modified_ts",
+    "objection_type",
+    "status",
+    "uid"
+  ],
+  "type": "object"
+}

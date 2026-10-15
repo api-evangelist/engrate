@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-schedule-version-response-schema.json",
+  "title": "ScheduleVersionResponse",
+  "description": "A [Schedule Version](/api-reference/schedule-management/models/schedule-version) representing one submission attempt. Each re-submission creates a new version.",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/engrate-openapi.json#/components/schemas/ScheduleVersionResponse",
+  "properties": {
+    "acceptance_level": {
+      "description": "Highest acceptance level reached: empty string, `ack`, `ano`, `par`, or `cnf`.",
+      "title": "Acceptance Level",
+      "type": "string"
+    },
+    "created_ts": {
+      "description": "ISO 8601 datetime when this version was created.",
+      "title": "Created Ts",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "description": "Whether this is the active version: the latest version the TSO has accepted, the one it currently treats as binding. Rejected or not-yet-answered versions are not active, and a later rejected version never replaces an accepted earlier one.",
+      "title": "Is Active",
+      "type": "boolean"
+    },
+    "last_modified_ts": {
+      "description": "ISO 8601 datetime of the most recent status change.",
+      "title": "Last Modified Ts",
+      "type": "string"
+    },
+    "message_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "TSO document identification assigned to this version's message.",
+      "title": "Message Id"
+    },
+    "nrr_received": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Whether a Non-Repudiation of Receipt (NRR) delivery confirmation has been received from the TSO.",
+      "title": "Nrr Received"
+    },
+    "org_uid": {
+      "description": "Organization that owns this version.",
+      "title": "Org Uid",
+      "type": "string"
+    },
+    "schedule_uid": {
+      "description": "Parent [Schedule](/api-reference/schedule-management/models/schedule) identifier.",
+      "title": "Schedule Uid",
+      "type": "string"
+    },
+    "spec": {
+      "$ref": "#/$defs/ScheduleVersionSpec",
+      "description": "Full submission specification including market routing and series references."
+    },
+    "status": {
+      "description": "Processing status. `created` before submission, then the verbatim market status: `submitted`, `ack_positive`, `ack_negative`, `ack_partial`, `icnf`, `dacnf`, `cnf`, `cnf_partial`, or `fcnf`.",
+      "title": "Status",
+      "type": "string"
+    },
+    "transmission_report_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Mako365/AS4 transmission report identifier for delivery tracking.",
+      "title": "Transmission Report Id"
+    },
+    "uid": {
+      "description": "Unique identifier for this version.",
+      "title": "Uid",
+      "type": "string"
+    },
+    "version": {
+      "description": "Sequential version number (1-based). Increments with each re-submission.",
+      "title": "Version",
+      "type": "integer"
+    },
+    "warnings": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/WarningItem"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "TSO warnings from the ACK response, if any.",
+      "title": "Warnings"
+    }
+  },
+  "required": [
+    "acceptance_level",
+    "created_ts",
+    "last_modified_ts",
+    "org_uid",
+    "schedule_uid",
+    "spec",
+    "status",
+    "uid",
+    "version"
+  ],
+  "type": "object",
+  "$defs": {
+    "ScheduleVersionSeriesItem": {
+      "description": "Series reference within a [Schedule Version](/api-reference/schedule-management/models/schedule-version) spec.",
+      "properties": {
+        "in_area": {
+          "description": "EIC Y code of the receiving control area.",
+          "title": "In Area",
+          "type": "string"
+        },
+        "in_party": {
+          "description": "EIC X code of the receiving party (balance responsible party).",
+          "title": "In Party",
+          "type": "string"
+        },
+        "out_area": {
+          "description": "EIC Y code of the sending control area.",
+          "title": "Out Area",
+          "type": "string"
+        },
+        "out_party": {
+          "description": "EIC X code of the sending party (balance responsible party).",
+          "title": "Out Party",
+          "type": "string"
+        },
+        "time_series_uid": {
+          "description": "Time series identifier used in the ESS/CIM document.",
+          "title": "Time Series Uid",
+          "type": "string"
+        },
+        "ts_version": {
+          "description": "Per-series version number (`SendersTimeSeriesVersion` in ESS) — the version in which this series last changed.",
+          "title": "Ts Version",
+          "type": "integer"
+        },
+        "type": {
+          "description": "Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.",
+          "title": "Type",
+          "type": "string"
+        },
+        "uid": {
+          "description": "Unique identifier for this series record.",
+          "title": "Uid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "in_area",
+        "in_party",
+        "out_area",
+        "out_party",
+        "time_series_uid",
+        "ts_version",
+        "type",
+        "uid"
+      ],
+      "title": "ScheduleVersionSeriesItem",
+      "type": "object"
+    },
+    "ScheduleVersionSpec": {
+      "description": "The full specification that was submitted with a schedule version, including market routing and all series.",
+      "properties": {
+        "market": {
+          "description": "Target market (`DE` or `NL`).",
+          "title": "Market",
+          "type": "string"
+        },
+        "receiver_id": {
+          "description": "EIC X code (DE) or EAN-13 (NL) identifying the TSO receiver.",
+          "title": "Receiver Id",
+          "type": "string"
+        },
+        "sender_id": {
+          "description": "EIC X code identifying the schedule sender.",
+          "title": "Sender Id",
+          "type": "string"
+        },
+        "series": {
+          "description": "The individual time series included in this version.",
+          "items": {
+            "$ref": "#/$defs/ScheduleVersionSeriesItem"
+          },
+          "title": "Series",
+          "type": "array"
+        },
+        "tso": {
+          "description": "TSO identifier the schedule was sent to.",
+          "title": "Tso",
+          "type": "string"
+        }
+      },
+      "required": [
+        "market",
+        "receiver_id",
+        "sender_id",
+        "series",
+        "tso"
+      ],
+      "title": "ScheduleVersionSpec",
+      "type": "object"
+    },
+    "WarningItem": {
+      "description": "A TSO warning returned in an ACK or CNF response (e.g. B45, A54).",
+      "properties": {
+        "code": {
+          "description": "Warning reason code from the TSO response.",
+          "title": "Code",
+          "type": "string"
+        },
+        "text": {
+          "description": "Human-readable warning description.",
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "text"
+      ],
+      "title": "WarningItem",
+      "type": "object"
+    }
+  }
+}

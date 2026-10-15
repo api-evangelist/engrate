@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/engrate/main/json-schema/engrate-market-location-document-schema.json",
+  "title": "MarketLocationDocument",
+  "x-generated": "2026-10-15",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/engrate-netzbetreiber-api-openapi.yml#/components/schemas/MarketLocationDocument",
+  "type": "object",
+  "required": [
+    "data"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "type",
+        "maloId"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Marktlokation",
+            "Tranche"
+          ]
+        },
+        "maloId": {
+          "$ref": "#/$defs/MaloId"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "supplier": {
+          "$ref": "#/$defs/MarketPartnerRef"
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "$ref": "#/$defs/Link"
+        },
+        "locationBundles": {
+          "$ref": "#/$defs/Link"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Link": {
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "URL der referenzierten Ressource."
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "MaloId": {
+      "type": "string",
+      "pattern": "^\\d{11}$",
+      "description": "Identifiziert die Marktlokation oder Tranche."
+    },
+    "MarketPartnerId": {
+      "type": "string",
+      "pattern": "^\\d{13}$",
+      "description": "Marktpartner-ID."
+    },
+    "MarketPartnerRef": {
+      "type": "object",
+      "required": [
+        "marketPartnerId"
+      ],
+      "properties": {
+        "marketPartnerId": {
+          "$ref": "#/$defs/MarketPartnerId"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "NB",
+            "LF",
+            "MSB",
+            "MWV",
+            "UENB"
+          ]
+        },
+        "href": {
+          "type": "string",
+          "format": "uri-reference"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,442 @@
+generated: '2026-10-15'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/engrate-openapi.json
+vocabulary:
+  name: Engrate Domain Vocabulary
+  description: 'Terms declared by Engrate''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-15'
+  terms:
+  - term: Add
+    definition: Element-wise addition of two or more operands. All operands are required to have the same resolution.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Add
+  - term: Aggregate
+    definition: Aggregate a dataset over a resolution window and apply a function.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Aggregate
+  - term: AggregateAllocation
+    definition: An aggregate allocation and its aggregation dimensions. A null or absent dimension includes the accounting points of all values.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AggregateAllocation
+  - term: AggregateAllocationPage
+    definition: 'Object declared by the contract with fields: items, limit, offset, total.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AggregateAllocationPage
+  - term: AggregateAllocationRecord
+    definition: A volume for one aggregate timeseries and one Imbalance Settlement Period (ISP).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AggregateAllocationRecord
+  - term: AggregateAllocationsResponse
+    definition: 'Object declared by the contract with fields: values.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AggregateAllocationsResponse
+  - term: AggregationFunction
+    definition: '### Available aggregation functions - **sum** — Add up all values. - **mean** — Take the mean - average - of all values. - **max**
+      — Take the maximum value. - **min** — Take the minimum value.'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/AggregationFunction
+  - term: AggregationObjectRequest
+    definition: Request model for aggregation object response.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AggregationObjectRequest
+  - term: AggregationObjectResponse
+    definition: Response model for aggregation objects.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AggregationObjectResponse
+  - term: AggregatorRole
+    definition: '### Available aggregator roles - **grid_operator** — Indicates the source of the aggregation is a grid operator. - **transmission_operator**
+      — Indicates the source of the aggregation is a transmission system operator.'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/AggregatorRole
+  - term: AllocationBasis
+    definition: 'The basis tells you where the energy data for an aggregation is coming from: Is it directly metered values from smart meters,
+      or is it something calculated from some standard profile? ### Available allocation basises - **metered** — Indicates this aggregation''s
+      data comes from directly metered energy, like from smart meters. - **profiled** — Indicates this aggregation''s data is coming from a ''prof'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/AllocationBasis
+  - term: AllocationQuality
+    definition: 'How the volume was arrived at, in ascending order of trust. When one settlement period carries several records, prefer the highest
+      quality. ### Available allocation qualities - **provisional** — A placeholder the sender intends to replace. - **estimated** — Substituted
+      because no reading was available: profiled, interpolated, or copied from a comparable period. Expect it to be superseded. - **calc'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/AllocationQuality
+  - term: AllocationRecord
+    definition: A volume allocated to some Accounting Point for one Imbalance Settlement Period (ISP).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AllocationRecord
+  - term: AllocationsResponse
+    definition: 'Object declared by the contract with fields: values.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AllocationsResponse
+  - term: AndCondition
+    definition: Condition that applies when all sub-conditions are met
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AndCondition
+  - term: AreaKind
+    definition: '### Available area kinds - **metering_grid_area** — The area of one grid operator. - **control_area** — The area of one transmission
+      system operator. - **scheduling_area** — See [Scheduling Area](/api-reference/core/models/scheduling-area).'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/AreaKind
+  - term: AuditLogResponse
+    definition: An audit log entry recording a state change or action.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/AuditLogResponse
+  - term: BiddingZone
+    definition: 'A Bidding Zone (also called a price area) is a core domain concept in the European energy market. The [ENTSO-E Harmonized Electricity
+      Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines a Bidding Zone as: > The largest geographical area within which
+      market participants are able to exchange energy without capacity allocation. In other words, it is an area within which electricit'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/BiddingZone
+  - term: CalculateComponentResult
+    definition: 'Object declared by the contract with fields: end_time, name, start_time, time_series.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/CalculateComponentResult
+  - term: CalculateTariffRequest
+    definition: 'Object declared by the contract with fields: end_time, profiles, start_time, tariff_id, time_series.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/CalculateTariffRequest
+  - term: CalculateTariffResponse
+    definition: 'Object declared by the contract with fields: components.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/CalculateTariffResponse
+  - term: CalculatedTimeSeries
+    definition: A named time series returned from a calculation, with explicit resolution and unit.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/CalculatedTimeSeries
+  - term: ClearingCalendarResponse
+    definition: MaBiS clearing calendar for a settlement month.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ClearingCalendarResponse
+  - term: ClearingPeriodCreateRequest
+    definition: Request to create a clearing period.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ClearingPeriodCreateRequest
+  - term: ClearingPeriodResponse
+    definition: A [Clearing Period](/api-reference/settlement-management/models/clearing-period) representing one settlement month for a balance
+      group.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ClearingPeriodResponse
+  - term: ClearingPeriodSummaryResponse
+    definition: Summary view for a clearing period including counts, totals, and the next deadline.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ClearingPeriodSummaryResponse
+  - term: ClearingSettlementResponse
+    definition: A [Clearing Settlement](/api-reference/settlement-management/models/clearing-settlement) representing one day's settlement data
+      within a clearing period, containing raw MSCONS interval values.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ClearingSettlementResponse
+  - term: Clip
+    definition: Clip values to a min/max range.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Clip
+  - term: ComponentIdentity
+    definition: Identifies a tariff component by its issuing-party name and applicability window. See [Tariff Component](/api-reference/cost-of-energy/models/tariff-component)
+      for the full definition.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ComponentIdentity
+  - term: ComponentRate
+    definition: A single tariff component's projected rate timeseries.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ComponentRate
+  - term: Constant
+    definition: Emit a constant value at a given resolution.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Constant
+  - term: ControlArea
+    definition: 'A Control Area is a core domain concept in the European energy market. The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/)
+      defines a Control Area as: > A coherent part of the interconnected system, operated by a single System Operator and shall include connected
+      physical loads and/or generation units if any. In other words, it is the grid a single TS'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ControlArea
+  - term: ControlEnergyPriceDataPoint
+    definition: Single price data point.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ControlEnergyPriceDataPoint
+  - term: ControlEnergyPriceResponse
+    definition: Response model for control energy prices (reBAP).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ControlEnergyPriceResponse
+  - term: DailyImbalance
+    definition: Imbalance summary for a single day within a clearing period.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/DailyImbalance
+  - term: Dataset
+    definition: 'A named timeseries with known resolution and unit. Used both for describing registered datasets (see below) as well as for naming
+      the intermediate results that get created by each step in a function pipeline. ## Absent values All datasets in this API are fixed resolution.
+      For an hourly dataset, there is some "slot" for each hour''s value. However, some operations - [Select](api-reference/cost-of-en'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Dataset
+  - term: DayOfWeekCondition
+    definition: Condition that only applies on the specified days of the week.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/DayOfWeekCondition
+  - term: Divide
+    definition: 'Element-wise division of numerator / denominator. Numerator and denominator are required to have the same resolution. The output
+      dataset will have a unit that follows the following algebra: **Unit algebra:** - kW / kW = % - kWh / hours = kW - kWh / kW = hours - any
+      / % = same as numerator'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Divide
+  - term: EnergyVolumeResponse
+    definition: Response model for energy volume records.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/EnergyVolumeResponse
+  - term: ExchangePriorityBalanceGroupResponse
+    definition: A balance group that has exchange priority (Börsenvorrang) per Bilanzkreisvertrag clause 12.b.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ExchangePriorityBalanceGroupResponse
+  - term: ExchangePriorityCheckResponse
+    definition: Result of checking whether a specific EIC code has exchange priority (Börsenvorrang).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ExchangePriorityCheckResponse
+  - term: ExcludeHolidaysCondition
+    definition: Condition that applies on all days except the specified holidays
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ExcludeHolidaysCondition
+  - term: ExtraIdentifier
+    definition: Extra identifiers are used to attach things like EIC ids, VAT numbers, jurisdiction-specific identifiers, etc. For example, Metering
+      Grid Area's in parts of Europe are assigned an local jurisdiction EIC code; for those MGAs, the Engrate system will store the EIC as an
+      extra identifier. However some jurisdictions have not yet switched to EIC codes, instead they rely on older local identification sc
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ExtraIdentifier
+  - term: Finality
+    definition: 'The settlement data comes in different levels of "finality". Each market has its own names for these levels, and all of them
+      map to this common ladder. When one settlement period has more than one record, use the record with the highest finality, then the latest
+      `known_at`. ### Available finalities - **preliminary** — The first level, sent before the market has all the data. - **revised** — The le'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/Finality
+  - term: GeoJsonFeature
+    definition: A single [GeoJSON Feature](https://datatracker.ietf.org/doc/html/rfc7946).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GeoJsonFeature
+  - term: GeoJsonFeatureCollection
+    definition: Standard [GeoJSON FeatureCollection](https://datatracker.ietf.org/doc/html/rfc7946) with typed properties.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GeoJsonFeatureCollection
+  - term: GeoJsonMultiPolygon
+    definition: A [GeoJSON MultiPolygon](https://datatracker.ietf.org/doc/html/rfc7946).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GeoJsonMultiPolygon
+  - term: GeoJsonPolygon
+    definition: A [GeoJSON Polygon](https://datatracker.ietf.org/doc/html/rfc7946).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GeoJsonPolygon
+  - term: GetBiddingZonesResponse
+    definition: 'Object declared by the contract with fields: bidding_zones.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetBiddingZonesResponse
+  - term: GetControlAreasResponse
+    definition: 'Object declared by the contract with fields: control_areas.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetControlAreasResponse
+  - term: GetDatasetsResponse
+    definition: 'Object declared by the contract with fields: datasets.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetDatasetsResponse
+  - term: GetMeteringGridAreasResponse
+    definition: 'Object declared by the contract with fields: mgas.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetMeteringGridAreasResponse
+  - term: GetPartiesResponse
+    definition: 'Object declared by the contract with fields: parties.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetPartiesResponse
+  - term: GetSchedulingAreasResponse
+    definition: 'Object declared by the contract with fields: scheduling_areas.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetSchedulingAreasResponse
+  - term: GetTariffsResponse
+    definition: 'Object declared by the contract with fields: tariffs.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/GetTariffsResponse
+  - term: HTTPValidationError
+    definition: 'Object declared by the contract with fields: detail.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/HTTPValidationError
+  - term: HighestCondition
+    definition: Keep the N highest values per resolution window.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/HighestCondition
+  - term: Holiday
+    definition: 'Public holiday ### Available holidays - **no/forste_nyttarsdag** — January 1st. - **no/skjartorsdag** — The Thursday before Easter
+      Sunday (moveable). - **no/langfredag** — The Friday before Easter Sunday (moveable). - **no/forste_paskedag** — Easter Sunday (moveable).
+      - **no/andre_paskedag** — The Monday after Easter Sunday (moveable). - **no/arbeidernes_dag** — May 1st. - **no/kristi_himmelfartsd'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/Holiday
+  - term: HolidayOccurrence
+    definition: A single occurrence of a holiday on a calendar date.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/HolidayOccurrence
+  - term: HolidaysResponse
+    definition: Holidays in the requested range.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/HolidaysResponse
+  - term: Identifier
+    definition: 'Object declared by the contract with fields: extra_ids, id.'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Identifier
+  - term: IdentifierKind
+    definition: 'Enumeration declared by the contract with values: eic, vat, gln, se.ediel, se.mga_code, no.mga_code, esett.mga_type.'
+    tags:
+    - Enumeration
+    source: openapi/engrate-openapi.json#/components/schemas/IdentifierKind
+  - term: ImbalanceResponse
+    definition: Aggregated imbalance calculation for an entire clearing period, broken down by day.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/ImbalanceResponse
+  - term: IncomingMessageResponse
+    definition: A message received from the TSO in response to a schedule submission (ACK, CNF, or ANO document).
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/IncomingMessageResponse
+  - term: InputProfile
+    definition: A reference to a persisted profile to use as input for a dataset.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/InputProfile
+  - term: InputTimeSeries
+    definition: A time series of data for a registered dataset that is input for a tariff component. Use ``null`` in the values array to represent
+      absent values.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/InputTimeSeries
+  - term: Level
+    definition: Some floating point value and an associated [Unit](/api-reference/cost-of-energy/models/unit)
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Level
+  - term: Lookup
+    definition: 'Look up the matching tier level for a value based on discrete boundaries. ### Example Let''s say the highest power peak for a
+      certain month (`monthly-power-peak`) is 150 kW. That means it falls into the second tier, since 150 kW >= `boundary` between the first and
+      second tier (100 kW). The `monthly-fixed-fee` for that month becomes 5000 SEK (`level` of the matching tier).'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Lookup
+  - term: LowestCondition
+    definition: Keep the N lowest values per resolution window.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/LowestCondition
+  - term: Mask
+    definition: 'Conditional substitution: where condition matches, use replacement; otherwise keep input. Works with temporal conditions only
+      (month, day_of_week, time_of_day, exclude_holidays, and, or, not).'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Mask
+  - term: MeteringGridArea
+    definition: 'A Metering Grid Area (MGA) is a core domain concept in the European energy market. The [ENTSO-E Harmonized Electricity Market
+      Role Model](https://www.entsoe.eu/data/cim/role-models/) defines an MGA as: > A physical area where consumption, production and exchange
+      can be measured. It is delimited by the placement of meters for continuous measurement for input to, and withdrawal from the area. In oth'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/MeteringGridArea
+  - term: MeteringGridAreaUnionEntry
+    definition: '[MeteringGridArea](/api-reference/core/models/metering-grid-area) with an extra ''type'' field, used in tagged unions'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/MeteringGridAreaUnionEntry
+  - term: MonthCondition
+    definition: Condition that only applies in the specified months.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/MonthCondition
+  - term: MonthlyCostResponse
+    definition: Response model for monthly cost calculation.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/MonthlyCostResponse
+  - term: MonthlyEnergySummaryResponse
+    definition: Response model for monthly energy summary.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/MonthlyEnergySummaryResponse
+  - term: MonthlySummaryResponse
+    definition: Combined monthly summary with energy and cost.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/MonthlySummaryResponse
+  - term: Multiply
+    definition: 'Element-wise multiplication of two operands. Left and right opererands are required to have the same resolution. The output dataset
+      will have a unit that follows the following algebra: **Unit algebra (commutative):** - kW * SEK_per_kW = SEK - kWh * SEK_per_kWh = SEK -
+      kW * hours = kWh - % * any = same as the other operand (dimensionless scaling)'
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/Multiply
+  - term: NLBusinessTypeTotalResponse
+    definition: Aggregated total for a single business type within a month.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/NLBusinessTypeTotalResponse
+  - term: NLImbalancePointResponse
+    definition: Single quarter-hourly data point within an imbalance time series.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/NLImbalancePointResponse
+  - term: NLImbalanceReportDetailResponse
+    definition: Full imbalance report including all time series.
+    tags:
+    - Object
+    source: openapi/engrate-openapi.json#/components/schemas/NLImbalanceReportDetailResponse

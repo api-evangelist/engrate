@@ -1,0 +1,59 @@
+generated: '2026-10-15'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://docs.engrate.io/changelog/product-updates.md
+sources:
+- https://docs.engrate.io/changelog/product-updates.md
+entries:
+- breaking: false
+  highlights:
+  - '`POST /schedules` now returns `400 Bad Request` when two series in a request describe the same flow: two production or two consumption series
+    in one scheduling area, two internal series with the same area, `in_party` and `out_party`, or two external or foreign series with the same
+    `in_area`, `out_area`, `in_party`, `out_party` and `market_agreement_id`.'
+  date: October 2026
+- breaking: false
+  highlights:
+  - The console now asks which market to open on the first time you sign in.
+  date: September 2026
+- breaking: false
+  highlights:
+  - Schedules, Settlement and Configuration are now separate pages in the console, in place of the single tabbed view.
+  date: September 2026
+- breaking: false
+  highlights:
+  - The API now enforces a request rate limit per credential.
+  date: August 2026
+- breaking: false
+  highlights:
+  - The console has a new Core section where you can find parties, bidding zones, scheduling areas, control areas, and metering grid areas.
+  date: August 2026
+- breaking: false
+  highlights:
+  - The console has a new top bar and left navigation.
+  date: August 2026
+- breaking: false
+  highlights:
+  - New `GET /core/v1/control-areas` endpoint lists ENTSO-e control areas — the grid a single TSO operates — identified by EIC code.
+  date: July 2026
+- breaking: false
+  highlights:
+  - New `GET /core/v1/bidding-zones` endpoint lists European bidding zones (price areas) such as `SE3` and `NO1`, identified by EIC code.
+  date: June 2026
+- breaking: false
+  highlights:
+  - DE schedule submissions now validate party and area EICs against AG-FPM v4.6 Appendix F before sending to the TSO.
+  date: March 2026
+- breaking: false
+  highlights:
+  - Schedule submissions are now rejected if the time series does not start at 00:00 Europe/Berlin for the declared delivery date.
+  date: March 2026
+- breaking: false
+  highlights:
+  - Clicking a row in the NL imbalance settlement table now expands an inline detail view showing all time series for that report.
+  date: March 2026
+- breaking: false
+  highlights:
+  - Dutch (TenneT) imbalance reports are now visible in the Settlement tab.
+  date: March 2026
+note: Versioning scheme and current version are not specified on the page.
+docs: https://docs.engrate.io/changelog/product-updates.md

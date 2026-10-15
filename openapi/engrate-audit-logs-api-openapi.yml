@@ -1,0 +1,206 @@
+openapi: 3.2.0
+info:
+  title: Engrate Audit Logs API
+  version: 1.0.0
+servers:
+- url: https://api.engrate.io
+security:
+- apiKeyAuth: []
+tags:
+- name: Audit Logs
+paths:
+  /schedule-management/v1/audit-logs:
+    get:
+      description: 'Query audit logs with optional filters.
+
+
+        Filters: - schedule_uid: Filter by related schedule - order: NEWEST_FIRST (default) or OLDEST_FIRST - limit: Maximum number of results (default 50, max 1000)'
+      operationId: list_audit_logs_schedule_management_v1_audit_logs_get
+      parameters:
+      - description: Filter by related schedule UID.
+        in: query
+        name: schedule_uid
+        required: false
+        schema:
+          anyOf:
+          - format: uuid
+            type: string
+          - type: 'null'
+          description: Filter by related schedule UID.
+          title: Schedule Uid
+      - description: Sort order. 'NEWEST_FIRST' (default) returns the latest events first.
+        in: query
+        name: order
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - NEWEST_FIRST
+            - OLDEST_FIRST
+            type: string
+          - type: 'null'
+          description: Sort order. 'NEWEST_FIRST' (default) returns the latest events first.
+          title: Order
+      - description: Maximum results to return (1–1000, default 50).
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 50
+          description: Maximum results to return (1–1000, default 50).
+          maximum: 1000
+          minimum: 1
+          title: Limit
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AuditLogResponse'
+                title: Response List Audit Logs Schedule Management V1 Audit Logs Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Audit Logs
+      tags:
+      - Audit Logs
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    JSONValue:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - items:
+          $ref: '#/components/schemas/JSONValue'
+        type: array
+      - additionalProperties:
+          $ref: '#/components/schemas/JSONValue'
+        type: object
+      - type: 'null'
+    AuditLogResponse:
+      description: An audit log entry recording a state change or action.
+      properties:
+        api_client_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: API client identifier that triggered the event, if applicable.
+          title: Api Client Id
+        created_ts:
+          description: ISO 8601 datetime with millisecond precision (`YYYY-MM-DDTHH:MM:SS.sssZ`).
+          examples:
+          - '2026-03-25T14:00:00.123Z'
+          title: Created Ts
+          type: string
+        data:
+          additionalProperties:
+            $ref: '#/components/schemas/JSONValue'
+          description: Combined metadata, after-state snapshot, and request context.
+          title: Data
+          type: object
+        org_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Organization identifier, if applicable.
+          title: Org Uid
+        schedule_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Related [Schedule](/api-reference/schedule-management/models/schedule) identifier, if applicable.
+          title: Schedule Uid
+        schedule_version_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Related [Schedule Version](/api-reference/schedule-management/models/schedule-version) identifier, if applicable.
+          title: Schedule Version Uid
+        time_series_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Related time series identifier, if applicable.
+          title: Time Series Uid
+        type:
+          description: Event type identifier (e.g. `schedule.created`).
+          examples:
+          - schedule.created
+          - schedule.modified
+          title: Type
+          type: string
+        uid:
+          description: Unique identifier for this audit event.
+          examples:
+          - e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b
+          title: Uid
+          type: string
+        user_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Identifier of the user who triggered the event, if applicable.
+          title: User Uid
+        version:
+          default: 1
+          description: Event schema version.
+          examples:
+          - 1
+          title: Version
+          type: integer
+      required:
+      - created_ts
+      - data
+      - type
+      - uid
+      title: AuditLogResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+  securitySchemes:
+    apiKeyAuth:
+      in: header
+      name: Authorization
+      type: apiKey
