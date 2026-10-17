@@ -161,6 +161,176 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
+    MaloId:
+      type: string
+      pattern: ^\d{11}$
+      description: Identifiziert die Marktlokation oder Tranche.
+      examples:
+      - '57685676748'
+    SubscriptionDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          $ref: '#/components/schemas/Subscription'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+    ChangeEvent:
+      type: object
+      required:
+      - type
+      - eventId
+      - occurredAt
+      - resource
+      description: 'Das Änderungsereignis trägt bewusst **keine** Fachdaten. Es informiert darüber,
+
+        dass etwas vorliegt, und nennt die URL. Der Abonnent ruft die Daten zu einem für
+
+        ihn passenden Zeitpunkt und in der von ihm benötigten Granularität ab.
+
+
+        Damit steigt die Wahrscheinlichkeit, dass die Daten zum Zeitpunkt ihrer
+
+        tatsächlichen Nutzung aktuell sind — und der Benachrichtigungsdienst kann auf
+
+        seine Kernaufgabe zugeschnitten werden, statt eine 1:N-Verteilung über eine
+
+        Punkt-zu-Punkt-Architektur nachzubilden.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - locationBundleChanged
+          - clearingCaseOpened
+          - clearingCaseResolved
+          - subscriptionRevoked
+        eventId:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        resource:
+          $ref: '#/components/schemas/Link'
+          description: URL der betroffenen Ressource.
+        etag:
+          type: string
+          description: '`ETag` des neuen Stands. Ein Abonnent, der diesen Stand bereits kennt, kann den
+
+            Abruf überspringen.
+
+            '
+    NeloId:
+      type: string
+      pattern: ^E[A-Z\d]{9}\d$
+      description: Netzlokations-ID.
+      examples:
+      - E1234848431
+    ListLinks:
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/Link'
+        next:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          description: Nächste Seite. Fehlt, wenn keine weiteren Elemente vorliegen.
+        prev:
+          $ref: '#/components/schemas/Link'
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          format: uri-reference
+          description: URL der referenzierten Ressource.
+        title:
+          type: string
+    Subscription:
+      type: object
+      required:
+      - type
+      - subscriptionId
+      - callbackUrl
+      - eventTypes
+      - state
+      properties:
+        type:
+          const: Abonnement
+        subscriptionId:
+          type: string
+          format: uuid
+        href:
+          type: string
+          format: uri-reference
+        callbackUrl:
+          type: string
+          format: uri
+        eventTypes:
+          type: array
+          items:
+            type: string
+        state:
+          type: string
+          enum:
+          - aktiv
+          - ausgesetzt
+          - beendet
+        createdAt:
+          type: string
+          format: date-time
+    SubscriptionList:
+      type: object
+      required:
+      - data
+      - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        links:
+          $ref: '#/components/schemas/ListLinks'
+    SubscriptionWrite:
+      type: object
+      required:
+      - callbackUrl
+      - eventTypes
+      properties:
+        callbackUrl:
+          type: string
+          format: uri
+          description: Endpunkt des Abonnenten, an den Ereignisse zugestellt werden.
+        eventTypes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+            - locationBundleChanged
+            - clearingCaseOpened
+            - clearingCaseResolved
+            - subscriptionRevoked
+        filter:
+          type: object
+          description: Optionale Einschränkung auf bestimmte Lokationen.
+          properties:
+            marketLocations:
+              type: array
+              items:
+                $ref: '#/components/schemas/MaloId'
+            networkLocations:
+              type: array
+              items:
+                $ref: '#/components/schemas/NeloId'
     Problem:
       type: object
       description: 'Fehlermeldung nach RFC 9457 (Problem Details for HTTP APIs).
@@ -212,176 +382,6 @@ components:
                 type: string
               code:
                 type: string
-    NeloId:
-      type: string
-      pattern: ^E[A-Z\d]{9}\d$
-      description: Netzlokations-ID.
-      examples:
-      - E1234848431
-    ChangeEvent:
-      type: object
-      required:
-      - type
-      - eventId
-      - occurredAt
-      - resource
-      description: 'Das Änderungsereignis trägt bewusst **keine** Fachdaten. Es informiert darüber,
-
-        dass etwas vorliegt, und nennt die URL. Der Abonnent ruft die Daten zu einem für
-
-        ihn passenden Zeitpunkt und in der von ihm benötigten Granularität ab.
-
-
-        Damit steigt die Wahrscheinlichkeit, dass die Daten zum Zeitpunkt ihrer
-
-        tatsächlichen Nutzung aktuell sind — und der Benachrichtigungsdienst kann auf
-
-        seine Kernaufgabe zugeschnitten werden, statt eine 1:N-Verteilung über eine
-
-        Punkt-zu-Punkt-Architektur nachzubilden.
-
-        '
-      properties:
-        type:
-          type: string
-          enum:
-          - locationBundleChanged
-          - clearingCaseOpened
-          - clearingCaseResolved
-          - subscriptionRevoked
-        eventId:
-          type: string
-          format: uuid
-        occurredAt:
-          type: string
-          format: date-time
-        resource:
-          $ref: '#/components/schemas/Link'
-          description: URL der betroffenen Ressource.
-        etag:
-          type: string
-          description: '`ETag` des neuen Stands. Ein Abonnent, der diesen Stand bereits kennt, kann den
-
-            Abruf überspringen.
-
-            '
-    MaloId:
-      type: string
-      pattern: ^\d{11}$
-      description: Identifiziert die Marktlokation oder Tranche.
-      examples:
-      - '57685676748'
-    ListLinks:
-      type: object
-      properties:
-        self:
-          $ref: '#/components/schemas/Link'
-        next:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          description: Nächste Seite. Fehlt, wenn keine weiteren Elemente vorliegen.
-        prev:
-          $ref: '#/components/schemas/Link'
-    Subscription:
-      type: object
-      required:
-      - type
-      - subscriptionId
-      - callbackUrl
-      - eventTypes
-      - state
-      properties:
-        type:
-          const: Abonnement
-        subscriptionId:
-          type: string
-          format: uuid
-        href:
-          type: string
-          format: uri-reference
-        callbackUrl:
-          type: string
-          format: uri
-        eventTypes:
-          type: array
-          items:
-            type: string
-        state:
-          type: string
-          enum:
-          - aktiv
-          - ausgesetzt
-          - beendet
-        createdAt:
-          type: string
-          format: date-time
-    SubscriptionDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          $ref: '#/components/schemas/Subscription'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-    SubscriptionWrite:
-      type: object
-      required:
-      - callbackUrl
-      - eventTypes
-      properties:
-        callbackUrl:
-          type: string
-          format: uri
-          description: Endpunkt des Abonnenten, an den Ereignisse zugestellt werden.
-        eventTypes:
-          type: array
-          minItems: 1
-          items:
-            type: string
-            enum:
-            - locationBundleChanged
-            - clearingCaseOpened
-            - clearingCaseResolved
-            - subscriptionRevoked
-        filter:
-          type: object
-          description: Optionale Einschränkung auf bestimmte Lokationen.
-          properties:
-            marketLocations:
-              type: array
-              items:
-                $ref: '#/components/schemas/MaloId'
-            networkLocations:
-              type: array
-              items:
-                $ref: '#/components/schemas/NeloId'
-    SubscriptionList:
-      type: object
-      required:
-      - data
-      - links
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Subscription'
-        links:
-          $ref: '#/components/schemas/ListLinks'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type: string
-          format: uri-reference
-          description: URL der referenzierten Ressource.
-        title:
-          type: string
   responses:
     NotFound:
       description: Ressource nicht vorhanden.

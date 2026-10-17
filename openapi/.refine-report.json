@@ -2,7 +2,7 @@
   "provider": "engrate",
   "sources": [
     "_original/engrate-netzbetreiber-api-openapi.yml",
-    "engrate-openapi.json"
+    "_original/engrate-openapi.json"
   ],
   "outputs": [
     "engrate-benachrichtigung-api-openapi.yml",
@@ -25,12 +25,12 @@
     "engrate-timeseries-api-openapi.yml"
   ],
   "archived": [
-    "archived openapi/engrate-openapi.json"
+    "deleted 1 superseded output(s) from the previous generation"
   ],
   "errors": [],
   "warnings": [],
   "notes": [
-    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "engrate-netzbetreiber-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "engrate-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "engrate-openapi.json: tagged paths GET /core/v1/bidding-zones -> Core",
@@ -55,7 +55,27 @@
     "engrate-openapi.json: declared missing tag: schedules",
     "engrate-openapi.json: declared missing tag: status-request",
     "engrate-openapi.json: declared missing tag: timeseries",
-    "apis.yml register: written (+18 apis, 18 total)"
+    "superseded outputs removed: engrate-time-series-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 18 total)"
   ],
-  "skipped": []
+  "skipped": [
+    "engrate-audit-logs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-benachrichtigung-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-betrieb-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-clearing-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-core-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-cost-of-energy-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-geo-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-holidays-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-lokationen-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-lokationsb-ndel-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-mabis-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-netzbetreiberwechsel-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-nl-settlement-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-profiles-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-reference-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-schedules-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-status-request-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "engrate-time-series-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

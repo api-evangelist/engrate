@@ -73,28 +73,6 @@ paths:
       - Audit Logs
 components:
   schemas:
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
-          type: array
-      title: HTTPValidationError
-      type: object
-    JSONValue:
-      anyOf:
-      - type: string
-      - type: integer
-      - type: number
-      - type: boolean
-      - items:
-          $ref: '#/components/schemas/JSONValue'
-        type: array
-      - additionalProperties:
-          $ref: '#/components/schemas/JSONValue'
-        type: object
-      - type: 'null'
     AuditLogResponse:
       description: An audit log entry recording a state change or action.
       properties:
@@ -173,6 +151,19 @@ components:
       - uid
       title: AuditLogResponse
       type: object
+    JSONValue:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - items:
+          $ref: '#/components/schemas/JSONValue'
+        type: array
+      - additionalProperties:
+          $ref: '#/components/schemas/JSONValue'
+        type: object
+      - type: 'null'
     ValidationError:
       properties:
         ctx:
@@ -198,6 +189,15 @@ components:
       - msg
       - type
       title: ValidationError
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
       type: object
   securitySchemes:
     apiKeyAuth:

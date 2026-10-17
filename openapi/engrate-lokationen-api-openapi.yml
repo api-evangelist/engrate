@@ -124,6 +124,233 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
+    MarketLocationDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: object
+          required:
+          - type
+          - maloId
+          properties:
+            type:
+              type: string
+              enum:
+              - Marktlokation
+              - Tranche
+            maloId:
+              $ref: '#/components/schemas/MaloId'
+            href:
+              type: string
+              format: uri-reference
+            supplier:
+              $ref: '#/components/schemas/MarketPartnerRef'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            locationBundles:
+              $ref: '#/components/schemas/Link'
+    MaloId:
+      type: string
+      pattern: ^\d{11}$
+      description: Identifiziert die Marktlokation oder Tranche.
+      examples:
+      - '57685676748'
+    NetworkLocationDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: object
+          required:
+          - type
+          - neloId
+          properties:
+            type:
+              const: Netzlokation
+            neloId:
+              $ref: '#/components/schemas/NeloId'
+            href:
+              type: string
+              format: uri-reference
+            networkOperator:
+              $ref: '#/components/schemas/MarketPartnerRef'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            locationBundles:
+              $ref: '#/components/schemas/Link'
+    MarketPartnerRef:
+      type: object
+      required:
+      - marketPartnerId
+      properties:
+        marketPartnerId:
+          $ref: '#/components/schemas/MarketPartnerId'
+        role:
+          type: string
+          enum:
+          - NB
+          - LF
+          - MSB
+          - MWV
+          - UENB
+        href:
+          type: string
+          format: uri-reference
+    IntelligentMeteringSystem:
+      type: object
+      required:
+      - type
+      - configurationId
+      - obisCodes
+      additionalProperties: false
+      properties:
+        type:
+          const: iMS
+        configurationId:
+          type: string
+          description: Konfigurations-ID. Bei einem intelligenten Messsystem erforderlich.
+        obisCodes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+    MeteringLocationDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: object
+          required:
+          - type
+          - meloId
+          - metering
+          properties:
+            type:
+              const: Messlokation
+            meloId:
+              $ref: '#/components/schemas/MeloId'
+            href:
+              type: string
+              format: uri-reference
+            meteringPointOperator:
+              $ref: '#/components/schemas/MarketPartnerRef'
+            metering:
+              $ref: '#/components/schemas/Metering'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            locationBundles:
+              $ref: '#/components/schemas/Link'
+    Metering:
+      description: 'Die Messung an einer Messlokation, als tagged union über die Art des Messsystems.
+
+
+        **Konkretes Beispiel für den Nutzen:** Bei einem intelligenten Messsystem ist die
+
+        Konfigurations-ID erforderlich; bei einem konventionellen Messsystem darf sie
+
+        nicht vorhanden sein; bei einer pauschalen Messlokation gibt es weder Zähler noch
+
+        OBIS-Kennzahlen noch Messwerte. Heute stehen diese drei Regeln als Bedingungen im
+
+        Anwendungshandbuch. Hier sind sie Teil des Schemas: Ein Payload, der einer
+
+        pauschalen Messlokation eine OBIS-Kennzahl zuordnet, ist schlicht nicht gültig und
+
+        wird von jedem Standardvalidator abgelehnt — nicht erst im Produktivbetrieb durch
+
+        einen Klärfall.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/IntelligentMeteringSystem'
+      - $ref: '#/components/schemas/ModernMeteringDevice'
+      - $ref: '#/components/schemas/FlatRateMetering'
+      discriminator:
+        propertyName: type
+        mapping:
+          iMS: '#/components/schemas/IntelligentMeteringSystem'
+          mME: '#/components/schemas/ModernMeteringDevice'
+          pauschal: '#/components/schemas/FlatRateMetering'
+    MarketPartnerId:
+      type: string
+      pattern: ^\d{13}$
+      description: Marktpartner-ID.
+      examples:
+      - '9900987654321'
+    FlatRateMetering:
+      type: object
+      required:
+      - type
+      additionalProperties: false
+      properties:
+        type:
+          const: pauschal
+        description:
+          type: string
+          description: 'Pauschale Messlokation ohne Zähler. Trägt eine Zählpunktbezeichnung, aber
+
+            keine Messeinrichtung, keine OBIS-Kennzahlen und keine Messwerte.
+
+
+            Mitteilung Nr. 57 sieht vor, dass künftig jede Marktlokation Strom mindestens
+
+            eine zugeordnete Messlokation aufweist — entweder eine pauschale ohne Zähler
+
+            oder eine gemessene. Dieser Typ macht die Unterscheidung im Schema explizit,
+
+            statt sie einer Bedingung im Anwendungshandbuch zu überlassen.
+
+            '
+    NeloId:
+      type: string
+      pattern: ^E[A-Z\d]{9}\d$
+      description: Netzlokations-ID.
+      examples:
+      - E1234848431
+    ModernMeteringDevice:
+      type: object
+      required:
+      - type
+      - obisCodes
+      additionalProperties: false
+      properties:
+        type:
+          const: mME
+        obisCodes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+    MeloId:
+      type: string
+      pattern: ^DE\d{11}[A-Z\d]{20}$
+      description: Messlokations-ID (Zählpunktbezeichnung).
+      examples:
+      - DE00014545768S0000000000000003054
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          format: uri-reference
+          description: URL der referenzierten Ressource.
+        title:
+          type: string
     Problem:
       type: object
       description: 'Fehlermeldung nach RFC 9457 (Problem Details for HTTP APIs).
@@ -175,238 +402,6 @@ components:
                 type: string
               code:
                 type: string
-    NeloId:
-      type: string
-      pattern: ^E[A-Z\d]{9}\d$
-      description: Netzlokations-ID.
-      examples:
-      - E1234848431
-    IntelligentMeteringSystem:
-      type: object
-      required:
-      - type
-      - configurationId
-      - obisCodes
-      additionalProperties: false
-      properties:
-        type:
-          const: iMS
-        configurationId:
-          type: string
-          description: Konfigurations-ID. Bei einem intelligenten Messsystem erforderlich.
-        obisCodes:
-          type: array
-          minItems: 1
-          items:
-            type: string
-    MeteringLocationDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: object
-          required:
-          - type
-          - meloId
-          - metering
-          properties:
-            type:
-              const: Messlokation
-            meloId:
-              $ref: '#/components/schemas/MeloId'
-            href:
-              type: string
-              format: uri-reference
-            meteringPointOperator:
-              $ref: '#/components/schemas/MarketPartnerRef'
-            metering:
-              $ref: '#/components/schemas/Metering'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            locationBundles:
-              $ref: '#/components/schemas/Link'
-    NetworkLocationDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: object
-          required:
-          - type
-          - neloId
-          properties:
-            type:
-              const: Netzlokation
-            neloId:
-              $ref: '#/components/schemas/NeloId'
-            href:
-              type: string
-              format: uri-reference
-            networkOperator:
-              $ref: '#/components/schemas/MarketPartnerRef'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            locationBundles:
-              $ref: '#/components/schemas/Link'
-    MaloId:
-      type: string
-      pattern: ^\d{11}$
-      description: Identifiziert die Marktlokation oder Tranche.
-      examples:
-      - '57685676748'
-    MarketLocationDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: object
-          required:
-          - type
-          - maloId
-          properties:
-            type:
-              type: string
-              enum:
-              - Marktlokation
-              - Tranche
-            maloId:
-              $ref: '#/components/schemas/MaloId'
-            href:
-              type: string
-              format: uri-reference
-            supplier:
-              $ref: '#/components/schemas/MarketPartnerRef'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            locationBundles:
-              $ref: '#/components/schemas/Link'
-    MarketPartnerRef:
-      type: object
-      required:
-      - marketPartnerId
-      properties:
-        marketPartnerId:
-          $ref: '#/components/schemas/MarketPartnerId'
-        role:
-          type: string
-          enum:
-          - NB
-          - LF
-          - MSB
-          - MWV
-          - UENB
-        href:
-          type: string
-          format: uri-reference
-    FlatRateMetering:
-      type: object
-      required:
-      - type
-      additionalProperties: false
-      properties:
-        type:
-          const: pauschal
-        description:
-          type: string
-          description: 'Pauschale Messlokation ohne Zähler. Trägt eine Zählpunktbezeichnung, aber
-
-            keine Messeinrichtung, keine OBIS-Kennzahlen und keine Messwerte.
-
-
-            Mitteilung Nr. 57 sieht vor, dass künftig jede Marktlokation Strom mindestens
-
-            eine zugeordnete Messlokation aufweist — entweder eine pauschale ohne Zähler
-
-            oder eine gemessene. Dieser Typ macht die Unterscheidung im Schema explizit,
-
-            statt sie einer Bedingung im Anwendungshandbuch zu überlassen.
-
-            '
-    MarketPartnerId:
-      type: string
-      pattern: ^\d{13}$
-      description: Marktpartner-ID.
-      examples:
-      - '9900987654321'
-    ModernMeteringDevice:
-      type: object
-      required:
-      - type
-      - obisCodes
-      additionalProperties: false
-      properties:
-        type:
-          const: mME
-        obisCodes:
-          type: array
-          minItems: 1
-          items:
-            type: string
-    MeloId:
-      type: string
-      pattern: ^DE\d{11}[A-Z\d]{20}$
-      description: Messlokations-ID (Zählpunktbezeichnung).
-      examples:
-      - DE00014545768S0000000000000003054
-    Metering:
-      description: 'Die Messung an einer Messlokation, als tagged union über die Art des Messsystems.
-
-
-        **Konkretes Beispiel für den Nutzen:** Bei einem intelligenten Messsystem ist die
-
-        Konfigurations-ID erforderlich; bei einem konventionellen Messsystem darf sie
-
-        nicht vorhanden sein; bei einer pauschalen Messlokation gibt es weder Zähler noch
-
-        OBIS-Kennzahlen noch Messwerte. Heute stehen diese drei Regeln als Bedingungen im
-
-        Anwendungshandbuch. Hier sind sie Teil des Schemas: Ein Payload, der einer
-
-        pauschalen Messlokation eine OBIS-Kennzahl zuordnet, ist schlicht nicht gültig und
-
-        wird von jedem Standardvalidator abgelehnt — nicht erst im Produktivbetrieb durch
-
-        einen Klärfall.
-
-        '
-      oneOf:
-      - $ref: '#/components/schemas/IntelligentMeteringSystem'
-      - $ref: '#/components/schemas/ModernMeteringDevice'
-      - $ref: '#/components/schemas/FlatRateMetering'
-      discriminator:
-        propertyName: type
-        mapping:
-          iMS: '#/components/schemas/IntelligentMeteringSystem'
-          mME: '#/components/schemas/ModernMeteringDevice'
-          pauschal: '#/components/schemas/FlatRateMetering'
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type: string
-          format: uri-reference
-          description: URL der referenzierten Ressource.
-        title:
-          type: string
-  headers:
-    ETag:
-      description: Version der Ressource für bedingte Anfragen.
-      schema:
-        type: string
   responses:
     NotFound:
       description: Ressource nicht vorhanden.
@@ -414,6 +409,11 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+  headers:
+    ETag:
+      description: Version der Ressource für bedingte Anfragen.
+      schema:
+        type: string
   securitySchemes:
     oauth2:
       type: oauth2

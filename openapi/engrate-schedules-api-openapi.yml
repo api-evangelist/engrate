@@ -462,14 +462,31 @@ paths:
         content: <Note>**Coming soon.**</Note>
 components:
   schemas:
-    HTTPValidationError:
+    ScheduleSeriesSpec:
+      description: 'Full series specification: identifiers, type, and interval data.'
       properties:
-        detail:
+        data:
+          description: Interval data points, one per slot, ordered from the start of the delivery day.
           items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
+            $ref: '#/components/schemas/ScheduleSeriesDataPoint'
+          title: Data
           type: array
-      title: HTTPValidationError
+        ids:
+          $ref: '#/components/schemas/ScheduleSeriesIds'
+          description: EIC identifiers for the series exchange.
+        type:
+          description: 'Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.'
+          examples:
+          - internal
+          - external
+          - production
+          title: Type
+          type: string
+      required:
+      - data
+      - ids
+      - type
+      title: ScheduleSeriesSpec
       type: object
     ScheduleSeriesDataPoint:
       description: 'One interval of a schedule series: a timestamp and its power amount.'
@@ -491,35 +508,54 @@ components:
       - ts
       title: ScheduleSeriesDataPoint
       type: object
-    ScheduleCreateSeriesItem:
+    ScheduleCreateRequest:
       additionalProperties: false
-      description: Time series item within a create-schedule request.
+      description: Request body for creating a schedule or a new spec for an existing one.
       properties:
-        data:
-          description: Interval data points (1-100), one per resolution slot of the delivery day.
-          items:
-            $ref: '#/components/schemas/ScheduleCreateDataPoint'
-          maxItems: 100
-          minItems: 1
-          title: Data
-          type: array
-        ids:
-          $ref: '#/components/schemas/ScheduleCreateSeriesIds'
-        type:
-          description: Series type.
+        date:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          description: Delivery date (YYYY-MM-DD). If omitted, derived from the first timestamp in series data (UTC -> market-local midnight).
+          title: Date
+        market:
+          description: 'Electricity market: `DE`/`germany` or `NL`/`netherlands`.'
           enum:
-          - production
-          - consumption
-          - internal
-          - external
-          - foreign
-          title: Type
+          - DE
+          - NL
+          - germany
+          - netherlands
+          title: Market
+          type: string
+        receiver_id:
+          description: EIC X code (DE) or EAN-13 (NL) of the receiving TSO.
+          minLength: 1
+          title: Receiver Id
+          type: string
+        series:
+          description: Time series to submit (0-50). NL allows an empty list; DE requires at least one series.
+          items:
+            $ref: '#/components/schemas/ScheduleCreateSeriesItem'
+          maxItems: 50
+          title: Series
+          type: array
+        test:
+          default: false
+          description: Legacy gate-closure bypass flag. Accepted for wire compatibility; this endpoint records the desired spec and does not submit, so it has no effect.
+          title: Test
+          type: boolean
+        tso:
+          description: 'TSO identifier. DE: `50HERTZ_DE_TSO`, `DE-AMPRION-TSO`, `TTG_DE`, `DE-TRANSNETBWTSO`. NL: `TENNET_TSO`.'
+          minLength: 1
+          title: Tso
           type: string
       required:
-      - data
-      - ids
-      - type
-      title: ScheduleCreateSeriesItem
+      - market
+      - receiver_id
+      - series
+      - tso
+      title: ScheduleCreateRequest
       type: object
     ScheduleSeriesIds:
       description: EIC identifiers locating a series in the area/party exchange.
@@ -555,31 +591,97 @@ components:
       - out_party
       title: ScheduleSeriesIds
       type: object
-    ValidationError:
+    HTTPValidationError:
       properties:
-        ctx:
-          title: Context
-          type: object
-        input:
-          title: Input
-        loc:
+        detail:
           items:
-            anyOf:
-            - type: string
-            - type: integer
-          title: Location
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
           type: array
-        msg:
-          title: Message
+      title: HTTPValidationError
+      type: object
+    ScheduleCreateSeriesIds:
+      additionalProperties: false
+      description: Series party and area identifiers for a submitted series.
+      properties:
+        in_area:
+          description: EIC Y code of the receiving control area.
+          title: In Area
           type: string
-        type:
-          title: Error Type
+        in_party:
+          description: Identifier of the receiving balance responsible party.
+          title: In Party
+          type: string
+        market_agreement_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Market agreement identifier; set for external/foreign series.
+          title: Market Agreement Id
+        out_area:
+          description: EIC Y code of the sending control area.
+          title: Out Area
+          type: string
+        out_party:
+          description: Identifier of the sending balance responsible party.
+          title: Out Party
           type: string
       required:
-      - loc
-      - msg
+      - in_area
+      - in_party
+      - out_area
+      - out_party
+      title: ScheduleCreateSeriesIds
+      type: object
+    ScheduleCreateDataPoint:
+      additionalProperties: false
+      description: Single interval data point in a submitted series.
+      properties:
+        amount:
+          description: Power in MW for this interval.
+          maximum: 99999.99
+          minimum: -99999.99
+          title: Amount
+          type: number
+        ts:
+          description: Interval start timestamp (ISO 8601, UTC).
+          format: date-time
+          title: Ts
+          type: string
+      required:
+      - amount
+      - ts
+      title: ScheduleCreateDataPoint
+      type: object
+    ScheduleCreateSeriesItem:
+      additionalProperties: false
+      description: Time series item within a create-schedule request.
+      properties:
+        data:
+          description: Interval data points (1-100), one per resolution slot of the delivery day.
+          items:
+            $ref: '#/components/schemas/ScheduleCreateDataPoint'
+          maxItems: 100
+          minItems: 1
+          title: Data
+          type: array
+        ids:
+          $ref: '#/components/schemas/ScheduleCreateSeriesIds'
+        type:
+          description: Series type.
+          enum:
+          - production
+          - consumption
+          - internal
+          - external
+          - foreign
+          title: Type
+          type: string
+      required:
+      - data
+      - ids
       - type
-      title: ValidationError
+      title: ScheduleCreateSeriesItem
       type: object
     ScheduleVersionSpec:
       description: The full specification that was submitted with a schedule version, including market routing and all series.
@@ -622,124 +724,6 @@ components:
       - series
       - tso
       title: ScheduleVersionSpec
-      type: object
-    ScheduleVersionSeriesItem:
-      description: Series reference within a [Schedule Version](/api-reference/schedule-management/models/schedule-version) spec.
-      properties:
-        in_area:
-          description: EIC Y code of the receiving control area.
-          examples:
-          - 10YDE-VE-------2
-          title: In Area
-          type: string
-        in_party:
-          description: EIC X code of the receiving party (balance responsible party).
-          examples:
-          - 11XDE-EXAMPLE--A
-          title: In Party
-          type: string
-        out_area:
-          description: EIC Y code of the sending control area.
-          examples:
-          - 10YDE-VE-------2
-          title: Out Area
-          type: string
-        out_party:
-          description: EIC X code of the sending party (balance responsible party).
-          examples:
-          - 11XDE-EXAMPLE--B
-          title: Out Party
-          type: string
-        time_series_uid:
-          description: Time series identifier used in the ESS/CIM document.
-          examples:
-          - TS-001
-          title: Time Series Uid
-          type: string
-        ts_version:
-          description: Per-series version number (`SendersTimeSeriesVersion` in ESS) — the version in which this series last changed.
-          examples:
-          - 1
-          - 2
-          title: Ts Version
-          type: integer
-        type:
-          description: 'Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.'
-          examples:
-          - internal
-          - external
-          - consumption
-          title: Type
-          type: string
-        uid:
-          description: Unique identifier for this series record.
-          examples:
-          - d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a
-          title: Uid
-          type: string
-      required:
-      - in_area
-      - in_party
-      - out_area
-      - out_party
-      - time_series_uid
-      - ts_version
-      - type
-      - uid
-      title: ScheduleVersionSeriesItem
-      type: object
-    ScheduleCreateDataPoint:
-      additionalProperties: false
-      description: Single interval data point in a submitted series.
-      properties:
-        amount:
-          description: Power in MW for this interval.
-          maximum: 99999.99
-          minimum: -99999.99
-          title: Amount
-          type: number
-        ts:
-          description: Interval start timestamp (ISO 8601, UTC).
-          format: date-time
-          title: Ts
-          type: string
-      required:
-      - amount
-      - ts
-      title: ScheduleCreateDataPoint
-      type: object
-    ScheduleCreateSeriesIds:
-      additionalProperties: false
-      description: Series party and area identifiers for a submitted series.
-      properties:
-        in_area:
-          description: EIC Y code of the receiving control area.
-          title: In Area
-          type: string
-        in_party:
-          description: Identifier of the receiving balance responsible party.
-          title: In Party
-          type: string
-        market_agreement_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Market agreement identifier; set for external/foreign series.
-          title: Market Agreement Id
-        out_area:
-          description: EIC Y code of the sending control area.
-          title: Out Area
-          type: string
-        out_party:
-          description: Identifier of the sending balance responsible party.
-          title: Out Party
-          type: string
-      required:
-      - in_area
-      - in_party
-      - out_area
-      - out_party
-      title: ScheduleCreateSeriesIds
       type: object
     ScheduleSeriesResponse:
       description: A [Schedule Series](/api-reference/schedule-management/models/schedule-series) representing one time series within a schedule version (e.g. one internal or external trade).
@@ -831,31 +815,59 @@ components:
       - version
       title: ScheduleSeriesResponse
       type: object
-    ScheduleSeriesSpec:
-      description: 'Full series specification: identifiers, type, and interval data.'
+    IncomingMessageResponse:
+      description: A message received from the TSO in response to a schedule submission (ACK, CNF, or ANO document).
       properties:
-        data:
-          description: Interval data points, one per slot, ordered from the start of the delivery day.
-          items:
-            $ref: '#/components/schemas/ScheduleSeriesDataPoint'
-          title: Data
-          type: array
-        ids:
-          $ref: '#/components/schemas/ScheduleSeriesIds'
-          description: EIC identifiers for the series exchange.
-        type:
-          description: 'Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.'
+        created_ts:
+          description: ISO 8601 datetime when this message was received.
           examples:
-          - internal
-          - external
-          - production
-          title: Type
+          - '2026-03-25T14:05:00+00:00'
+          title: Created Ts
+          type: string
+        document_type:
+          description: Document kind. `ACK` (acknowledgement), `CNF` (confirmation), `ANO` (anomaly); NL also emits `RI` / `BAL`. `NA` when the kind cannot be derived for the message's broker.
+          examples:
+          - ACK
+          - CNF
+          - ANO
+          - NA
+          title: Document Type
+          type: string
+        message_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: The TSO's own identifier for this response message, taken verbatim from the message payload (CIM `mRID` / ESS `MessageIdentification`). Never a broker-assigned id.
+          examples:
+          - TSO-MSG-20260325-001
+          title: Message Id
+        original_message_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Identifier of our schedule submission this response refers to.
+          examples:
+          - MSG-20260325-001
+          title: Original Message Id
+        processing_status:
+          description: '`processed` once reconciled against the schedule, else `pending`.'
+          examples:
+          - processed
+          - pending
+          title: Processing Status
+          type: string
+        uid:
+          description: Unique identifier for this incoming message.
+          examples:
+          - '42'
+          title: Uid
           type: string
       required:
-      - data
-      - ids
-      - type
-      title: ScheduleSeriesSpec
+      - created_ts
+      - document_type
+      - processing_status
+      - uid
+      title: IncomingMessageResponse
       type: object
     ScheduleResponse:
       description: A [Schedule](/api-reference/schedule-management/models/schedule) header representing a single delivery-date submission to a TSO.
@@ -925,108 +937,31 @@ components:
       - uid
       title: ScheduleResponse
       type: object
-    IncomingMessageResponse:
-      description: A message received from the TSO in response to a schedule submission (ACK, CNF, or ANO document).
+    ValidationError:
       properties:
-        created_ts:
-          description: ISO 8601 datetime when this message was received.
-          examples:
-          - '2026-03-25T14:05:00+00:00'
-          title: Created Ts
-          type: string
-        document_type:
-          description: Document kind. `ACK` (acknowledgement), `CNF` (confirmation), `ANO` (anomaly); NL also emits `RI` / `BAL`. `NA` when the kind cannot be derived for the message's broker.
-          examples:
-          - ACK
-          - CNF
-          - ANO
-          - NA
-          title: Document Type
-          type: string
-        message_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: The TSO's own identifier for this response message, taken verbatim from the message payload (CIM `mRID` / ESS `MessageIdentification`). Never a broker-assigned id.
-          examples:
-          - TSO-MSG-20260325-001
-          title: Message Id
-        original_message_id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Identifier of our schedule submission this response refers to.
-          examples:
-          - MSG-20260325-001
-          title: Original Message Id
-        processing_status:
-          description: '`processed` once reconciled against the schedule, else `pending`.'
-          examples:
-          - processed
-          - pending
-          title: Processing Status
-          type: string
-        uid:
-          description: Unique identifier for this incoming message.
-          examples:
-          - '42'
-          title: Uid
-          type: string
-      required:
-      - created_ts
-      - document_type
-      - processing_status
-      - uid
-      title: IncomingMessageResponse
-      type: object
-    ScheduleCreateRequest:
-      additionalProperties: false
-      description: Request body for creating a schedule or a new spec for an existing one.
-      properties:
-        date:
-          anyOf:
-          - format: date
-            type: string
-          - type: 'null'
-          description: Delivery date (YYYY-MM-DD). If omitted, derived from the first timestamp in series data (UTC -> market-local midnight).
-          title: Date
-        market:
-          description: 'Electricity market: `DE`/`germany` or `NL`/`netherlands`.'
-          enum:
-          - DE
-          - NL
-          - germany
-          - netherlands
-          title: Market
-          type: string
-        receiver_id:
-          description: EIC X code (DE) or EAN-13 (NL) of the receiving TSO.
-          minLength: 1
-          title: Receiver Id
-          type: string
-        series:
-          description: Time series to submit (0-50). NL allows an empty list; DE requires at least one series.
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
           items:
-            $ref: '#/components/schemas/ScheduleCreateSeriesItem'
-          maxItems: 50
-          title: Series
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
           type: array
-        test:
-          default: false
-          description: Legacy gate-closure bypass flag. Accepted for wire compatibility; this endpoint records the desired spec and does not submit, so it has no effect.
-          title: Test
-          type: boolean
-        tso:
-          description: 'TSO identifier. DE: `50HERTZ_DE_TSO`, `DE-AMPRION-TSO`, `TTG_DE`, `DE-TRANSNETBWTSO`. NL: `TENNET_TSO`.'
-          minLength: 1
-          title: Tso
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
           type: string
       required:
-      - market
-      - receiver_id
-      - series
-      - tso
-      title: ScheduleCreateRequest
+      - loc
+      - msg
+      - type
+      title: ValidationError
       type: object
     WarningItem:
       description: A TSO warning returned in an ACK or CNF response (e.g. B45, A54).
@@ -1172,6 +1107,71 @@ components:
       - uid
       - version
       title: ScheduleVersionResponse
+      type: object
+    ScheduleVersionSeriesItem:
+      description: Series reference within a [Schedule Version](/api-reference/schedule-management/models/schedule-version) spec.
+      properties:
+        in_area:
+          description: EIC Y code of the receiving control area.
+          examples:
+          - 10YDE-VE-------2
+          title: In Area
+          type: string
+        in_party:
+          description: EIC X code of the receiving party (balance responsible party).
+          examples:
+          - 11XDE-EXAMPLE--A
+          title: In Party
+          type: string
+        out_area:
+          description: EIC Y code of the sending control area.
+          examples:
+          - 10YDE-VE-------2
+          title: Out Area
+          type: string
+        out_party:
+          description: EIC X code of the sending party (balance responsible party).
+          examples:
+          - 11XDE-EXAMPLE--B
+          title: Out Party
+          type: string
+        time_series_uid:
+          description: Time series identifier used in the ESS/CIM document.
+          examples:
+          - TS-001
+          title: Time Series Uid
+          type: string
+        ts_version:
+          description: Per-series version number (`SendersTimeSeriesVersion` in ESS) — the version in which this series last changed.
+          examples:
+          - 1
+          - 2
+          title: Ts Version
+          type: integer
+        type:
+          description: 'Series type: `internal`, `external`, `foreign`, `production`, or `consumption`.'
+          examples:
+          - internal
+          - external
+          - consumption
+          title: Type
+          type: string
+        uid:
+          description: Unique identifier for this series record.
+          examples:
+          - d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a
+          title: Uid
+          type: string
+      required:
+      - in_area
+      - in_party
+      - out_area
+      - out_party
+      - time_series_uid
+      - ts_version
+      - type
+      - uid
+      title: ScheduleVersionSeriesItem
       type: object
   securitySchemes:
     apiKeyAuth:

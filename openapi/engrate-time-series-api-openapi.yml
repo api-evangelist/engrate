@@ -415,230 +415,6 @@ paths:
       - Time Series
 components:
   schemas:
-    AllocationRecord:
-      description: A volume allocated to some Accounting Point for one Imbalance Settlement Period (ISP).
-      properties:
-        accounting_point_id:
-          format: uuid
-          title: Accounting Point Id
-          type: string
-        flow_direction:
-          enum:
-          - consumption
-          - production
-          title: Flow Direction
-          type: string
-        isp_resolution_minutes:
-          title: Isp Resolution Minutes
-          type: integer
-        isp_time:
-          format: date-time
-          title: Isp Time
-          type: string
-        known_at:
-          format: date-time
-          title: Known At
-          type: string
-        quality:
-          $ref: '#/components/schemas/AllocationQuality'
-        volume_wh:
-          title: Volume Wh
-          type: integer
-      required:
-      - accounting_point_id
-      - flow_direction
-      - isp_resolution_minutes
-      - isp_time
-      - known_at
-      - quality
-      - volume_wh
-      title: AllocationRecord
-      type: object
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
-          type: array
-      title: HTTPValidationError
-      type: object
-    AggregateAllocationPage:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/AggregateAllocation'
-          title: Items
-          type: array
-        limit:
-          title: Limit
-          type: integer
-        offset:
-          title: Offset
-          type: integer
-        total:
-          description: The number of aggregate allocations that agree with the filters, on all pages.
-          title: Total
-          type: integer
-      required:
-      - items
-      - limit
-      - offset
-      - total
-      title: AggregateAllocationPage
-      type: object
-    AllocationsResponse:
-      properties:
-        values:
-          items:
-            $ref: '#/components/schemas/AllocationRecord'
-          title: Values
-          type: array
-      required:
-      - values
-      title: AllocationsResponse
-      type: object
-    ValidationError:
-      properties:
-        ctx:
-          title: Context
-          type: object
-        input:
-          title: Input
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          title: Location
-          type: array
-        msg:
-          title: Message
-          type: string
-        type:
-          title: Error Type
-          type: string
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-      type: object
-    Finality:
-      description: 'The settlement data comes in different levels of "finality". Each market has its own names for these levels, and all of them map to this common ladder. When one settlement period has more than one record, use the record with the highest finality, then the latest `known_at`.
-
-
-        ### Available finalities
-
-
-        - **preliminary** — The first level, sent before the market has all the data.
-
-
-        - **revised** — The level used for corrections to the preliminary data.
-
-
-        - **final** — The level used for settlement and invoicing.
-
-
-        - **correction** — The level used for corrections when the final value was wrong. A correction replaces the final value.'
-      enum:
-      - preliminary
-      - revised
-      - final
-      - correction
-      title: Finality
-      type: string
-    AreaKind:
-      description: '### Available area kinds
-
-
-        - **metering_grid_area** — The area of one grid operator.
-
-
-        - **control_area** — The area of one transmission system operator.
-
-
-        - **scheduling_area** — See [Scheduling Area](/api-reference/core/models/scheduling-area).'
-      enum:
-      - metering_grid_area
-      - control_area
-      - scheduling_area
-      title: AreaKind
-      type: string
-    AggregateAllocationRecord:
-      description: A volume for one aggregate timeseries and one Imbalance Settlement Period (ISP).
-      properties:
-        external_id:
-          title: External Id
-          type: string
-        finality:
-          $ref: '#/components/schemas/Finality'
-          examples:
-          - final
-        flow_direction:
-          enum:
-          - consumption
-          - production
-          title: Flow Direction
-          type: string
-        isp_resolution_minutes:
-          title: Isp Resolution Minutes
-          type: integer
-        isp_time:
-          format: date-time
-          title: Isp Time
-          type: string
-        known_at:
-          format: date-time
-          title: Known At
-          type: string
-        quality:
-          $ref: '#/components/schemas/AllocationQuality'
-          examples:
-          - calculated
-        volume_wh:
-          title: Volume Wh
-          type: integer
-      required:
-      - external_id
-      - finality
-      - flow_direction
-      - isp_resolution_minutes
-      - isp_time
-      - known_at
-      - quality
-      - volume_wh
-      title: AggregateAllocationRecord
-      type: object
-    AllocationBasis:
-      description: 'The basis tells you where the energy data for an aggregation is coming from: Is it directly metered values from smart meters, or is it something calculated from some standard profile?
-
-
-        ### Available allocation basises
-
-
-        - **metered** — Indicates this aggregation''s data comes from directly metered energy, like from smart meters.
-
-
-        - **profiled** — Indicates this aggregation''s data is coming from a ''profile'' of some kind, a pre-determined shape of consumption or production, usually coupled with some adjustment calculations, like adjusting for daily temperature or past annual metered consumption.'
-      enum:
-      - metered
-      - profiled
-      title: AllocationBasis
-      type: string
-    AggregatorRole:
-      description: '### Available aggregator roles
-
-
-        - **grid_operator** — Indicates the source of the aggregation is a grid operator.
-
-
-        - **transmission_operator** — Indicates the source of the aggregation is a transmission system operator.'
-      enum:
-      - grid_operator
-      - transmission_operator
-      title: AggregatorRole
-      type: string
     AggregateAllocation:
       description: An aggregate allocation and its aggregation dimensions. A null or absent dimension includes the accounting points of all values.
       properties:
@@ -710,6 +486,15 @@ components:
       - supplier
       title: AggregateAllocation
       type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
     AggregateAllocationsResponse:
       properties:
         values:
@@ -721,6 +506,30 @@ components:
       - values
       title: AggregateAllocationsResponse
       type: object
+    Finality:
+      description: 'The settlement data comes in different levels of "finality". Each market has its own names for these levels, and all of them map to this common ladder. When one settlement period has more than one record, use the record with the highest finality, then the latest `known_at`.
+
+
+        ### Available finalities
+
+
+        - **preliminary** — The first level, sent before the market has all the data.
+
+
+        - **revised** — The level used for corrections to the preliminary data.
+
+
+        - **final** — The level used for settlement and invoicing.
+
+
+        - **correction** — The level used for corrections when the final value was wrong. A correction replaces the final value.'
+      enum:
+      - preliminary
+      - revised
+      - final
+      - correction
+      title: Finality
+      type: string
     AllocationQuality:
       description: 'How the volume was arrived at, in ascending order of trust. When one settlement period carries several records, prefer the highest quality.
 
@@ -747,6 +556,197 @@ components:
       - measured
       title: AllocationQuality
       type: string
+    AllocationBasis:
+      description: 'The basis tells you where the energy data for an aggregation is coming from: Is it directly metered values from smart meters, or is it something calculated from some standard profile?
+
+
+        ### Available allocation basises
+
+
+        - **metered** — Indicates this aggregation''s data comes from directly metered energy, like from smart meters.
+
+
+        - **profiled** — Indicates this aggregation''s data is coming from a ''profile'' of some kind, a pre-determined shape of consumption or production, usually coupled with some adjustment calculations, like adjusting for daily temperature or past annual metered consumption.'
+      enum:
+      - metered
+      - profiled
+      title: AllocationBasis
+      type: string
+    AggregateAllocationPage:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AggregateAllocation'
+          title: Items
+          type: array
+        limit:
+          title: Limit
+          type: integer
+        offset:
+          title: Offset
+          type: integer
+        total:
+          description: The number of aggregate allocations that agree with the filters, on all pages.
+          title: Total
+          type: integer
+      required:
+      - items
+      - limit
+      - offset
+      - total
+      title: AggregateAllocationPage
+      type: object
+    AllocationsResponse:
+      properties:
+        values:
+          items:
+            $ref: '#/components/schemas/AllocationRecord'
+          title: Values
+          type: array
+      required:
+      - values
+      title: AllocationsResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    AggregateAllocationRecord:
+      description: A volume for one aggregate timeseries and one Imbalance Settlement Period (ISP).
+      properties:
+        external_id:
+          title: External Id
+          type: string
+        finality:
+          $ref: '#/components/schemas/Finality'
+          examples:
+          - final
+        flow_direction:
+          enum:
+          - consumption
+          - production
+          title: Flow Direction
+          type: string
+        isp_resolution_minutes:
+          title: Isp Resolution Minutes
+          type: integer
+        isp_time:
+          format: date-time
+          title: Isp Time
+          type: string
+        known_at:
+          format: date-time
+          title: Known At
+          type: string
+        quality:
+          $ref: '#/components/schemas/AllocationQuality'
+          examples:
+          - calculated
+        volume_wh:
+          title: Volume Wh
+          type: integer
+      required:
+      - external_id
+      - finality
+      - flow_direction
+      - isp_resolution_minutes
+      - isp_time
+      - known_at
+      - quality
+      - volume_wh
+      title: AggregateAllocationRecord
+      type: object
+    AreaKind:
+      description: '### Available area kinds
+
+
+        - **metering_grid_area** — The area of one grid operator.
+
+
+        - **control_area** — The area of one transmission system operator.
+
+
+        - **scheduling_area** — See [Scheduling Area](/api-reference/core/models/scheduling-area).'
+      enum:
+      - metering_grid_area
+      - control_area
+      - scheduling_area
+      title: AreaKind
+      type: string
+    AggregatorRole:
+      description: '### Available aggregator roles
+
+
+        - **grid_operator** — Indicates the source of the aggregation is a grid operator.
+
+
+        - **transmission_operator** — Indicates the source of the aggregation is a transmission system operator.'
+      enum:
+      - grid_operator
+      - transmission_operator
+      title: AggregatorRole
+      type: string
+    AllocationRecord:
+      description: A volume allocated to some Accounting Point for one Imbalance Settlement Period (ISP).
+      properties:
+        accounting_point_id:
+          format: uuid
+          title: Accounting Point Id
+          type: string
+        flow_direction:
+          enum:
+          - consumption
+          - production
+          title: Flow Direction
+          type: string
+        isp_resolution_minutes:
+          title: Isp Resolution Minutes
+          type: integer
+        isp_time:
+          format: date-time
+          title: Isp Time
+          type: string
+        known_at:
+          format: date-time
+          title: Known At
+          type: string
+        quality:
+          $ref: '#/components/schemas/AllocationQuality'
+        volume_wh:
+          title: Volume Wh
+          type: integer
+      required:
+      - accounting_point_id
+      - flow_direction
+      - isp_resolution_minutes
+      - isp_time
+      - known_at
+      - quality
+      - volume_wh
+      title: AllocationRecord
+      type: object
   securitySchemes:
     apiKeyAuth:
       in: header

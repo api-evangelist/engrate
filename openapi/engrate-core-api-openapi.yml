@@ -470,182 +470,61 @@ paths:
       - Core
 components:
   schemas:
-    GetSchedulingAreasResponse:
-      properties:
-        scheduling_areas:
-          items:
-            $ref: '#/components/schemas/SchedulingArea'
-          title: Scheduling Areas
-          type: array
-      required:
-      - scheduling_areas
-      title: GetSchedulingAreasResponse
-      type: object
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
-          type: array
-      title: HTTPValidationError
-      type: object
-    GetMeteringGridAreasResponse:
-      properties:
-        mgas:
-          items:
-            $ref: '#/components/schemas/MeteringGridArea'
-          title: Mgas
-          type: array
-      required:
-      - mgas
-      title: GetMeteringGridAreasResponse
-      type: object
-    SchedulingArea:
-      description: 'A Scheduling Area is a core domain concept in the European energy market.
+    MeteringGridArea:
+      description: 'A Metering Grid Area (MGA) is a core domain concept in the European energy market.
 
 
-        The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines a Scheduling Area as:
+        The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines an MGA as:
 
 
-        > An area within which the TSOs'' obligations regarding scheduling apply due to operational or organisational needs. This area consists of one or more Metering Grid Areas with common market rules for which the settlement responsible party carries out an imbalance settlement and which has the same price for imbalance.
+        > A physical area where consumption, production and exchange can be measured. It is delimited by the placement of meters for continuous measurement for input to, and withdrawal from the area.
 
 
-        In other words, it is the area within which schedules are submitted and imbalance is settled at a single price. In the Nordics each Scheduling Area shares its EIC with the corresponding Bidding Zone (e.g. SE3, NO1).'
-      example:
-        countries:
-        - SE
-        id: 10Y1001A1001A47J
-        name: Swedish Elspot Area 4
-        short_name: SE4
-      properties:
-        countries:
-          description: ISO 3166-1 alpha-2 country codes this scheduling area covers
-          items:
-            type: string
-          title: Countries
-          type: array
-        id:
-          description: EIC code identifying this scheduling area
-          title: Id
-          type: string
-        name:
-          description: Full official name of the scheduling area
-          title: Name
-          type: string
-        short_name:
-          description: Short display name for the scheduling area
-          title: Short Name
-          type: string
-      required:
-      - countries
-      - id
-      - name
-      - short_name
-      title: SchedulingArea
-      type: object
-    ValidationError:
-      properties:
-        ctx:
-          title: Context
-          type: object
-        input:
-          title: Input
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          title: Location
-          type: array
-        msg:
-          title: Message
-          type: string
-        type:
-          title: Error Type
-          type: string
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-      type: object
-    GetPartiesResponse:
-      properties:
-        parties:
-          items:
-            $ref: '#/components/schemas/Party'
-          title: Parties
-          type: array
-      required:
-      - parties
-      title: GetPartiesResponse
-      type: object
-    Identifier:
+        In other words, an MGA is a collection of Metering Points operated by some System Operator, usually a DSO.'
       example:
         extra_ids:
         - kind: eic
-          value: 46X000000000245K
-        id: 0199c317-25ec-7cf7-94cc-32a39f068433
+          value: 46Y000000000016G
+        - kind: se.mga_code
+          value: STO
+        id: 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
+        name: Stockholm
+        scheduling_area_eic: 10Y1001A1001A47J
+        system_operator:
+          extra_ids:
+          - kind: eic
+            value: 46X000000000245K
+          id: 0199c317-25ec-7cf7-94cc-32a39f068433
       properties:
         extra_ids:
-          description: '[Extra Identifiers](/api-reference/core/models/extra-identifier) used to reference this same entity'
+          description: '[Extra Identifiers](/api-reference/core/models/extra-identifier) for this MGA'
           items:
             $ref: '#/components/schemas/ExtraIdentifier'
           title: Extra Ids
           type: array
         id:
-          description: Unique identifier assigned by Engrate
+          description: Unique identifier for the MGA
           format: uuid
           title: Id
           type: string
+        name:
+          description: Name of the metering grid area
+          title: Name
+          type: string
+        scheduling_area_eic:
+          description: EIC code for the Scheduling Area this Metering Grid Area belongs to
+          title: Scheduling Area Eic
+          type: string
+        system_operator:
+          $ref: '#/components/schemas/Identifier'
+          description: The [Party](/api-reference/core/models/party) that operates this MGA
       required:
       - extra_ids
       - id
-      title: Identifier
-      type: object
-    BiddingZone:
-      description: 'A Bidding Zone (also called a price area) is a core domain concept in the European energy market.
-
-
-        The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines a Bidding Zone as:
-
-
-        > The largest geographical area within which market participants are able to exchange energy without capacity allocation.
-
-
-        In other words, it is an area within which electricity clears at a single day-ahead price; in the Nordics these are the Nord Pool price areas such as SE3 and NO1.'
-      example:
-        countries:
-        - SE
-        id: 10Y1001A1001A46L
-        name: Swedish Elspot Area 3
-        short_name: SE3
-      properties:
-        countries:
-          description: ISO 3166-1 alpha-2 country codes this bidding zone covers
-          items:
-            type: string
-          title: Countries
-          type: array
-        id:
-          description: EIC code identifying this bidding zone
-          title: Id
-          type: string
-        name:
-          description: Full official name of the bidding zone
-          title: Name
-          type: string
-        short_name:
-          description: Short display name for the bidding zone
-          title: Short Name
-          type: string
-      required:
-      - countries
-      - id
       - name
-      - short_name
-      title: BiddingZone
+      - scheduling_area_eic
+      - system_operator
+      title: MeteringGridArea
       type: object
     ControlArea:
       description: 'A Control Area is a core domain concept in the European energy market.
@@ -690,6 +569,123 @@ components:
       - short_name
       title: ControlArea
       type: object
+    IdentifierKind:
+      enum:
+      - eic
+      - vat
+      - gln
+      - se.ediel
+      - se.mga_code
+      - no.mga_code
+      - esett.mga_type
+      title: IdentifierKind
+      type: string
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    BiddingZone:
+      description: 'A Bidding Zone (also called a price area) is a core domain concept in the European energy market.
+
+
+        The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines a Bidding Zone as:
+
+
+        > The largest geographical area within which market participants are able to exchange energy without capacity allocation.
+
+
+        In other words, it is an area within which electricity clears at a single day-ahead price; in the Nordics these are the Nord Pool price areas such as SE3 and NO1.'
+      example:
+        countries:
+        - SE
+        id: 10Y1001A1001A46L
+        name: Swedish Elspot Area 3
+        short_name: SE3
+      properties:
+        countries:
+          description: ISO 3166-1 alpha-2 country codes this bidding zone covers
+          items:
+            type: string
+          title: Countries
+          type: array
+        id:
+          description: EIC code identifying this bidding zone
+          title: Id
+          type: string
+        name:
+          description: Full official name of the bidding zone
+          title: Name
+          type: string
+        short_name:
+          description: Short display name for the bidding zone
+          title: Short Name
+          type: string
+      required:
+      - countries
+      - id
+      - name
+      - short_name
+      title: BiddingZone
+      type: object
+    GetSchedulingAreasResponse:
+      properties:
+        scheduling_areas:
+          items:
+            $ref: '#/components/schemas/SchedulingArea'
+          title: Scheduling Areas
+          type: array
+      required:
+      - scheduling_areas
+      title: GetSchedulingAreasResponse
+      type: object
+    SchedulingArea:
+      description: 'A Scheduling Area is a core domain concept in the European energy market.
+
+
+        The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines a Scheduling Area as:
+
+
+        > An area within which the TSOs'' obligations regarding scheduling apply due to operational or organisational needs. This area consists of one or more Metering Grid Areas with common market rules for which the settlement responsible party carries out an imbalance settlement and which has the same price for imbalance.
+
+
+        In other words, it is the area within which schedules are submitted and imbalance is settled at a single price. In the Nordics each Scheduling Area shares its EIC with the corresponding Bidding Zone (e.g. SE3, NO1).'
+      example:
+        countries:
+        - SE
+        id: 10Y1001A1001A47J
+        name: Swedish Elspot Area 4
+        short_name: SE4
+      properties:
+        countries:
+          description: ISO 3166-1 alpha-2 country codes this scheduling area covers
+          items:
+            type: string
+          title: Countries
+          type: array
+        id:
+          description: EIC code identifying this scheduling area
+          title: Id
+          type: string
+        name:
+          description: Full official name of the scheduling area
+          title: Name
+          type: string
+        short_name:
+          description: Short display name for the scheduling area
+          title: Short Name
+          type: string
+      required:
+      - countries
+      - id
+      - name
+      - short_name
+      title: SchedulingArea
+      type: object
     GetBiddingZonesResponse:
       properties:
         bidding_zones:
@@ -701,6 +697,53 @@ components:
       - bidding_zones
       title: GetBiddingZonesResponse
       type: object
+    ExtraIdentifier:
+      description: 'Extra identifiers are used to attach things like EIC ids, VAT numbers, jurisdiction-specific identifiers, etc.
+
+
+        For example, Metering Grid Area''s in parts of Europe are assigned an local jurisdiction EIC code; for those MGAs, the Engrate system will store the EIC as an extra identifier. However some jurisdictions have not yet switched to EIC codes, instead they rely on older local identification schemes. Swedish MGAs, as an example, use a local code assigned by the Swedish TSO.
+
+
+        Because the local schemes are subject to collisions - two TSOs assigning the same numerical code to different things, as they do not coordinate id assignment - we also track an identifier "kind".'
+      example:
+        kind: eic
+        value: 46X000000000245K
+      properties:
+        kind:
+          $ref: '#/components/schemas/IdentifierKind'
+          description: The kind of identifier
+        value:
+          description: The identifier value
+          title: Value
+          type: string
+      required:
+      - kind
+      - value
+      title: ExtraIdentifier
+      type: object
+    Identifier:
+      example:
+        extra_ids:
+        - kind: eic
+          value: 46X000000000245K
+        id: 0199c317-25ec-7cf7-94cc-32a39f068433
+      properties:
+        extra_ids:
+          description: '[Extra Identifiers](/api-reference/core/models/extra-identifier) used to reference this same entity'
+          items:
+            $ref: '#/components/schemas/ExtraIdentifier'
+          title: Extra Ids
+          type: array
+        id:
+          description: Unique identifier assigned by Engrate
+          format: uuid
+          title: Id
+          type: string
+      required:
+      - extra_ids
+      - id
+      title: Identifier
+      type: object
     GetControlAreasResponse:
       properties:
         control_areas:
@@ -711,6 +754,32 @@ components:
       required:
       - control_areas
       title: GetControlAreasResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
       type: object
     Party:
       description: 'Represents a "Market Party" of some kind. Normally this is some legal person - a corporation, government entity, NGO etc - that serves some role in the electrical system.
@@ -777,97 +846,28 @@ components:
       - website_url
       title: Party
       type: object
-    MeteringGridArea:
-      description: 'A Metering Grid Area (MGA) is a core domain concept in the European energy market.
-
-
-        The [ENTSO-E Harmonized Electricity Market Role Model](https://www.entsoe.eu/data/cim/role-models/) defines an MGA as:
-
-
-        > A physical area where consumption, production and exchange can be measured. It is delimited by the placement of meters for continuous measurement for input to, and withdrawal from the area.
-
-
-        In other words, an MGA is a collection of Metering Points operated by some System Operator, usually a DSO.'
-      example:
-        extra_ids:
-        - kind: eic
-          value: 46Y000000000016G
-        - kind: se.mga_code
-          value: STO
-        id: 0199c317-25ec-7c00-b1a0-a1b2c3d4e5f6
-        name: Stockholm
-        scheduling_area_eic: 10Y1001A1001A47J
-        system_operator:
-          extra_ids:
-          - kind: eic
-            value: 46X000000000245K
-          id: 0199c317-25ec-7cf7-94cc-32a39f068433
+    GetMeteringGridAreasResponse:
       properties:
-        extra_ids:
-          description: '[Extra Identifiers](/api-reference/core/models/extra-identifier) for this MGA'
+        mgas:
           items:
-            $ref: '#/components/schemas/ExtraIdentifier'
-          title: Extra Ids
+            $ref: '#/components/schemas/MeteringGridArea'
+          title: Mgas
           type: array
-        id:
-          description: Unique identifier for the MGA
-          format: uuid
-          title: Id
-          type: string
-        name:
-          description: Name of the metering grid area
-          title: Name
-          type: string
-        scheduling_area_eic:
-          description: EIC code for the Scheduling Area this Metering Grid Area belongs to
-          title: Scheduling Area Eic
-          type: string
-        system_operator:
-          $ref: '#/components/schemas/Identifier'
-          description: The [Party](/api-reference/core/models/party) that operates this MGA
       required:
-      - extra_ids
-      - id
-      - name
-      - scheduling_area_eic
-      - system_operator
-      title: MeteringGridArea
+      - mgas
+      title: GetMeteringGridAreasResponse
       type: object
-    ExtraIdentifier:
-      description: 'Extra identifiers are used to attach things like EIC ids, VAT numbers, jurisdiction-specific identifiers, etc.
-
-
-        For example, Metering Grid Area''s in parts of Europe are assigned an local jurisdiction EIC code; for those MGAs, the Engrate system will store the EIC as an extra identifier. However some jurisdictions have not yet switched to EIC codes, instead they rely on older local identification schemes. Swedish MGAs, as an example, use a local code assigned by the Swedish TSO.
-
-
-        Because the local schemes are subject to collisions - two TSOs assigning the same numerical code to different things, as they do not coordinate id assignment - we also track an identifier "kind".'
-      example:
-        kind: eic
-        value: 46X000000000245K
+    GetPartiesResponse:
       properties:
-        kind:
-          $ref: '#/components/schemas/IdentifierKind'
-          description: The kind of identifier
-        value:
-          description: The identifier value
-          title: Value
-          type: string
+        parties:
+          items:
+            $ref: '#/components/schemas/Party'
+          title: Parties
+          type: array
       required:
-      - kind
-      - value
-      title: ExtraIdentifier
+      - parties
+      title: GetPartiesResponse
       type: object
-    IdentifierKind:
-      enum:
-      - eic
-      - vat
-      - gln
-      - se.ediel
-      - se.mga_code
-      - no.mga_code
-      - esett.mga_type
-      title: IdentifierKind
-      type: string
   securitySchemes:
     apiKeyAuth:
       in: header

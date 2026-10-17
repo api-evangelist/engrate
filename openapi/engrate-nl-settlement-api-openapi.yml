@@ -187,6 +187,40 @@ paths:
       - nl-settlement
 components:
   schemas:
+    NLImbalanceSummaryResponse:
+      description: Aggregation of NL imbalance settlement data over a date range.
+      properties:
+        business_type_totals:
+          description: Per-business-type aggregated totals.
+          items:
+            $ref: '#/components/schemas/NLBusinessTypeTotalResponse'
+          title: Business Type Totals
+          type: array
+        date_from:
+          description: Start of the queried date range.
+          format: date
+          title: Date From
+          type: string
+        date_to:
+          description: End of the queried date range.
+          format: date
+          title: Date To
+          type: string
+        days_covered:
+          description: Number of distinct report dates.
+          title: Days Covered
+          type: integer
+        report_count:
+          description: Number of imbalance reports in the range.
+          title: Report Count
+          type: integer
+      required:
+      - date_from
+      - date_to
+      - days_covered
+      - report_count
+      title: NLImbalanceSummaryResponse
+      type: object
     NLImbalanceReportResponse:
       description: Imbalance report header as returned in list views.
       properties:
@@ -246,86 +280,31 @@ components:
           type: array
       title: HTTPValidationError
       type: object
-    ValidationError:
+    NLImbalanceTimeSeriesListResponse:
+      description: Wrapped list of time series for a report.
       properties:
-        ctx:
-          title: Context
-          type: object
-        input:
-          title: Input
-        loc:
+        items:
+          description: Time series.
           items:
-            anyOf:
-            - type: string
-            - type: integer
-          title: Location
+            $ref: '#/components/schemas/NLImbalanceTimeSeriesResponse'
+          title: Items
           type: array
-        msg:
-          title: Message
-          type: string
-        type:
-          title: Error Type
-          type: string
       required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
+      - items
+      title: NLImbalanceTimeSeriesListResponse
       type: object
-    NLBusinessTypeTotalResponse:
-      description: Aggregated total for a single business type within a month.
+    NLImbalanceReportListResponse:
+      description: Wrapped list of imbalance reports.
       properties:
-        business_type:
-          description: Business type code.
-          title: Business Type
-          type: string
-        series_count:
-          description: Number of time series contributing to the total.
-          title: Series Count
-          type: integer
-        total_quantity:
-          description: Sum of quantities across all reports.
-          title: Total Quantity
-          type: number
-      required:
-      - business_type
-      - series_count
-      - total_quantity
-      title: NLBusinessTypeTotalResponse
-      type: object
-    NLImbalanceSummaryResponse:
-      description: Aggregation of NL imbalance settlement data over a date range.
-      properties:
-        business_type_totals:
-          description: Per-business-type aggregated totals.
+        items:
+          description: Imbalance reports.
           items:
-            $ref: '#/components/schemas/NLBusinessTypeTotalResponse'
-          title: Business Type Totals
+            $ref: '#/components/schemas/NLImbalanceReportResponse'
+          title: Items
           type: array
-        date_from:
-          description: Start of the queried date range.
-          format: date
-          title: Date From
-          type: string
-        date_to:
-          description: End of the queried date range.
-          format: date
-          title: Date To
-          type: string
-        days_covered:
-          description: Number of distinct report dates.
-          title: Days Covered
-          type: integer
-        report_count:
-          description: Number of imbalance reports in the range.
-          title: Report Count
-          type: integer
       required:
-      - date_from
-      - date_to
-      - days_covered
-      - report_count
-      title: NLImbalanceSummaryResponse
+      - items
+      title: NLImbalanceReportListResponse
       type: object
     NLImbalanceTimeSeriesResponse:
       description: 'Individual time series within an imbalance report.
@@ -402,19 +381,6 @@ components:
       - version
       title: NLImbalanceTimeSeriesResponse
       type: object
-    NLImbalanceReportListResponse:
-      description: Wrapped list of imbalance reports.
-      properties:
-        items:
-          description: Imbalance reports.
-          items:
-            $ref: '#/components/schemas/NLImbalanceReportResponse'
-          title: Items
-          type: array
-      required:
-      - items
-      title: NLImbalanceReportListResponse
-      type: object
     NLImbalanceReportDetailResponse:
       description: Full imbalance report including all time series.
       properties:
@@ -430,6 +396,53 @@ components:
       required:
       - report
       title: NLImbalanceReportDetailResponse
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    NLBusinessTypeTotalResponse:
+      description: Aggregated total for a single business type within a month.
+      properties:
+        business_type:
+          description: Business type code.
+          title: Business Type
+          type: string
+        series_count:
+          description: Number of time series contributing to the total.
+          title: Series Count
+          type: integer
+        total_quantity:
+          description: Sum of quantities across all reports.
+          title: Total Quantity
+          type: number
+      required:
+      - business_type
+      - series_count
+      - total_quantity
+      title: NLBusinessTypeTotalResponse
       type: object
     NLImbalancePointResponse:
       description: Single quarter-hourly data point within an imbalance time series.
@@ -459,19 +472,6 @@ components:
       required:
       - position
       title: NLImbalancePointResponse
-      type: object
-    NLImbalanceTimeSeriesListResponse:
-      description: Wrapped list of time series for a report.
-      properties:
-        items:
-          description: Time series.
-          items:
-            $ref: '#/components/schemas/NLImbalanceTimeSeriesResponse'
-          title: Items
-          type: array
-      required:
-      - items
-      title: NLImbalanceTimeSeriesListResponse
       type: object
   securitySchemes:
     apiKeyAuth:

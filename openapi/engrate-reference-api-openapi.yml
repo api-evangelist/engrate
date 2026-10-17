@@ -66,40 +66,6 @@ paths:
       - Reference
 components:
   schemas:
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
-          type: array
-      title: HTTPValidationError
-      type: object
-    ExchangePriorityBalanceGroupResponse:
-      description: A balance group that has exchange priority (Börsenvorrang) per Bilanzkreisvertrag clause 12.b.
-      properties:
-        eic_code:
-          description: EIC X code of the exchange balance group.
-          examples:
-          - 11XEPEXSPOT----W
-          title: Eic Code
-          type: string
-        exchange_name:
-          description: Name of the energy exchange (e.g. EPEX SPOT, EEX).
-          examples:
-          - EPEX SPOT SE
-          title: Exchange Name
-          type: string
-        has_exchange_priority:
-          default: true
-          description: Always `true` for entries in this list.
-          title: Has Exchange Priority
-          type: boolean
-      required:
-      - eic_code
-      - exchange_name
-      title: ExchangePriorityBalanceGroupResponse
-      type: object
     ExchangePriorityCheckResponse:
       description: Result of checking whether a specific EIC code has exchange priority (Börsenvorrang).
       properties:
@@ -126,6 +92,31 @@ components:
       - has_exchange_priority
       title: ExchangePriorityCheckResponse
       type: object
+    ExchangePriorityBalanceGroupResponse:
+      description: A balance group that has exchange priority (Börsenvorrang) per Bilanzkreisvertrag clause 12.b.
+      properties:
+        eic_code:
+          description: EIC X code of the exchange balance group.
+          examples:
+          - 11XEPEXSPOT----W
+          title: Eic Code
+          type: string
+        exchange_name:
+          description: Name of the energy exchange (e.g. EPEX SPOT, EEX).
+          examples:
+          - EPEX SPOT SE
+          title: Exchange Name
+          type: string
+        has_exchange_priority:
+          default: true
+          description: Always `true` for entries in this list.
+          title: Has Exchange Priority
+          type: boolean
+      required:
+      - eic_code
+      - exchange_name
+      title: ExchangePriorityBalanceGroupResponse
+      type: object
     ValidationError:
       properties:
         ctx:
@@ -151,6 +142,15 @@ components:
       - msg
       - type
       title: ValidationError
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
       type: object
   securitySchemes:
     apiKeyAuth:

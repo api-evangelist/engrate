@@ -750,101 +750,225 @@ paths:
         content: <Note>**Coming soon.**</Note>
 components:
   schemas:
-    MonthlyEnergySummaryResponse:
-      description: Response model for monthly energy summary.
+    ImbalanceResponse:
+      description: Aggregated imbalance calculation for an entire clearing period, broken down by day.
       properties:
-        aggregation_object_uid:
+        clearing_period_uid:
+          description: Parent [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.
+          title: Clearing Period Uid
+          type: string
+        daily_imbalances:
+          description: Per-day imbalance breakdown.
+          items:
+            $ref: '#/components/schemas/DailyImbalance'
+          title: Daily Imbalances
+          type: array
+        total_actual_mwh:
+          description: Total actual energy across all days in MWh.
+          examples:
+          - 3732.5
+          title: Total Actual Mwh
+          type: number
+        total_imbalance_cost_eur:
+          description: Total imbalance cost in EUR based on reBAP control energy prices.
+          examples:
+          - 1875.0
+          title: Total Imbalance Cost Eur
+          type: number
+        total_imbalance_mwh:
+          description: Total net imbalance across all days in MWh.
+          examples:
+          - 12.5
+          title: Total Imbalance Mwh
+          type: number
+        total_scheduled_mwh:
+          description: Total scheduled energy across all days in MWh.
+          examples:
+          - 3720.0
+          title: Total Scheduled Mwh
+          type: number
+      required:
+      - clearing_period_uid
+      - daily_imbalances
+      - total_actual_mwh
+      - total_imbalance_cost_eur
+      - total_imbalance_mwh
+      - total_scheduled_mwh
+      title: ImbalanceResponse
+      type: object
+    ClearingPeriodCreateRequest:
+      additionalProperties: false
+      description: Request to create a clearing period.
+      properties:
+        bilanzierungsmonat:
+          description: 'First day of the billing month (YYYY-MM-DD). Example: ''2026-01-01'' for January 2026. Use `GET /mabis/clearing-calendar` to compute the MaBiS deadlines for this month.'
+          format: date
+          title: Bilanzierungsmonat
+          type: string
+        bilanzkreis_eic:
+          description: Balance group (Bilanzkreis) EIC X code (16-character organization code, starts with '11X'). Registered with the TSO as the BRP identifier.
+          title: Bilanzkreis Eic
+          type: string
+        final_deadline:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: Final billing deadline (ISO 8601 datetime). Corresponds to M+42 WT per BK6-24-174.
+          title: Final Deadline
+        objection_deadline:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: Objection window closing deadline (ISO 8601 datetime). Corresponds to M+30 WT — after this date objections can no longer be submitted.
+          title: Objection Deadline
+        preliminary_deadline:
+          anyOf:
+          - format: date-time
+            type: string
+          - type: 'null'
+          description: 'Preliminary billing deadline (ISO 8601 datetime with timezone). Corresponds to M+18 WT per BK6-24-174. Example: ''2026-02-25T23:59:59+01:00''.'
+          title: Preliminary Deadline
+      required:
+      - bilanzierungsmonat
+      - bilanzkreis_eic
+      title: ClearingPeriodCreateRequest
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    AggregationObjectResponse:
+      description: Response model for aggregation objects.
+      properties:
+        aggregation_subtypes:
+          description: OBIS codes
+          items:
+            type: string
+          title: Aggregation Subtypes
+          type: array
+        aggregation_type:
+          description: 'Type: BAS, FPE, FPI, SLP, RLM'
+          title: Aggregation Type
+          type: string
+        brp:
           anyOf:
           - type: string
           - type: 'null'
-          description: Linked aggregation object UID
-          title: Aggregation Object Uid
-        bilanzierungsmonat:
-          description: Settlement month (YYYY-MM-DD)
-          title: Bilanzierungsmonat
+          description: Balance responsible party EIC
+          title: Brp
+        date_from:
+          description: Valid from date (YYYY-MM-DD)
+          title: Date From
           type: string
-        data_status:
-          description: MaBiS data status
-          title: Data Status
+        date_to:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Valid to date (YYYY-MM-DD)
+          title: Date To
+        dso:
+          description: Distribution system operator identifier
+          title: Dso
           type: string
-        interval_count:
-          description: Number of intervals
-          title: Interval Count
-          type: integer
-        mabis_zp_id:
-          description: MaBiS-Zählpunkt ID
-          title: Mabis Zp Id
+        id:
+          description: Aggregation object identifier (MaBiS-ZP ID)
+          title: Id
           type: string
-        message_date:
-          description: Version timestamp (ISO datetime)
-          title: Message Date
+        mga:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: MGA Y area code (Marktgebietsverantwortlicher)
+          title: Mga
+        receiver:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: Receiver MP-ID
+          title: Receiver
+        sender:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: Sender MP-ID (DSO responsible for this MGA)
+          title: Sender
+        status:
+          description: 'Status: pending, confirmed, rejected, deactivated'
+          title: Status
           type: string
-        mscons_message_id:
-          description: Version identifier
-          title: Mscons Message Id
-          type: string
-        resolution:
-          description: Resolution
-          title: Resolution
-          type: string
-        total_kwh:
-          description: Total energy in kWh
-          title: Total Kwh
-          type: number
-        total_mwh:
-          description: Total energy in MWh
-          title: Total Mwh
-          type: number
-        unit:
-          description: Unit
-          title: Unit
+        time_series_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Summenzeitreihe type (Z95-ZG7, e.g., ZA6=ASZR)
+          title: Time Series Type
+        tso:
+          description: TSO Y area code (e.g., 10YDE-EON------1)
+          title: Tso
           type: string
       required:
-      - bilanzierungsmonat
-      - data_status
-      - interval_count
-      - mabis_zp_id
-      - message_date
-      - mscons_message_id
-      - resolution
-      - total_kwh
-      - total_mwh
-      - unit
-      title: MonthlyEnergySummaryResponse
+      - aggregation_type
+      - date_from
+      - dso
+      - id
+      - status
+      - tso
+      title: AggregationObjectResponse
       type: object
-    DailyImbalance:
-      description: Imbalance summary for a single day within a clearing period.
+    ControlEnergyPriceDataPoint:
+      description: Single price data point.
       properties:
-        actual_mwh:
-          description: Total actual (metered) energy for this day in MWh.
-          examples:
-          - 125.5
-          title: Actual Mwh
+        amount:
+          description: Price amount in EUR/MWh
+          title: Amount
           type: number
-        date:
-          description: Settlement date in ISO 8601 format.
-          examples:
-          - '2026-01-15'
-          title: Date
+        ts:
+          description: Timestamp (ISO datetime)
+          title: Ts
           type: string
-        imbalance_mwh:
-          description: Imbalance (actual minus scheduled) in MWh.
-          examples:
-          - 5.5
-          title: Imbalance Mwh
-          type: number
-        scheduled_mwh:
-          description: Total scheduled energy for this day in MWh.
-          examples:
-          - 120.0
-          title: Scheduled Mwh
-          type: number
       required:
-      - actual_mwh
-      - date
-      - imbalance_mwh
-      - scheduled_mwh
-      title: DailyImbalance
+      - amount
+      - ts
+      title: ControlEnergyPriceDataPoint
+      type: object
+    MonthlySummaryResponse:
+      description: Combined monthly summary with energy and cost.
+      properties:
+        cost:
+          anyOf:
+          - $ref: '#/components/schemas/MonthlyCostResponse'
+          - type: 'null'
+          description: Cost calculation
+        energy:
+          anyOf:
+          - $ref: '#/components/schemas/MonthlyEnergySummaryResponse'
+          - type: 'null'
+          description: Energy summary
+      title: MonthlySummaryResponse
       type: object
     ObjectionResponse:
       description: An [Objection](/api-reference/settlement-management/models/objection) (Einspruch) filed against settlement data within a clearing period.
@@ -925,14 +1049,110 @@ components:
       - uid
       title: ObjectionResponse
       type: object
-    HTTPValidationError:
+    MonthlyCostResponse:
+      description: Response model for monthly cost calculation.
       properties:
-        detail:
+        aggregation_object_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Linked aggregation object UID
+          title: Aggregation Object Uid
+        average_price_eur_mwh:
+          description: Average price EUR/MWh
+          title: Average Price Eur Mwh
+          type: number
+        bilanzierungsmonat:
+          description: Settlement month (YYYY-MM-DD)
+          title: Bilanzierungsmonat
+          type: string
+        interval_count:
+          description: Number of intervals
+          title: Interval Count
+          type: integer
+        mabis_zp_id:
+          description: MaBiS-Zählpunkt ID
+          title: Mabis Zp Id
+          type: string
+        missing_prices_count:
+          description: Intervals without price data
+          title: Missing Prices Count
+          type: integer
+        total_cost_eur:
+          description: Total cost in EUR
+          title: Total Cost Eur
+          type: number
+        total_energy_mwh:
+          description: Total energy in MWh
+          title: Total Energy Mwh
+          type: number
+        tso_area:
+          description: TSO control area
+          title: Tso Area
+          type: string
+      required:
+      - average_price_eur_mwh
+      - bilanzierungsmonat
+      - interval_count
+      - mabis_zp_id
+      - missing_prices_count
+      - total_cost_eur
+      - total_energy_mwh
+      - tso_area
+      title: MonthlyCostResponse
+      type: object
+    ControlEnergyPriceResponse:
+      description: Response model for control energy prices (reBAP).
+      properties:
+        data:
+          description: Price data points
           items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
+            $ref: '#/components/schemas/ControlEnergyPriceDataPoint'
+          title: Data
           type: array
-      title: HTTPValidationError
+        month:
+          description: Month in YYYY-MM format
+          title: Month
+          type: string
+        tso:
+          description: TSO control area identifier
+          title: Tso
+          type: string
+      required:
+      - month
+      - tso
+      title: ControlEnergyPriceResponse
+      type: object
+    ObjectionCreateRequest:
+      additionalProperties: false
+      description: Request to create an objection.
+      properties:
+        disputed_values:
+          additionalProperties: true
+          description: 'Free-form dict describing the disputed values. Example: {"date": "2026-01-15", "interval": 42, "our_value_mwh": 1.5, "tso_value_mwh": 1.8}.'
+          title: Disputed Values
+          type: object
+        objection_type:
+          description: 'Objection type. ''volume'': disputed energy quantity (MWh). ''price'': disputed reBAP price. ''metering_point'': incorrect metering point assignment. ''allocation'': incorrect balance group allocation. ''timing'': wrong delivery period or timestamp. ''other'': any other dispute.'
+          enum:
+          - volume
+          - price
+          - metering_point
+          - allocation
+          - timing
+          - other
+          title: Objection Type
+          type: string
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Human-readable reason for the objection.
+          title: Reason
+      required:
+      - disputed_values
+      - objection_type
+      title: ObjectionCreateRequest
       type: object
     AggregationObjectRequest:
       additionalProperties: false
@@ -995,20 +1215,152 @@ components:
       - tso
       title: AggregationObjectRequest
       type: object
-    MonthlySummaryResponse:
-      description: Combined monthly summary with energy and cost.
+    SettlementMessageResponse:
+      description: An EDIFACT message exchanged during the settlement process (MSCONS, PRICAT, UTILMD, IFTSTA, etc.).
       properties:
-        cost:
+        clearing_period_uid:
+          description: Parent [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.
+          title: Clearing Period Uid
+          type: string
+        created_ts:
+          description: ISO 8601 datetime when this record was created.
+          examples:
+          - '2026-02-20T08:00:00+00:00'
+          title: Created Ts
+          type: string
+        direction:
+          description: 'Message direction: `inbound` (received from TSO/DSO) or `outbound` (sent to TSO/DSO).'
+          examples:
+          - inbound
+          - outbound
+          title: Direction
+          type: string
+        error_message:
           anyOf:
-          - $ref: '#/components/schemas/MonthlyCostResponse'
+          - type: string
           - type: 'null'
-          description: Cost calculation
-        energy:
+          description: Error description if processing failed.
+          title: Error Message
+        message_type:
+          description: 'EDIFACT message type: `MSCONS`, `PRICAT`, `UTILMD`, `IFTSTA`, `PARTIN`, etc.'
+          examples:
+          - MSCONS
+          - PRICAT
+          - IFTSTA
+          title: Message Type
+          type: string
+        received_ts:
           anyOf:
-          - $ref: '#/components/schemas/MonthlyEnergySummaryResponse'
+          - type: string
           - type: 'null'
-          description: Energy summary
-      title: MonthlySummaryResponse
+          description: ISO 8601 datetime when the message was received (inbound only).
+          title: Received Ts
+        reference_id:
+          description: EDIFACT reference identifier for this message.
+          examples:
+          - MSCONS-20260115-001
+          title: Reference Id
+          type: string
+        sent_ts:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: ISO 8601 datetime when the message was sent (outbound only).
+          title: Sent Ts
+        status:
+          description: 'Processing status: `pending`, `processed`, `failed`, or `acknowledged`.'
+          examples:
+          - processed
+          - pending
+          title: Status
+          type: string
+        uid:
+          description: Unique identifier for this message record.
+          examples:
+          - f8a9b0c1-d2e3-4f4a-8b5c-6d7e8f9a0b1c
+          title: Uid
+          type: string
+      required:
+      - clearing_period_uid
+      - created_ts
+      - direction
+      - message_type
+      - reference_id
+      - status
+      - uid
+      title: SettlementMessageResponse
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ClearingPeriodSummaryResponse:
+      description: Summary view for a clearing period including counts, totals, and the next deadline.
+      properties:
+        clearing_period:
+          $ref: '#/components/schemas/ClearingPeriodResponse'
+          description: The clearing period details.
+        deadline_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 'Type of the upcoming deadline: `preliminary`, `objection`, or `final`.'
+          examples:
+          - preliminary
+          - objection
+          - final
+          title: Deadline Type
+        message_count:
+          description: Number of EDIFACT messages exchanged for this period.
+          examples:
+          - 5
+          title: Message Count
+          type: integer
+        objection_count:
+          description: Number of objections filed for this period.
+          examples:
+          - 0
+          - 2
+          title: Objection Count
+          type: integer
+        settlement_count:
+          description: Number of daily settlement records in this period.
+          examples:
+          - 28
+          - 31
+          title: Settlement Count
+          type: integer
+        total_imbalance_cost_eur:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Total imbalance cost in EUR.
+          title: Total Imbalance Cost Eur
+        total_imbalance_mwh:
+          anyOf:
+          - type: number
+          - type: 'null'
+          description: Total imbalance energy in MWh.
+          title: Total Imbalance Mwh
+        upcoming_deadline:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Next approaching deadline as ISO 8601 datetime.
+          examples:
+          - '2026-02-25T23:59:59+01:00'
+          title: Upcoming Deadline
+      required:
+      - clearing_period
+      - message_count
+      - objection_count
+      - settlement_count
+      title: ClearingPeriodSummaryResponse
       type: object
     ClearingSettlementResponse:
       description: A [Clearing Settlement](/api-reference/settlement-management/models/clearing-settlement) representing one day's settlement data within a clearing period, containing raw MSCONS interval values.
@@ -1054,6 +1406,62 @@ components:
       - uid
       - values
       title: ClearingSettlementResponse
+      type: object
+    ClearingCalendarResponse:
+      description: MaBiS clearing calendar for a settlement month.
+      properties:
+        bilanzierungsmonat:
+          description: Settlement month (YYYY-MM-DD)
+          title: Bilanzierungsmonat
+          type: string
+        clearing_end_bg_szr:
+          description: BG-SZR clearing phase end (30 WT)
+          title: Clearing End Bg Szr
+          type: string
+        clearing_end_bk_szr:
+          description: BK-SZR clearing phase end (30 WT)
+          title: Clearing End Bk Szr
+          type: string
+        clearing_start_bg_szr:
+          description: BG-SZR clearing phase start (11 WT)
+          title: Clearing Start Bg Szr
+          type: string
+        clearing_start_bk_szr:
+          description: BK-SZR clearing phase start (13 WT)
+          title: Clearing Start Bk Szr
+          type: string
+        current_phase:
+          description: 'Current phase: erstaufschlag, clearing, final, closed'
+          title: Current Phase
+          type: string
+        erstaufschlag_bg_szr:
+          description: BG-SZR Erstaufschlag deadline (10 WT)
+          title: Erstaufschlag Bg Szr
+          type: string
+        erstaufschlag_bk_szr:
+          description: BK-SZR Erstaufschlag deadline (12 WT)
+          title: Erstaufschlag Bk Szr
+          type: string
+        final_deadline:
+          description: Final billing deadline (42 WT)
+          title: Final Deadline
+          type: string
+        preliminary_deadline:
+          description: Preliminary billing deadline (18 WT)
+          title: Preliminary Deadline
+          type: string
+      required:
+      - bilanzierungsmonat
+      - clearing_end_bg_szr
+      - clearing_end_bk_szr
+      - clearing_start_bg_szr
+      - clearing_start_bk_szr
+      - current_phase
+      - erstaufschlag_bg_szr
+      - erstaufschlag_bk_szr
+      - final_deadline
+      - preliminary_deadline
+      title: ClearingCalendarResponse
       type: object
     ClearingPeriodResponse:
       description: A [Clearing Period](/api-reference/settlement-management/models/clearing-period) representing one settlement month for a balance group.
@@ -1150,433 +1558,39 @@ components:
       - uid
       title: ClearingPeriodResponse
       type: object
-    ValidationResponse:
-      description: Validation result for a clearing period, checking data completeness and consistency.
+    DailyImbalance:
+      description: Imbalance summary for a single day within a clearing period.
       properties:
-        bilanzierungsmonat:
-          description: Settlement month in ISO 8601 format.
+        actual_mwh:
+          description: Total actual (metered) energy for this day in MWh.
           examples:
-          - '2026-01-01'
-          title: Bilanzierungsmonat
-          type: string
-        clearing_period_uid:
-          description: Validated [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.
-          title: Clearing Period Uid
-          type: string
-        expected_days:
-          description: Number of days expected for this settlement month.
-          examples:
-          - 31
-          title: Expected Days
-          type: integer
-        issues:
-          description: List of validation issues found. Empty when `valid` is `true`.
-          examples:
-          - - Missing settlement data for 2026-01-15
-            - MSCONS message count mismatch
-          items:
-            type: string
-          title: Issues
-          type: array
-        message_count:
-          description: Number of EDIFACT messages processed for this period.
-          examples:
-          - 5
-          title: Message Count
-          type: integer
-        settlement_count:
-          description: Number of daily settlement records present.
-          examples:
-          - 31
-          title: Settlement Count
-          type: integer
-        status:
-          description: Current clearing period status.
-          examples:
-          - preliminary
-          title: Status
-          type: string
-        valid:
-          description: Whether the clearing period data passes all validation checks.
-          title: Valid
-          type: boolean
-      required:
-      - bilanzierungsmonat
-      - clearing_period_uid
-      - expected_days
-      - issues
-      - message_count
-      - settlement_count
-      - status
-      - valid
-      title: ValidationResponse
-      type: object
-    ClearingPeriodSummaryResponse:
-      description: Summary view for a clearing period including counts, totals, and the next deadline.
-      properties:
-        clearing_period:
-          $ref: '#/components/schemas/ClearingPeriodResponse'
-          description: The clearing period details.
-        deadline_type:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: 'Type of the upcoming deadline: `preliminary`, `objection`, or `final`.'
-          examples:
-          - preliminary
-          - objection
-          - final
-          title: Deadline Type
-        message_count:
-          description: Number of EDIFACT messages exchanged for this period.
-          examples:
-          - 5
-          title: Message Count
-          type: integer
-        objection_count:
-          description: Number of objections filed for this period.
-          examples:
-          - 0
-          - 2
-          title: Objection Count
-          type: integer
-        settlement_count:
-          description: Number of daily settlement records in this period.
-          examples:
-          - 28
-          - 31
-          title: Settlement Count
-          type: integer
-        total_imbalance_cost_eur:
-          anyOf:
-          - type: number
-          - type: 'null'
-          description: Total imbalance cost in EUR.
-          title: Total Imbalance Cost Eur
-        total_imbalance_mwh:
-          anyOf:
-          - type: number
-          - type: 'null'
-          description: Total imbalance energy in MWh.
-          title: Total Imbalance Mwh
-        upcoming_deadline:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Next approaching deadline as ISO 8601 datetime.
-          examples:
-          - '2026-02-25T23:59:59+01:00'
-          title: Upcoming Deadline
-      required:
-      - clearing_period
-      - message_count
-      - objection_count
-      - settlement_count
-      title: ClearingPeriodSummaryResponse
-      type: object
-    ObjectionCreateRequest:
-      additionalProperties: false
-      description: Request to create an objection.
-      properties:
-        disputed_values:
-          additionalProperties: true
-          description: 'Free-form dict describing the disputed values. Example: {"date": "2026-01-15", "interval": 42, "our_value_mwh": 1.5, "tso_value_mwh": 1.8}.'
-          title: Disputed Values
-          type: object
-        objection_type:
-          description: 'Objection type. ''volume'': disputed energy quantity (MWh). ''price'': disputed reBAP price. ''metering_point'': incorrect metering point assignment. ''allocation'': incorrect balance group allocation. ''timing'': wrong delivery period or timestamp. ''other'': any other dispute.'
-          enum:
-          - volume
-          - price
-          - metering_point
-          - allocation
-          - timing
-          - other
-          title: Objection Type
-          type: string
-        reason:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Human-readable reason for the objection.
-          title: Reason
-      required:
-      - disputed_values
-      - objection_type
-      title: ObjectionCreateRequest
-      type: object
-    ClearingCalendarResponse:
-      description: MaBiS clearing calendar for a settlement month.
-      properties:
-        bilanzierungsmonat:
-          description: Settlement month (YYYY-MM-DD)
-          title: Bilanzierungsmonat
-          type: string
-        clearing_end_bg_szr:
-          description: BG-SZR clearing phase end (30 WT)
-          title: Clearing End Bg Szr
-          type: string
-        clearing_end_bk_szr:
-          description: BK-SZR clearing phase end (30 WT)
-          title: Clearing End Bk Szr
-          type: string
-        clearing_start_bg_szr:
-          description: BG-SZR clearing phase start (11 WT)
-          title: Clearing Start Bg Szr
-          type: string
-        clearing_start_bk_szr:
-          description: BK-SZR clearing phase start (13 WT)
-          title: Clearing Start Bk Szr
-          type: string
-        current_phase:
-          description: 'Current phase: erstaufschlag, clearing, final, closed'
-          title: Current Phase
-          type: string
-        erstaufschlag_bg_szr:
-          description: BG-SZR Erstaufschlag deadline (10 WT)
-          title: Erstaufschlag Bg Szr
-          type: string
-        erstaufschlag_bk_szr:
-          description: BK-SZR Erstaufschlag deadline (12 WT)
-          title: Erstaufschlag Bk Szr
-          type: string
-        final_deadline:
-          description: Final billing deadline (42 WT)
-          title: Final Deadline
-          type: string
-        preliminary_deadline:
-          description: Preliminary billing deadline (18 WT)
-          title: Preliminary Deadline
-          type: string
-      required:
-      - bilanzierungsmonat
-      - clearing_end_bg_szr
-      - clearing_end_bk_szr
-      - clearing_start_bg_szr
-      - clearing_start_bk_szr
-      - current_phase
-      - erstaufschlag_bg_szr
-      - erstaufschlag_bk_szr
-      - final_deadline
-      - preliminary_deadline
-      title: ClearingCalendarResponse
-      type: object
-    ControlEnergyPriceResponse:
-      description: Response model for control energy prices (reBAP).
-      properties:
-        data:
-          description: Price data points
-          items:
-            $ref: '#/components/schemas/ControlEnergyPriceDataPoint'
-          title: Data
-          type: array
-        month:
-          description: Month in YYYY-MM format
-          title: Month
-          type: string
-        tso:
-          description: TSO control area identifier
-          title: Tso
-          type: string
-      required:
-      - month
-      - tso
-      title: ControlEnergyPriceResponse
-      type: object
-    AggregationObjectResponse:
-      description: Response model for aggregation objects.
-      properties:
-        aggregation_subtypes:
-          description: OBIS codes
-          items:
-            type: string
-          title: Aggregation Subtypes
-          type: array
-        aggregation_type:
-          description: 'Type: BAS, FPE, FPI, SLP, RLM'
-          title: Aggregation Type
-          type: string
-        brp:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Balance responsible party EIC
-          title: Brp
-        date_from:
-          description: Valid from date (YYYY-MM-DD)
-          title: Date From
-          type: string
-        date_to:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Valid to date (YYYY-MM-DD)
-          title: Date To
-        dso:
-          description: Distribution system operator identifier
-          title: Dso
-          type: string
-        id:
-          description: Aggregation object identifier (MaBiS-ZP ID)
-          title: Id
-          type: string
-        mga:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: MGA Y area code (Marktgebietsverantwortlicher)
-          title: Mga
-        receiver:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          description: Receiver MP-ID
-          title: Receiver
-        sender:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          description: Sender MP-ID (DSO responsible for this MGA)
-          title: Sender
-        status:
-          description: 'Status: pending, confirmed, rejected, deactivated'
-          title: Status
-          type: string
-        time_series_type:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Summenzeitreihe type (Z95-ZG7, e.g., ZA6=ASZR)
-          title: Time Series Type
-        tso:
-          description: TSO Y area code (e.g., 10YDE-EON------1)
-          title: Tso
-          type: string
-      required:
-      - aggregation_type
-      - date_from
-      - dso
-      - id
-      - status
-      - tso
-      title: AggregationObjectResponse
-      type: object
-    ValidationError:
-      properties:
-        ctx:
-          title: Context
-          type: object
-        input:
-          title: Input
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          title: Location
-          type: array
-        msg:
-          title: Message
-          type: string
-        type:
-          title: Error Type
-          type: string
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-      type: object
-    MonthlyCostResponse:
-      description: Response model for monthly cost calculation.
-      properties:
-        aggregation_object_uid:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Linked aggregation object UID
-          title: Aggregation Object Uid
-        average_price_eur_mwh:
-          description: Average price EUR/MWh
-          title: Average Price Eur Mwh
+          - 125.5
+          title: Actual Mwh
           type: number
-        bilanzierungsmonat:
-          description: Settlement month (YYYY-MM-DD)
-          title: Bilanzierungsmonat
+        date:
+          description: Settlement date in ISO 8601 format.
+          examples:
+          - '2026-01-15'
+          title: Date
           type: string
-        interval_count:
-          description: Number of intervals
-          title: Interval Count
-          type: integer
-        mabis_zp_id:
-          description: MaBiS-Zählpunkt ID
-          title: Mabis Zp Id
-          type: string
-        missing_prices_count:
-          description: Intervals without price data
-          title: Missing Prices Count
-          type: integer
-        total_cost_eur:
-          description: Total cost in EUR
-          title: Total Cost Eur
+        imbalance_mwh:
+          description: Imbalance (actual minus scheduled) in MWh.
+          examples:
+          - 5.5
+          title: Imbalance Mwh
           type: number
-        total_energy_mwh:
-          description: Total energy in MWh
-          title: Total Energy Mwh
+        scheduled_mwh:
+          description: Total scheduled energy for this day in MWh.
+          examples:
+          - 120.0
+          title: Scheduled Mwh
           type: number
-        tso_area:
-          description: TSO control area
-          title: Tso Area
-          type: string
       required:
-      - average_price_eur_mwh
-      - bilanzierungsmonat
-      - interval_count
-      - mabis_zp_id
-      - missing_prices_count
-      - total_cost_eur
-      - total_energy_mwh
-      - tso_area
-      title: MonthlyCostResponse
-      type: object
-    ClearingPeriodCreateRequest:
-      additionalProperties: false
-      description: Request to create a clearing period.
-      properties:
-        bilanzierungsmonat:
-          description: 'First day of the billing month (YYYY-MM-DD). Example: ''2026-01-01'' for January 2026. Use `GET /mabis/clearing-calendar` to compute the MaBiS deadlines for this month.'
-          format: date
-          title: Bilanzierungsmonat
-          type: string
-        bilanzkreis_eic:
-          description: Balance group (Bilanzkreis) EIC X code (16-character organization code, starts with '11X'). Registered with the TSO as the BRP identifier.
-          title: Bilanzkreis Eic
-          type: string
-        final_deadline:
-          anyOf:
-          - format: date-time
-            type: string
-          - type: 'null'
-          description: Final billing deadline (ISO 8601 datetime). Corresponds to M+42 WT per BK6-24-174.
-          title: Final Deadline
-        objection_deadline:
-          anyOf:
-          - format: date-time
-            type: string
-          - type: 'null'
-          description: Objection window closing deadline (ISO 8601 datetime). Corresponds to M+30 WT — after this date objections can no longer be submitted.
-          title: Objection Deadline
-        preliminary_deadline:
-          anyOf:
-          - format: date-time
-            type: string
-          - type: 'null'
-          description: 'Preliminary billing deadline (ISO 8601 datetime with timezone). Corresponds to M+18 WT per BK6-24-174. Example: ''2026-02-25T23:59:59+01:00''.'
-          title: Preliminary Deadline
-      required:
-      - bilanzierungsmonat
-      - bilanzkreis_eic
-      title: ClearingPeriodCreateRequest
+      - actual_mwh
+      - date
+      - imbalance_mwh
+      - scheduled_mwh
+      title: DailyImbalance
       type: object
     EnergyVolumeResponse:
       description: Response model for energy volume records.
@@ -1655,142 +1669,128 @@ components:
       - unit
       title: EnergyVolumeResponse
       type: object
-    SettlementMessageResponse:
-      description: An EDIFACT message exchanged during the settlement process (MSCONS, PRICAT, UTILMD, IFTSTA, etc.).
+    ValidationResponse:
+      description: Validation result for a clearing period, checking data completeness and consistency.
       properties:
+        bilanzierungsmonat:
+          description: Settlement month in ISO 8601 format.
+          examples:
+          - '2026-01-01'
+          title: Bilanzierungsmonat
+          type: string
         clearing_period_uid:
-          description: Parent [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.
+          description: Validated [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.
           title: Clearing Period Uid
           type: string
-        created_ts:
-          description: ISO 8601 datetime when this record was created.
+        expected_days:
+          description: Number of days expected for this settlement month.
           examples:
-          - '2026-02-20T08:00:00+00:00'
-          title: Created Ts
-          type: string
-        direction:
-          description: 'Message direction: `inbound` (received from TSO/DSO) or `outbound` (sent to TSO/DSO).'
+          - 31
+          title: Expected Days
+          type: integer
+        issues:
+          description: List of validation issues found. Empty when `valid` is `true`.
           examples:
-          - inbound
-          - outbound
-          title: Direction
-          type: string
-        error_message:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: Error description if processing failed.
-          title: Error Message
-        message_type:
-          description: 'EDIFACT message type: `MSCONS`, `PRICAT`, `UTILMD`, `IFTSTA`, `PARTIN`, etc.'
+          - - Missing settlement data for 2026-01-15
+            - MSCONS message count mismatch
+          items:
+            type: string
+          title: Issues
+          type: array
+        message_count:
+          description: Number of EDIFACT messages processed for this period.
           examples:
-          - MSCONS
-          - PRICAT
-          - IFTSTA
-          title: Message Type
-          type: string
-        received_ts:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: ISO 8601 datetime when the message was received (inbound only).
-          title: Received Ts
-        reference_id:
-          description: EDIFACT reference identifier for this message.
+          - 5
+          title: Message Count
+          type: integer
+        settlement_count:
+          description: Number of daily settlement records present.
           examples:
-          - MSCONS-20260115-001
-          title: Reference Id
-          type: string
-        sent_ts:
-          anyOf:
-          - type: string
-          - type: 'null'
-          description: ISO 8601 datetime when the message was sent (outbound only).
-          title: Sent Ts
+          - 31
+          title: Settlement Count
+          type: integer
         status:
-          description: 'Processing status: `pending`, `processed`, `failed`, or `acknowledged`.'
+          description: Current clearing period status.
           examples:
-          - processed
-          - pending
+          - preliminary
           title: Status
           type: string
-        uid:
-          description: Unique identifier for this message record.
-          examples:
-          - f8a9b0c1-d2e3-4f4a-8b5c-6d7e8f9a0b1c
-          title: Uid
-          type: string
+        valid:
+          description: Whether the clearing period data passes all validation checks.
+          title: Valid
+          type: boolean
       required:
+      - bilanzierungsmonat
       - clearing_period_uid
-      - created_ts
-      - direction
-      - message_type
-      - reference_id
+      - expected_days
+      - issues
+      - message_count
+      - settlement_count
       - status
-      - uid
-      title: SettlementMessageResponse
+      - valid
+      title: ValidationResponse
       type: object
-    ControlEnergyPriceDataPoint:
-      description: Single price data point.
+    MonthlyEnergySummaryResponse:
+      description: Response model for monthly energy summary.
       properties:
-        amount:
-          description: Price amount in EUR/MWh
-          title: Amount
+        aggregation_object_uid:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Linked aggregation object UID
+          title: Aggregation Object Uid
+        bilanzierungsmonat:
+          description: Settlement month (YYYY-MM-DD)
+          title: Bilanzierungsmonat
+          type: string
+        data_status:
+          description: MaBiS data status
+          title: Data Status
+          type: string
+        interval_count:
+          description: Number of intervals
+          title: Interval Count
+          type: integer
+        mabis_zp_id:
+          description: MaBiS-Zählpunkt ID
+          title: Mabis Zp Id
+          type: string
+        message_date:
+          description: Version timestamp (ISO datetime)
+          title: Message Date
+          type: string
+        mscons_message_id:
+          description: Version identifier
+          title: Mscons Message Id
+          type: string
+        resolution:
+          description: Resolution
+          title: Resolution
+          type: string
+        total_kwh:
+          description: Total energy in kWh
+          title: Total Kwh
           type: number
-        ts:
-          description: Timestamp (ISO datetime)
-          title: Ts
+        total_mwh:
+          description: Total energy in MWh
+          title: Total Mwh
+          type: number
+        unit:
+          description: Unit
+          title: Unit
           type: string
       required:
-      - amount
-      - ts
-      title: ControlEnergyPriceDataPoint
-      type: object
-    ImbalanceResponse:
-      description: Aggregated imbalance calculation for an entire clearing period, broken down by day.
-      properties:
-        clearing_period_uid:
-          description: Parent [Clearing Period](/api-reference/settlement-management/models/clearing-period) identifier.
-          title: Clearing Period Uid
-          type: string
-        daily_imbalances:
-          description: Per-day imbalance breakdown.
-          items:
-            $ref: '#/components/schemas/DailyImbalance'
-          title: Daily Imbalances
-          type: array
-        total_actual_mwh:
-          description: Total actual energy across all days in MWh.
-          examples:
-          - 3732.5
-          title: Total Actual Mwh
-          type: number
-        total_imbalance_cost_eur:
-          description: Total imbalance cost in EUR based on reBAP control energy prices.
-          examples:
-          - 1875.0
-          title: Total Imbalance Cost Eur
-          type: number
-        total_imbalance_mwh:
-          description: Total net imbalance across all days in MWh.
-          examples:
-          - 12.5
-          title: Total Imbalance Mwh
-          type: number
-        total_scheduled_mwh:
-          description: Total scheduled energy across all days in MWh.
-          examples:
-          - 3720.0
-          title: Total Scheduled Mwh
-          type: number
-      required:
-      - clearing_period_uid
-      - daily_imbalances
-      - total_actual_mwh
-      - total_imbalance_cost_eur
-      - total_imbalance_mwh
-      - total_scheduled_mwh
-      title: ImbalanceResponse
+      - bilanzierungsmonat
+      - data_status
+      - interval_count
+      - mabis_zp_id
+      - message_date
+      - mscons_message_id
+      - resolution
+      - total_kwh
+      - total_mwh
+      - unit
+      title: MonthlyEnergySummaryResponse
       type: object
   securitySchemes:
     apiKeyAuth:

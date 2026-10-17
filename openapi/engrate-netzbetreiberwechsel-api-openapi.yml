@@ -147,7 +147,228 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
+  responses:
+    NotFound:
+      description: Ressource nicht vorhanden.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    BadRequest:
+      description: Fehlerhafte Anfrage.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: 'Syntaktisch gültig, aber fachlich nicht verarbeitbar. `errors` benennt die
+
+        betroffenen Stellen über JSON-Pointer nach RFC 6901.
+
+        '
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
   schemas:
+    NetworkOperatorChangeRequest:
+      type: object
+      required:
+      - locationBundleId
+      - effectiveFrom
+      properties:
+        locationBundleId:
+          $ref: '#/components/schemas/LocationBundleId'
+        effectiveFrom:
+          $ref: '#/components/schemas/DayBoundary'
+        successorNetworkOperator:
+          $ref: '#/components/schemas/MarketPartnerRef'
+    PendingResult:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: inArbeit
+        expectedAvailableAt:
+          type: string
+          format: date-time
+          description: Voraussichtlicher Zeitpunkt der Bereitstellung.
+    MarketPartnerRef:
+      type: object
+      required:
+      - marketPartnerId
+      properties:
+        marketPartnerId:
+          $ref: '#/components/schemas/MarketPartnerId'
+        role:
+          type: string
+          enum:
+          - NB
+          - LF
+          - MSB
+          - MWV
+          - UENB
+        href:
+          type: string
+          format: uri-reference
+    NetworkOperatorChangePackageId:
+      type: string
+      pattern: ^P[A-Z\d]{9}\d$
+      examples:
+      - P1234848431
+    OperatorAssignment:
+      type: object
+      required:
+      - objectType
+      - objectId
+      properties:
+        objectType:
+          type: string
+          enum:
+          - Netzlokation
+          - Messlokation
+          - Marktlokation
+          - Tranche
+          - SteuerbareRessource
+        objectId:
+          type: string
+        href:
+          type: string
+          format: uri-reference
+        meteringPointOperator:
+          $ref: '#/components/schemas/MarketPartnerRef'
+        supplier:
+          $ref: '#/components/schemas/MarketPartnerRef'
+        transmissionSystemOperator:
+          $ref: '#/components/schemas/MarketPartnerRef'
+    MarketPartnerId:
+      type: string
+      pattern: ^\d{13}$
+      description: Marktpartner-ID.
+      examples:
+      - '9900987654321'
+    LocationBundleId:
+      type: string
+      pattern: ^F[A-Z\d]{9}\d$
+      description: 'Lokationsbündel-ID.
+
+
+        Muster und Beispiel sind unverändert aus der konsultierten Fassung
+
+        übernommen (`schema/identifier/locationBundleId.yaml`).
+
+
+        **Hinweis:** Issue #175 im Repository `EDI-Energy/api-electricity`
+
+        (eingereicht am 20.08.2026) macht geltend, dass nach der
+
+        Bildungsvorschrift an der ersten Stelle `G` statt `F` stehen muss.
+
+        Wir teilen diese Auffassung. Wird das Issue angenommen, sind Muster
+
+        und Beispiele hier und in den beigefügten Beispiel-Payloads
+
+        entsprechend auf `G` zu ändern. Wir haben bewusst nicht vorgegriffen,
+
+        damit dieser Entwurf gegen den konsultierten Stand vergleichbar
+
+        bleibt.
+
+        '
+      examples:
+      - F1234848431
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          format: uri-reference
+          description: URL der referenzierten Ressource.
+        title:
+          type: string
+    NetworkOperatorChangePackageDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          $ref: '#/components/schemas/NetworkOperatorChangePackage'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            locationBundle:
+              $ref: '#/components/schemas/Link'
+    NetworkOperatorChangePackage:
+      type: object
+      required:
+      - type
+      - packageId
+      - effectiveFrom
+      - locationBundle
+      - assignments
+      properties:
+        type:
+          const: NetzbetreiberwechselPaket
+        packageId:
+          $ref: '#/components/schemas/NetworkOperatorChangePackageId'
+        href:
+          type: string
+          format: uri-reference
+        effectiveFrom:
+          $ref: '#/components/schemas/DayBoundary'
+        locationBundle:
+          $ref: '#/components/schemas/Link'
+          description: 'Verweis auf das Bündel statt Einbettung einer Kopie.
+
+
+            In der konsultierten Fassung wird das vollständige Lokationsbündel in das
+
+            Wechselpaket eingebettet. Damit existieren zwei Kopien desselben Sachverhalts,
+
+            die auseinanderlaufen können — und das Paket mischt zwei Zeitmodelle, weil das
+
+            eingebettete Bündel Zeitscheiben trägt, die Marktpartnerzuordnung des Pakets
+
+            aber ausdrücklich nicht.
+
+            '
+        assignments:
+          type: array
+          description: 'Die Marktpartnerzuordnung zum Wechselzeitpunkt. Als einheitliche Liste über
+
+            alle Objekttypen statt fünf paralleler, gleichartiger Arrays.
+
+            '
+          items:
+            $ref: '#/components/schemas/OperatorAssignment'
+    DayBoundary:
+      type: string
+      format: date
+      description: 'Kalendertag. Der zugehörige Zeitpunkt ist stets der Tagesbeginn 00:00 Uhr
+
+        gesetzlicher deutscher Zeit.
+
+
+        Anmerkung zur Abweichung von der konsultierten Fassung: Dort wird derselbe
+
+        Sachverhalt als UTC-Zeitstempel mit Regex-Muster übertragen
+
+        (`2023-08-01T22:00:00Z` für den 2. August 2023). Das ist fehleranfällig, weil der
+
+        Zeitzonenversatz zwischen Sommer- und Winterzeit wechselt und ein Leser den
+
+        Kalendertag zurückrechnen muss. Ein Datum ohne Uhrzeit drückt genau das aus, was
+
+        gemeint ist, und ist nicht falsch interpretierbar.
+
+        '
+      examples:
+      - '2027-10-01'
     Problem:
       type: object
       description: 'Fehlermeldung nach RFC 9457 (Problem Details for HTTP APIs).
@@ -199,232 +420,11 @@ components:
                 type: string
               code:
                 type: string
-    NetworkOperatorChangePackageDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          $ref: '#/components/schemas/NetworkOperatorChangePackage'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            locationBundle:
-              $ref: '#/components/schemas/Link'
-    DayBoundary:
-      type: string
-      format: date
-      description: 'Kalendertag. Der zugehörige Zeitpunkt ist stets der Tagesbeginn 00:00 Uhr
-
-        gesetzlicher deutscher Zeit.
-
-
-        Anmerkung zur Abweichung von der konsultierten Fassung: Dort wird derselbe
-
-        Sachverhalt als UTC-Zeitstempel mit Regex-Muster übertragen
-
-        (`2023-08-01T22:00:00Z` für den 2. August 2023). Das ist fehleranfällig, weil der
-
-        Zeitzonenversatz zwischen Sommer- und Winterzeit wechselt und ein Leser den
-
-        Kalendertag zurückrechnen muss. Ein Datum ohne Uhrzeit drückt genau das aus, was
-
-        gemeint ist, und ist nicht falsch interpretierbar.
-
-        '
-      examples:
-      - '2027-10-01'
-    PendingResult:
-      type: object
-      required:
-      - status
-      properties:
-        status:
-          const: inArbeit
-        expectedAvailableAt:
-          type: string
-          format: date-time
-          description: Voraussichtlicher Zeitpunkt der Bereitstellung.
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type: string
-          format: uri-reference
-          description: URL der referenzierten Ressource.
-        title:
-          type: string
-    NetworkOperatorChangePackage:
-      type: object
-      required:
-      - type
-      - packageId
-      - effectiveFrom
-      - locationBundle
-      - assignments
-      properties:
-        type:
-          const: NetzbetreiberwechselPaket
-        packageId:
-          $ref: '#/components/schemas/NetworkOperatorChangePackageId'
-        href:
-          type: string
-          format: uri-reference
-        effectiveFrom:
-          $ref: '#/components/schemas/DayBoundary'
-        locationBundle:
-          $ref: '#/components/schemas/Link'
-          description: 'Verweis auf das Bündel statt Einbettung einer Kopie.
-
-
-            In der konsultierten Fassung wird das vollständige Lokationsbündel in das
-
-            Wechselpaket eingebettet. Damit existieren zwei Kopien desselben Sachverhalts,
-
-            die auseinanderlaufen können — und das Paket mischt zwei Zeitmodelle, weil das
-
-            eingebettete Bündel Zeitscheiben trägt, die Marktpartnerzuordnung des Pakets
-
-            aber ausdrücklich nicht.
-
-            '
-        assignments:
-          type: array
-          description: 'Die Marktpartnerzuordnung zum Wechselzeitpunkt. Als einheitliche Liste über
-
-            alle Objekttypen statt fünf paralleler, gleichartiger Arrays.
-
-            '
-          items:
-            $ref: '#/components/schemas/OperatorAssignment'
-    MarketPartnerRef:
-      type: object
-      required:
-      - marketPartnerId
-      properties:
-        marketPartnerId:
-          $ref: '#/components/schemas/MarketPartnerId'
-        role:
-          type: string
-          enum:
-          - NB
-          - LF
-          - MSB
-          - MWV
-          - UENB
-        href:
-          type: string
-          format: uri-reference
-    OperatorAssignment:
-      type: object
-      required:
-      - objectType
-      - objectId
-      properties:
-        objectType:
-          type: string
-          enum:
-          - Netzlokation
-          - Messlokation
-          - Marktlokation
-          - Tranche
-          - SteuerbareRessource
-        objectId:
-          type: string
-        href:
-          type: string
-          format: uri-reference
-        meteringPointOperator:
-          $ref: '#/components/schemas/MarketPartnerRef'
-        supplier:
-          $ref: '#/components/schemas/MarketPartnerRef'
-        transmissionSystemOperator:
-          $ref: '#/components/schemas/MarketPartnerRef'
-    MarketPartnerId:
-      type: string
-      pattern: ^\d{13}$
-      description: Marktpartner-ID.
-      examples:
-      - '9900987654321'
-    NetworkOperatorChangePackageId:
-      type: string
-      pattern: ^P[A-Z\d]{9}\d$
-      examples:
-      - P1234848431
-    NetworkOperatorChangeRequest:
-      type: object
-      required:
-      - locationBundleId
-      - effectiveFrom
-      properties:
-        locationBundleId:
-          $ref: '#/components/schemas/LocationBundleId'
-        effectiveFrom:
-          $ref: '#/components/schemas/DayBoundary'
-        successorNetworkOperator:
-          $ref: '#/components/schemas/MarketPartnerRef'
-    LocationBundleId:
-      type: string
-      pattern: ^F[A-Z\d]{9}\d$
-      description: 'Lokationsbündel-ID.
-
-
-        Muster und Beispiel sind unverändert aus der konsultierten Fassung
-
-        übernommen (`schema/identifier/locationBundleId.yaml`).
-
-
-        **Hinweis:** Issue #175 im Repository `EDI-Energy/api-electricity`
-
-        (eingereicht am 20.08.2026) macht geltend, dass nach der
-
-        Bildungsvorschrift an der ersten Stelle `G` statt `F` stehen muss.
-
-        Wir teilen diese Auffassung. Wird das Issue angenommen, sind Muster
-
-        und Beispiele hier und in den beigefügten Beispiel-Payloads
-
-        entsprechend auf `G` zu ändern. Wir haben bewusst nicht vorgegriffen,
-
-        damit dieser Entwurf gegen den konsultierten Stand vergleichbar
-
-        bleibt.
-
-        '
-      examples:
-      - F1234848431
   headers:
     ETag:
       description: Version der Ressource für bedingte Anfragen.
       schema:
         type: string
-  responses:
-    NotFound:
-      description: Ressource nicht vorhanden.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    BadRequest:
-      description: Fehlerhafte Anfrage.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    UnprocessableEntity:
-      description: 'Syntaktisch gültig, aber fachlich nicht verarbeitbar. `errors` benennt die
-
-        betroffenen Stellen über JSON-Pointer nach RFC 6901.
-
-        '
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
   securitySchemes:
     oauth2:
       type: oauth2

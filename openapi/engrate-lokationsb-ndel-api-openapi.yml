@@ -399,7 +399,294 @@ paths:
         '412':
           $ref: '#/components/responses/PreconditionFailed'
 components:
+  headers:
+    Sunset:
+      description: Zeitpunkt, ab dem die Ressource nicht mehr bereitgestellt wird (RFC 8594).
+      schema:
+        type: string
+    CacheControl:
+      description: 'Zwischenspeicherbarkeit. Stammdaten dieser Art ändern sich selten; sinnvolle
+
+        Vorgaben entlasten sowohl den Anbieter als auch die Prozesslaufzeit beim Abrufer.
+
+        '
+      schema:
+        type: string
+        examples:
+        - private, max-age=3600
+    ETag:
+      description: Version der Ressource für bedingte Anfragen.
+      schema:
+        type: string
+    Deprecation:
+      description: 'Gesetzt, sobald die Ressource abgekündigt ist (RFC 8594). Maschinenlesbar, im
+
+        Unterschied zu einem Freitexthinweis.
+
+        '
+      schema:
+        type: string
+    LastModified:
+      description: Zeitpunkt der letzten Änderung.
+      schema:
+        type: string
+    RetryAfter:
+      description: Wartezeit vor dem nächsten Versuch, in Sekunden.
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    PreconditionRequired:
+      description: Schreibender Zugriff ohne `If-Match` ist nicht zulässig.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: Nicht authentisiert.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    TooManyRequests:
+      description: Ratenbegrenzung erreicht.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PreconditionFailed:
+      description: 'Der in `If-Match` angegebene `ETag` entspricht nicht dem aktuellen Stand — die
+
+        Ressource wurde zwischenzeitlich geändert.
+
+        '
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Forbidden:
+      description: 'Authentisiert, aber für die angeforderte Ressource nicht berechtigt. Die
+
+        Berechtigung ergibt sich aus der fachlichen Zuordnung des Marktpartners zu Objekt
+
+        und Zeitraum.
+
+        '
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Fachlicher Konflikt mit dem aktuellen Zustand der Ressource.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    ServiceUnavailable:
+      description: Vorübergehend nicht verfügbar.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Ressource nicht vorhanden.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    BadRequest:
+      description: Fehlerhafte Anfrage.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: 'Syntaktisch gültig, aber fachlich nicht verarbeitbar. `errors` benennt die
+
+        betroffenen Stellen über JSON-Pointer nach RFC 6901.
+
+        '
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
   schemas:
+    MarketPartnerRef:
+      type: object
+      required:
+      - marketPartnerId
+      properties:
+        marketPartnerId:
+          $ref: '#/components/schemas/MarketPartnerId'
+        role:
+          type: string
+          enum:
+          - NB
+          - LF
+          - MSB
+          - MWV
+          - UENB
+        href:
+          type: string
+          format: uri-reference
+    IntelligentMeteringSystem:
+      type: object
+      required:
+      - type
+      - configurationId
+      - obisCodes
+      additionalProperties: false
+      properties:
+        type:
+          const: iMS
+        configurationId:
+          type: string
+          description: Konfigurations-ID. Bei einem intelligenten Messsystem erforderlich.
+        obisCodes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+    Metering:
+      description: 'Die Messung an einer Messlokation, als tagged union über die Art des Messsystems.
+
+
+        **Konkretes Beispiel für den Nutzen:** Bei einem intelligenten Messsystem ist die
+
+        Konfigurations-ID erforderlich; bei einem konventionellen Messsystem darf sie
+
+        nicht vorhanden sein; bei einer pauschalen Messlokation gibt es weder Zähler noch
+
+        OBIS-Kennzahlen noch Messwerte. Heute stehen diese drei Regeln als Bedingungen im
+
+        Anwendungshandbuch. Hier sind sie Teil des Schemas: Ein Payload, der einer
+
+        pauschalen Messlokation eine OBIS-Kennzahl zuordnet, ist schlicht nicht gültig und
+
+        wird von jedem Standardvalidator abgelehnt — nicht erst im Produktivbetrieb durch
+
+        einen Klärfall.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/IntelligentMeteringSystem'
+      - $ref: '#/components/schemas/ModernMeteringDevice'
+      - $ref: '#/components/schemas/FlatRateMetering'
+      discriminator:
+        propertyName: type
+        mapping:
+          iMS: '#/components/schemas/IntelligentMeteringSystem'
+          mME: '#/components/schemas/ModernMeteringDevice'
+          pauschal: '#/components/schemas/FlatRateMetering'
+    LocationBundleId:
+      type: string
+      pattern: ^F[A-Z\d]{9}\d$
+      description: 'Lokationsbündel-ID.
+
+
+        Muster und Beispiel sind unverändert aus der konsultierten Fassung
+
+        übernommen (`schema/identifier/locationBundleId.yaml`).
+
+
+        **Hinweis:** Issue #175 im Repository `EDI-Energy/api-electricity`
+
+        (eingereicht am 20.08.2026) macht geltend, dass nach der
+
+        Bildungsvorschrift an der ersten Stelle `G` statt `F` stehen muss.
+
+        Wir teilen diese Auffassung. Wird das Issue angenommen, sind Muster
+
+        und Beispiele hier und in den beigefügten Beispiel-Payloads
+
+        entsprechend auf `G` zu ändern. Wir haben bewusst nicht vorgegriffen,
+
+        damit dieser Entwurf gegen den konsultierten Stand vergleichbar
+
+        bleibt.
+
+        '
+      examples:
+      - F1234848431
+    LocationBundle:
+      type: object
+      required:
+      - type
+      - locationBundleId
+      - networkOperator
+      - timeSlices
+      properties:
+        type:
+          const: Lokationsbuendel
+        locationBundleId:
+          $ref: '#/components/schemas/LocationBundleId'
+        href:
+          type: string
+          format: uri-reference
+        networkOperator:
+          $ref: '#/components/schemas/MarketPartnerRef'
+          description: Der für dieses Bündel verantwortliche Netzbetreiber.
+        changedAt:
+          type: string
+          format: date-time
+        timeSlices:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TimeSlice'
+          description: 'Zeitscheiben in aufsteigender Reihenfolge von `validFrom`. Anders als in der
+
+            konsultierten Fassung trägt jede Zeitscheibe ein explizites `validTo`; ein
+
+            Sonderkonstrukt für das Ende der letzten Scheibe ist damit entbehrlich.
+
+            '
+    TimeSliceDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeSlice'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            bundle:
+              $ref: '#/components/schemas/Link'
+    TimeSliceList:
+      type: object
+      required:
+      - data
+      - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlice'
+        links:
+          $ref: '#/components/schemas/ListLinks'
+    ControllableResourceMember:
+      type: object
+      required:
+      - type
+      - srId
+      additionalProperties: false
+      properties:
+        type:
+          const: SteuerbareRessource
+        srId:
+          $ref: '#/components/schemas/SrId'
+        href:
+          type: string
+          format: uri-reference
     Problem:
       type: object
       description: 'Fehlermeldung nach RFC 9457 (Problem Details for HTTP APIs).
@@ -451,7 +738,13 @@ components:
                 type: string
               code:
                 type: string
-    RelationMaloToTr:
+    MaloId:
+      type: string
+      pattern: ^\d{11}$
+      description: Identifiziert die Marktlokation oder Tranche.
+      examples:
+      - '57685676748'
+    RelationNeloToMelo:
       type: object
       required:
       - kind
@@ -460,119 +753,17 @@ components:
       additionalProperties: false
       properties:
         kind:
-          const: MarktlokationZuTechnischerRessource
+          const: NetzlokationZuMesslokation
         from:
-          $ref: '#/components/schemas/MaloId'
+          $ref: '#/components/schemas/NeloId'
         to:
-          $ref: '#/components/schemas/TrId'
-    BundleMember:
-      description: 'Ein Knoten des Lokationsbündels. Der Typ wird über das Feld `type` markiert
-
-        (tagged union). Damit ist für jeden Typ genau festgelegt, welche Felder zulässig
-
-        und welche erforderlich sind — Kombinationen, die es fachlich nicht gibt, sind
-
-        nicht darstellbar.
-
-
-        Dies ist der in Abschnitt 3.5 der Stellungnahme beschriebene Hebel: Bedingungen,
-
-        die heute als natürlichsprachliche Ad-hoc-Bedingungen im Anwendungshandbuch stehen
-
-        und von jedem Marktpartner eigenständig implementiert werden, wandern in das
-
-        Schema und werden von Standardwerkzeugen geprüft.
-
-        '
-      oneOf:
-      - $ref: '#/components/schemas/NetworkLocationMember'
-      - $ref: '#/components/schemas/MeteringLocationMember'
-      - $ref: '#/components/schemas/MarketLocationMember'
-      - $ref: '#/components/schemas/TrancheMember'
-      - $ref: '#/components/schemas/TechnicalResourceMember'
-      - $ref: '#/components/schemas/ControllableResourceMember'
-      discriminator:
-        propertyName: type
-        mapping:
-          Netzlokation: '#/components/schemas/NetworkLocationMember'
-          Messlokation: '#/components/schemas/MeteringLocationMember'
-          Marktlokation: '#/components/schemas/MarketLocationMember'
-          Tranche: '#/components/schemas/TrancheMember'
-          TechnischeRessource: '#/components/schemas/TechnicalResourceMember'
-          SteuerbareRessource: '#/components/schemas/ControllableResourceMember'
-    TimeSliceDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          $ref: '#/components/schemas/TimeSlice'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            bundle:
-              $ref: '#/components/schemas/Link'
-    LocationBundle:
-      type: object
-      required:
-      - type
-      - locationBundleId
-      - networkOperator
-      - timeSlices
-      properties:
-        type:
-          const: Lokationsbuendel
-        locationBundleId:
-          $ref: '#/components/schemas/LocationBundleId'
-        href:
-          type: string
-          format: uri-reference
-        networkOperator:
-          $ref: '#/components/schemas/MarketPartnerRef'
-          description: Der für dieses Bündel verantwortliche Netzbetreiber.
-        changedAt:
-          type: string
-          format: date-time
-        timeSlices:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/TimeSlice'
-          description: 'Zeitscheiben in aufsteigender Reihenfolge von `validFrom`. Anders als in der
-
-            konsultierten Fassung trägt jede Zeitscheibe ein explizites `validTo`; ein
-
-            Sonderkonstrukt für das Ende der letzten Scheibe ist damit entbehrlich.
-
-            '
-    RelationMeloToMalo:
-      type: object
-      required:
-      - kind
-      - from
-      - to
-      additionalProperties: false
-      properties:
-        kind:
-          const: MesslokationZuMarktlokation
-        from:
           $ref: '#/components/schemas/MeloId'
-        to:
-          $ref: '#/components/schemas/MaloId'
-    LocationBundleList:
-      type: object
-      required:
-      - data
-      - links
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/LocationBundleSummary'
-        links:
-          $ref: '#/components/schemas/ListLinks'
+    TrId:
+      type: string
+      pattern: ^D[A-Z\d]{9}\d$
+      description: ID der technischen Ressource.
+      examples:
+      - D1234848431
     MeteringLocationMember:
       type: object
       required:
@@ -592,457 +783,6 @@ components:
           $ref: '#/components/schemas/MarketPartnerRef'
         metering:
           $ref: '#/components/schemas/Metering'
-    TechnicalResourceMember:
-      type: object
-      required:
-      - type
-      - trId
-      additionalProperties: false
-      properties:
-        type:
-          const: TechnischeRessource
-        trId:
-          $ref: '#/components/schemas/TrId'
-        href:
-          type: string
-          format: uri-reference
-    TrancheMember:
-      type: object
-      required:
-      - type
-      - trancheId
-      additionalProperties: false
-      description: 'Die Tranche als eigener Knotentyp.
-
-
-        In der konsultierten Fassung ist die Tranche kein eigenes Objekt, sondern eine
-
-        ID-Liste unter der Marktlokation, die den Datentyp der Marktlokations-ID
-
-        mitbenutzt. Ob eine gegebene elfstellige Ziffernfolge eine Marktlokation oder eine
-
-        Tranche bezeichnet, ergibt sich dort nur aus der Position im Dokument. Als eigener
-
-        Typ ist es eindeutig.
-
-        '
-      properties:
-        type:
-          const: Tranche
-        trancheId:
-          $ref: '#/components/schemas/MaloId'
-        href:
-          type: string
-          format: uri-reference
-        supplier:
-          $ref: '#/components/schemas/MarketPartnerRef'
-    ControllableResourceMember:
-      type: object
-      required:
-      - type
-      - srId
-      additionalProperties: false
-      properties:
-        type:
-          const: SteuerbareRessource
-        srId:
-          $ref: '#/components/schemas/SrId'
-        href:
-          type: string
-          format: uri-reference
-    NeloId:
-      type: string
-      pattern: ^E[A-Z\d]{9}\d$
-      description: Netzlokations-ID.
-      examples:
-      - E1234848431
-    DayBoundary:
-      type: string
-      format: date
-      description: 'Kalendertag. Der zugehörige Zeitpunkt ist stets der Tagesbeginn 00:00 Uhr
-
-        gesetzlicher deutscher Zeit.
-
-
-        Anmerkung zur Abweichung von der konsultierten Fassung: Dort wird derselbe
-
-        Sachverhalt als UTC-Zeitstempel mit Regex-Muster übertragen
-
-        (`2023-08-01T22:00:00Z` für den 2. August 2023). Das ist fehleranfällig, weil der
-
-        Zeitzonenversatz zwischen Sommer- und Winterzeit wechselt und ein Leser den
-
-        Kalendertag zurückrechnen muss. Ein Datum ohne Uhrzeit drückt genau das aus, was
-
-        gemeint ist, und ist nicht falsch interpretierbar.
-
-        '
-      examples:
-      - '2027-10-01'
-    LocationBundleSummary:
-      type: object
-      required:
-      - type
-      - locationBundleId
-      - href
-      properties:
-        type:
-          const: Lokationsbuendel
-        locationBundleId:
-          $ref: '#/components/schemas/LocationBundleId'
-        href:
-          type: string
-          format: uri-reference
-        changedAt:
-          type: string
-          format: date-time
-        validFrom:
-          $ref: '#/components/schemas/DayBoundary'
-        validTo:
-          oneOf:
-          - $ref: '#/components/schemas/DayBoundary'
-          - type: 'null'
-          description: Ende der Gültigkeit; `null` bedeutet offen.
-    LocationBundleWrite:
-      type: object
-      required:
-      - timeSlices
-      properties:
-        timeSlices:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/TimeSliceWrite'
-    RelationMaloToTranche:
-      type: object
-      required:
-      - kind
-      - from
-      - to
-      additionalProperties: false
-      properties:
-        kind:
-          const: MarktlokationZuTranche
-        from:
-          $ref: '#/components/schemas/MaloId'
-        to:
-          $ref: '#/components/schemas/MaloId'
-    LocationBundleId:
-      type: string
-      pattern: ^F[A-Z\d]{9}\d$
-      description: 'Lokationsbündel-ID.
-
-
-        Muster und Beispiel sind unverändert aus der konsultierten Fassung
-
-        übernommen (`schema/identifier/locationBundleId.yaml`).
-
-
-        **Hinweis:** Issue #175 im Repository `EDI-Energy/api-electricity`
-
-        (eingereicht am 20.08.2026) macht geltend, dass nach der
-
-        Bildungsvorschrift an der ersten Stelle `G` statt `F` stehen muss.
-
-        Wir teilen diese Auffassung. Wird das Issue angenommen, sind Muster
-
-        und Beispiele hier und in den beigefügten Beispiel-Payloads
-
-        entsprechend auf `G` zu ändern. Wir haben bewusst nicht vorgegriffen,
-
-        damit dieser Entwurf gegen den konsultierten Stand vergleichbar
-
-        bleibt.
-
-        '
-      examples:
-      - F1234848431
-    BundleRelation:
-      description: 'Eine gerichtete Kante zwischen zwei Knoten der Zeitscheibe. Quelle und Ziel werden
-
-        über ihre fachliche ID benannt.
-
-
-        Die zulässigen Typkombinationen sind hier abschließend als `oneOf` festgelegt.
-
-        Sie entsprechen den Zuordnungen der konsultierten Fassung:
-
-        Netzlokation → Messlokation, Messlokation → Messlokation,
-
-        Messlokation → Marktlokation, Messlokation → technische Ressource,
-
-        Marktlokation → technische Ressource, Marktlokation → Tranche.
-
-        '
-      oneOf:
-      - $ref: '#/components/schemas/RelationNeloToMelo'
-      - $ref: '#/components/schemas/RelationMeloToMelo'
-      - $ref: '#/components/schemas/RelationMeloToMalo'
-      - $ref: '#/components/schemas/RelationMeloToTr'
-      - $ref: '#/components/schemas/RelationMaloToTr'
-      - $ref: '#/components/schemas/RelationMaloToTranche'
-      discriminator:
-        propertyName: kind
-        mapping:
-          NetzlokationZuMesslokation: '#/components/schemas/RelationNeloToMelo'
-          MesslokationZuMesslokation: '#/components/schemas/RelationMeloToMelo'
-          MesslokationZuMarktlokation: '#/components/schemas/RelationMeloToMalo'
-          MesslokationZuTechnischerRessource: '#/components/schemas/RelationMeloToTr'
-          MarktlokationZuTechnischerRessource: '#/components/schemas/RelationMaloToTr'
-          MarktlokationZuTranche: '#/components/schemas/RelationMaloToTranche'
-    Metering:
-      description: 'Die Messung an einer Messlokation, als tagged union über die Art des Messsystems.
-
-
-        **Konkretes Beispiel für den Nutzen:** Bei einem intelligenten Messsystem ist die
-
-        Konfigurations-ID erforderlich; bei einem konventionellen Messsystem darf sie
-
-        nicht vorhanden sein; bei einer pauschalen Messlokation gibt es weder Zähler noch
-
-        OBIS-Kennzahlen noch Messwerte. Heute stehen diese drei Regeln als Bedingungen im
-
-        Anwendungshandbuch. Hier sind sie Teil des Schemas: Ein Payload, der einer
-
-        pauschalen Messlokation eine OBIS-Kennzahl zuordnet, ist schlicht nicht gültig und
-
-        wird von jedem Standardvalidator abgelehnt — nicht erst im Produktivbetrieb durch
-
-        einen Klärfall.
-
-        '
-      oneOf:
-      - $ref: '#/components/schemas/IntelligentMeteringSystem'
-      - $ref: '#/components/schemas/ModernMeteringDevice'
-      - $ref: '#/components/schemas/FlatRateMetering'
-      discriminator:
-        propertyName: type
-        mapping:
-          iMS: '#/components/schemas/IntelligentMeteringSystem'
-          mME: '#/components/schemas/ModernMeteringDevice'
-          pauschal: '#/components/schemas/FlatRateMetering'
-    TimeSliceList:
-      type: object
-      required:
-      - data
-      - links
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlice'
-        links:
-          $ref: '#/components/schemas/ListLinks'
-    TrId:
-      type: string
-      pattern: ^D[A-Z\d]{9}\d$
-      description: ID der technischen Ressource.
-      examples:
-      - D1234848431
-    RelationMeloToTr:
-      type: object
-      required:
-      - kind
-      - from
-      - to
-      additionalProperties: false
-      properties:
-        kind:
-          const: MesslokationZuTechnischerRessource
-        from:
-          $ref: '#/components/schemas/MeloId'
-        to:
-          $ref: '#/components/schemas/TrId'
-    RelationMeloToMelo:
-      type: object
-      required:
-      - kind
-      - from
-      - to
-      additionalProperties: false
-      properties:
-        kind:
-          const: MesslokationZuMesslokation
-        from:
-          $ref: '#/components/schemas/MeloId'
-        to:
-          $ref: '#/components/schemas/MeloId'
-    IntelligentMeteringSystem:
-      type: object
-      required:
-      - type
-      - configurationId
-      - obisCodes
-      additionalProperties: false
-      properties:
-        type:
-          const: iMS
-        configurationId:
-          type: string
-          description: Konfigurations-ID. Bei einem intelligenten Messsystem erforderlich.
-        obisCodes:
-          type: array
-          minItems: 1
-          items:
-            type: string
-    MaloId:
-      type: string
-      pattern: ^\d{11}$
-      description: Identifiziert die Marktlokation oder Tranche.
-      examples:
-      - '57685676748'
-    LocationBundleDocument:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          $ref: '#/components/schemas/LocationBundle'
-        links:
-          type: object
-          properties:
-            self:
-              $ref: '#/components/schemas/Link'
-            timeSlices:
-              $ref: '#/components/schemas/Link'
-            clearingCases:
-              $ref: '#/components/schemas/Link'
-    FlatRateMetering:
-      type: object
-      required:
-      - type
-      additionalProperties: false
-      properties:
-        type:
-          const: pauschal
-        description:
-          type: string
-          description: 'Pauschale Messlokation ohne Zähler. Trägt eine Zählpunktbezeichnung, aber
-
-            keine Messeinrichtung, keine OBIS-Kennzahlen und keine Messwerte.
-
-
-            Mitteilung Nr. 57 sieht vor, dass künftig jede Marktlokation Strom mindestens
-
-            eine zugeordnete Messlokation aufweist — entweder eine pauschale ohne Zähler
-
-            oder eine gemessene. Dieser Typ macht die Unterscheidung im Schema explizit,
-
-            statt sie einer Bedingung im Anwendungshandbuch zu überlassen.
-
-            '
-    TimeSliceWrite:
-      type: object
-      required:
-      - validFrom
-      - validTo
-      - members
-      properties:
-        validFrom:
-          $ref: '#/components/schemas/DayBoundary'
-        validTo:
-          oneOf:
-          - $ref: '#/components/schemas/DayBoundary'
-          - type: 'null'
-        members:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/BundleMember'
-        relations:
-          type: array
-          items:
-            $ref: '#/components/schemas/BundleRelation'
-    MarketPartnerId:
-      type: string
-      pattern: ^\d{13}$
-      description: Marktpartner-ID.
-      examples:
-      - '9900987654321'
-    ModernMeteringDevice:
-      type: object
-      required:
-      - type
-      - obisCodes
-      additionalProperties: false
-      properties:
-        type:
-          const: mME
-        obisCodes:
-          type: array
-          minItems: 1
-          items:
-            type: string
-    MeloId:
-      type: string
-      pattern: ^DE\d{11}[A-Z\d]{20}$
-      description: Messlokations-ID (Zählpunktbezeichnung).
-      examples:
-      - DE00014545768S0000000000000003054
-    Link:
-      type: object
-      required:
-      - href
-      properties:
-        href:
-          type: string
-          format: uri-reference
-          description: URL der referenzierten Ressource.
-        title:
-          type: string
-    SrId:
-      type: string
-      pattern: ^C[A-Z\d]{9}\d$
-      description: ID der steuerbaren Ressource.
-      examples:
-      - C1234848431
-    MarketPartnerRef:
-      type: object
-      required:
-      - marketPartnerId
-      properties:
-        marketPartnerId:
-          $ref: '#/components/schemas/MarketPartnerId'
-        role:
-          type: string
-          enum:
-          - NB
-          - LF
-          - MSB
-          - MWV
-          - UENB
-        href:
-          type: string
-          format: uri-reference
-    MarketLocationMember:
-      type: object
-      required:
-      - type
-      - maloId
-      additionalProperties: false
-      properties:
-        type:
-          const: Marktlokation
-        maloId:
-          $ref: '#/components/schemas/MaloId'
-        href:
-          type: string
-          format: uri-reference
-        supplier:
-          $ref: '#/components/schemas/MarketPartnerRef'
-        transmissionSystemOperator:
-          $ref: '#/components/schemas/MarketPartnerRef'
-    ListLinks:
-      type: object
-      properties:
-        self:
-          $ref: '#/components/schemas/Link'
-        next:
-          allOf:
-          - $ref: '#/components/schemas/Link'
-          description: Nächste Seite. Fehlt, wenn keine weiteren Elemente vorliegen.
-        prev:
-          $ref: '#/components/schemas/Link'
     TimeSlice:
       type: object
       required:
@@ -1093,6 +833,176 @@ components:
             automatisiert prüfbar.
 
             '
+    MarketPartnerId:
+      type: string
+      pattern: ^\d{13}$
+      description: Marktpartner-ID.
+      examples:
+      - '9900987654321'
+    FlatRateMetering:
+      type: object
+      required:
+      - type
+      additionalProperties: false
+      properties:
+        type:
+          const: pauschal
+        description:
+          type: string
+          description: 'Pauschale Messlokation ohne Zähler. Trägt eine Zählpunktbezeichnung, aber
+
+            keine Messeinrichtung, keine OBIS-Kennzahlen und keine Messwerte.
+
+
+            Mitteilung Nr. 57 sieht vor, dass künftig jede Marktlokation Strom mindestens
+
+            eine zugeordnete Messlokation aufweist — entweder eine pauschale ohne Zähler
+
+            oder eine gemessene. Dieser Typ macht die Unterscheidung im Schema explizit,
+
+            statt sie einer Bedingung im Anwendungshandbuch zu überlassen.
+
+            '
+    DayBoundary:
+      type: string
+      format: date
+      description: 'Kalendertag. Der zugehörige Zeitpunkt ist stets der Tagesbeginn 00:00 Uhr
+
+        gesetzlicher deutscher Zeit.
+
+
+        Anmerkung zur Abweichung von der konsultierten Fassung: Dort wird derselbe
+
+        Sachverhalt als UTC-Zeitstempel mit Regex-Muster übertragen
+
+        (`2023-08-01T22:00:00Z` für den 2. August 2023). Das ist fehleranfällig, weil der
+
+        Zeitzonenversatz zwischen Sommer- und Winterzeit wechselt und ein Leser den
+
+        Kalendertag zurückrechnen muss. Ein Datum ohne Uhrzeit drückt genau das aus, was
+
+        gemeint ist, und ist nicht falsch interpretierbar.
+
+        '
+      examples:
+      - '2027-10-01'
+    BundleMember:
+      description: 'Ein Knoten des Lokationsbündels. Der Typ wird über das Feld `type` markiert
+
+        (tagged union). Damit ist für jeden Typ genau festgelegt, welche Felder zulässig
+
+        und welche erforderlich sind — Kombinationen, die es fachlich nicht gibt, sind
+
+        nicht darstellbar.
+
+
+        Dies ist der in Abschnitt 3.5 der Stellungnahme beschriebene Hebel: Bedingungen,
+
+        die heute als natürlichsprachliche Ad-hoc-Bedingungen im Anwendungshandbuch stehen
+
+        und von jedem Marktpartner eigenständig implementiert werden, wandern in das
+
+        Schema und werden von Standardwerkzeugen geprüft.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/NetworkLocationMember'
+      - $ref: '#/components/schemas/MeteringLocationMember'
+      - $ref: '#/components/schemas/MarketLocationMember'
+      - $ref: '#/components/schemas/TrancheMember'
+      - $ref: '#/components/schemas/TechnicalResourceMember'
+      - $ref: '#/components/schemas/ControllableResourceMember'
+      discriminator:
+        propertyName: type
+        mapping:
+          Netzlokation: '#/components/schemas/NetworkLocationMember'
+          Messlokation: '#/components/schemas/MeteringLocationMember'
+          Marktlokation: '#/components/schemas/MarketLocationMember'
+          Tranche: '#/components/schemas/TrancheMember'
+          TechnischeRessource: '#/components/schemas/TechnicalResourceMember'
+          SteuerbareRessource: '#/components/schemas/ControllableResourceMember'
+    RelationMeloToTr:
+      type: object
+      required:
+      - kind
+      - from
+      - to
+      additionalProperties: false
+      properties:
+        kind:
+          const: MesslokationZuTechnischerRessource
+        from:
+          $ref: '#/components/schemas/MeloId'
+        to:
+          $ref: '#/components/schemas/TrId'
+    MarketLocationMember:
+      type: object
+      required:
+      - type
+      - maloId
+      additionalProperties: false
+      properties:
+        type:
+          const: Marktlokation
+        maloId:
+          $ref: '#/components/schemas/MaloId'
+        href:
+          type: string
+          format: uri-reference
+        supplier:
+          $ref: '#/components/schemas/MarketPartnerRef'
+        transmissionSystemOperator:
+          $ref: '#/components/schemas/MarketPartnerRef'
+    LocationBundleList:
+      type: object
+      required:
+      - data
+      - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocationBundleSummary'
+        links:
+          $ref: '#/components/schemas/ListLinks'
+    RelationMeloToMalo:
+      type: object
+      required:
+      - kind
+      - from
+      - to
+      additionalProperties: false
+      properties:
+        kind:
+          const: MesslokationZuMarktlokation
+        from:
+          $ref: '#/components/schemas/MeloId'
+        to:
+          $ref: '#/components/schemas/MaloId'
+    LocationBundleSummary:
+      type: object
+      required:
+      - type
+      - locationBundleId
+      - href
+      properties:
+        type:
+          const: Lokationsbuendel
+        locationBundleId:
+          $ref: '#/components/schemas/LocationBundleId'
+        href:
+          type: string
+          format: uri-reference
+        changedAt:
+          type: string
+          format: date-time
+        validFrom:
+          $ref: '#/components/schemas/DayBoundary'
+        validTo:
+          oneOf:
+          - $ref: '#/components/schemas/DayBoundary'
+          - type: 'null'
+          description: Ende der Gültigkeit; `null` bedeutet offen.
     NetworkLocationMember:
       type: object
       required:
@@ -1107,7 +1017,7 @@ components:
         href:
           type: string
           format: uri-reference
-    RelationNeloToMelo:
+    RelationMaloToTranche:
       type: object
       required:
       - kind
@@ -1116,128 +1026,218 @@ components:
       additionalProperties: false
       properties:
         kind:
-          const: NetzlokationZuMesslokation
+          const: MarktlokationZuTranche
         from:
-          $ref: '#/components/schemas/NeloId'
+          $ref: '#/components/schemas/MaloId'
+        to:
+          $ref: '#/components/schemas/MaloId'
+    RelationMaloToTr:
+      type: object
+      required:
+      - kind
+      - from
+      - to
+      additionalProperties: false
+      properties:
+        kind:
+          const: MarktlokationZuTechnischerRessource
+        from:
+          $ref: '#/components/schemas/MaloId'
+        to:
+          $ref: '#/components/schemas/TrId'
+    LocationBundleWrite:
+      type: object
+      required:
+      - timeSlices
+      properties:
+        timeSlices:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TimeSliceWrite'
+    SrId:
+      type: string
+      pattern: ^C[A-Z\d]{9}\d$
+      description: ID der steuerbaren Ressource.
+      examples:
+      - C1234848431
+    BundleRelation:
+      description: 'Eine gerichtete Kante zwischen zwei Knoten der Zeitscheibe. Quelle und Ziel werden
+
+        über ihre fachliche ID benannt.
+
+
+        Die zulässigen Typkombinationen sind hier abschließend als `oneOf` festgelegt.
+
+        Sie entsprechen den Zuordnungen der konsultierten Fassung:
+
+        Netzlokation → Messlokation, Messlokation → Messlokation,
+
+        Messlokation → Marktlokation, Messlokation → technische Ressource,
+
+        Marktlokation → technische Ressource, Marktlokation → Tranche.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/RelationNeloToMelo'
+      - $ref: '#/components/schemas/RelationMeloToMelo'
+      - $ref: '#/components/schemas/RelationMeloToMalo'
+      - $ref: '#/components/schemas/RelationMeloToTr'
+      - $ref: '#/components/schemas/RelationMaloToTr'
+      - $ref: '#/components/schemas/RelationMaloToTranche'
+      discriminator:
+        propertyName: kind
+        mapping:
+          NetzlokationZuMesslokation: '#/components/schemas/RelationNeloToMelo'
+          MesslokationZuMesslokation: '#/components/schemas/RelationMeloToMelo'
+          MesslokationZuMarktlokation: '#/components/schemas/RelationMeloToMalo'
+          MesslokationZuTechnischerRessource: '#/components/schemas/RelationMeloToTr'
+          MarktlokationZuTechnischerRessource: '#/components/schemas/RelationMaloToTr'
+          MarktlokationZuTranche: '#/components/schemas/RelationMaloToTranche'
+    TrancheMember:
+      type: object
+      required:
+      - type
+      - trancheId
+      additionalProperties: false
+      description: 'Die Tranche als eigener Knotentyp.
+
+
+        In der konsultierten Fassung ist die Tranche kein eigenes Objekt, sondern eine
+
+        ID-Liste unter der Marktlokation, die den Datentyp der Marktlokations-ID
+
+        mitbenutzt. Ob eine gegebene elfstellige Ziffernfolge eine Marktlokation oder eine
+
+        Tranche bezeichnet, ergibt sich dort nur aus der Position im Dokument. Als eigener
+
+        Typ ist es eindeutig.
+
+        '
+      properties:
+        type:
+          const: Tranche
+        trancheId:
+          $ref: '#/components/schemas/MaloId'
+        href:
+          type: string
+          format: uri-reference
+        supplier:
+          $ref: '#/components/schemas/MarketPartnerRef'
+    LocationBundleDocument:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          $ref: '#/components/schemas/LocationBundle'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            timeSlices:
+              $ref: '#/components/schemas/Link'
+            clearingCases:
+              $ref: '#/components/schemas/Link'
+    TimeSliceWrite:
+      type: object
+      required:
+      - validFrom
+      - validTo
+      - members
+      properties:
+        validFrom:
+          $ref: '#/components/schemas/DayBoundary'
+        validTo:
+          oneOf:
+          - $ref: '#/components/schemas/DayBoundary'
+          - type: 'null'
+        members:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/BundleMember'
+        relations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleRelation'
+    NeloId:
+      type: string
+      pattern: ^E[A-Z\d]{9}\d$
+      description: Netzlokations-ID.
+      examples:
+      - E1234848431
+    RelationMeloToMelo:
+      type: object
+      required:
+      - kind
+      - from
+      - to
+      additionalProperties: false
+      properties:
+        kind:
+          const: MesslokationZuMesslokation
+        from:
+          $ref: '#/components/schemas/MeloId'
         to:
           $ref: '#/components/schemas/MeloId'
-  responses:
-    Forbidden:
-      description: 'Authentisiert, aber für die angeforderte Ressource nicht berechtigt. Die
-
-        Berechtigung ergibt sich aus der fachlichen Zuordnung des Marktpartners zu Objekt
-
-        und Zeitraum.
-
-        '
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    ServiceUnavailable:
-      description: Vorübergehend nicht verfügbar.
-      headers:
-        Retry-After:
-          $ref: '#/components/headers/RetryAfter'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    UnprocessableEntity:
-      description: 'Syntaktisch gültig, aber fachlich nicht verarbeitbar. `errors` benennt die
-
-        betroffenen Stellen über JSON-Pointer nach RFC 6901.
-
-        '
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    PreconditionRequired:
-      description: Schreibender Zugriff ohne `If-Match` ist nicht zulässig.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    Unauthorized:
-      description: Nicht authentisiert.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    TooManyRequests:
-      description: Ratenbegrenzung erreicht.
-      headers:
-        Retry-After:
-          $ref: '#/components/headers/RetryAfter'
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    Conflict:
-      description: Fachlicher Konflikt mit dem aktuellen Zustand der Ressource.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    PreconditionFailed:
-      description: 'Der in `If-Match` angegebene `ETag` entspricht nicht dem aktuellen Stand — die
-
-        Ressource wurde zwischenzeitlich geändert.
-
-        '
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    NotFound:
-      description: Ressource nicht vorhanden.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    BadRequest:
-      description: Fehlerhafte Anfrage.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-  headers:
-    ETag:
-      description: Version der Ressource für bedingte Anfragen.
-      schema:
-        type: string
-    CacheControl:
-      description: 'Zwischenspeicherbarkeit. Stammdaten dieser Art ändern sich selten; sinnvolle
-
-        Vorgaben entlasten sowohl den Anbieter als auch die Prozesslaufzeit beim Abrufer.
-
-        '
-      schema:
-        type: string
-        examples:
-        - private, max-age=3600
-    RetryAfter:
-      description: Wartezeit vor dem nächsten Versuch, in Sekunden.
-      schema:
-        type: integer
-        minimum: 1
-    Deprecation:
-      description: 'Gesetzt, sobald die Ressource abgekündigt ist (RFC 8594). Maschinenlesbar, im
-
-        Unterschied zu einem Freitexthinweis.
-
-        '
-      schema:
-        type: string
-    Sunset:
-      description: Zeitpunkt, ab dem die Ressource nicht mehr bereitgestellt wird (RFC 8594).
-      schema:
-        type: string
-    LastModified:
-      description: Zeitpunkt der letzten Änderung.
-      schema:
-        type: string
+    TechnicalResourceMember:
+      type: object
+      required:
+      - type
+      - trId
+      additionalProperties: false
+      properties:
+        type:
+          const: TechnischeRessource
+        trId:
+          $ref: '#/components/schemas/TrId'
+        href:
+          type: string
+          format: uri-reference
+    MeloId:
+      type: string
+      pattern: ^DE\d{11}[A-Z\d]{20}$
+      description: Messlokations-ID (Zählpunktbezeichnung).
+      examples:
+      - DE00014545768S0000000000000003054
+    ModernMeteringDevice:
+      type: object
+      required:
+      - type
+      - obisCodes
+      additionalProperties: false
+      properties:
+        type:
+          const: mME
+        obisCodes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+    Link:
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          type: string
+          format: uri-reference
+          description: URL der referenzierten Ressource.
+        title:
+          type: string
+    ListLinks:
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/Link'
+        next:
+          allOf:
+          - $ref: '#/components/schemas/Link'
+          description: Nächste Seite. Fehlt, wenn keine weiteren Elemente vorliegen.
+        prev:
+          $ref: '#/components/schemas/Link'
   parameters:
     PageSize:
       name: page-size
@@ -1248,23 +1248,6 @@ components:
         minimum: 1
         maximum: 100
         default: 20
-    LocationBundleId:
-      name: locationBundleId
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/LocationBundleId'
-    IfMatch:
-      name: If-Match
-      in: header
-      required: true
-      description: 'Der zuletzt gelesene `ETag`. Verhindert, dass eine zwischenzeitliche Änderung eines
-
-        anderen Aufrufers unbemerkt überschrieben wird.
-
-        '
-      schema:
-        type: string
     Cursor:
       name: cursor
       in: query
@@ -1277,6 +1260,17 @@ components:
         '
       schema:
         type: string
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      description: 'Der zuletzt gelesene `ETag`. Verhindert, dass eine zwischenzeitliche Änderung eines
+
+        anderen Aufrufers unbemerkt überschrieben wird.
+
+        '
+      schema:
+        type: string
     IfNoneMatch:
       name: If-None-Match
       in: header
@@ -1284,6 +1278,12 @@ components:
       description: Bereits bekannter `ETag`. Führt bei unverändertem Stand zu `304`.
       schema:
         type: string
+    LocationBundleId:
+      name: locationBundleId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/LocationBundleId'
   securitySchemes:
     oauth2:
       type: oauth2

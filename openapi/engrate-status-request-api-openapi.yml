@@ -40,14 +40,29 @@ paths:
       - status-request
 components:
   schemas:
-    HTTPValidationError:
+    StatusRequestCreate:
+      additionalProperties: false
+      description: Request body for sending a status request to TSO.
       properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          title: Detail
-          type: array
-      title: HTTPValidationError
+        date:
+          description: 'Delivery date (YYYY-MM-DD). Example: ''2026-01-24''.'
+          format: date
+          title: Date
+          type: string
+        sender_id:
+          description: Your own EIC X code (balance responsible party, 16-character organization code) as registered with the TSO. Must match the EIC configured for the calling organization.
+          title: Sender Id
+          type: string
+        tso:
+          description: 'TSO identifier. DE values: ''50HERTZ_DE_TSO'' (50Hertz), ''DE-AMPRION-TSO'' (Amprion), ''TTG_DE'' (TenneT DE), ''DE-TRANSNETBWTSO'' (TransnetBW).'
+          minLength: 1
+          title: Tso
+          type: string
+      required:
+      - date
+      - sender_id
+      - tso
+      title: StatusRequestCreate
       type: object
     StatusRequestResponse:
       description: Response from a status request submission to a TSO.
@@ -88,30 +103,6 @@ components:
       - status
       title: StatusRequestResponse
       type: object
-    StatusRequestCreate:
-      additionalProperties: false
-      description: Request body for sending a status request to TSO.
-      properties:
-        date:
-          description: 'Delivery date (YYYY-MM-DD). Example: ''2026-01-24''.'
-          format: date
-          title: Date
-          type: string
-        sender_id:
-          description: Your own EIC X code (balance responsible party, 16-character organization code) as registered with the TSO. Must match the EIC configured for the calling organization.
-          title: Sender Id
-          type: string
-        tso:
-          description: 'TSO identifier. DE values: ''50HERTZ_DE_TSO'' (50Hertz), ''DE-AMPRION-TSO'' (Amprion), ''TTG_DE'' (TenneT DE), ''DE-TRANSNETBWTSO'' (TransnetBW).'
-          minLength: 1
-          title: Tso
-          type: string
-      required:
-      - date
-      - sender_id
-      - tso
-      title: StatusRequestCreate
-      type: object
     ValidationError:
       properties:
         ctx:
@@ -137,6 +128,15 @@ components:
       - msg
       - type
       title: ValidationError
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
       type: object
   securitySchemes:
     apiKeyAuth:
