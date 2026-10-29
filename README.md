@@ -64,5 +64,151 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Engrate is a company surfaced via the API Evangelist harvest backlog (source: stockholm-trip) and added to the network as a stub for full-pipeline profiling.
-- https://engrate.io/
+Engrate provides a unified platform for energy market communication, enabling balance responsible parties and suppliers to integrate with multiple energy markets through a single API. The solution abstracts diverse market protocols, message formats, identifiers, and deadlines, allowing seamless asset trading across bidding zones. By offering a comprehensive market communication layer, Engrate reduces integration complexity, accelerates time‑to‑market, and supports cost‑of‑energy analysis, documentation, and developer tools. Book a demo or explore the docs to learn how Engrate simplifies energy market interactions.
+
+**Areas:** Company · Energy · Platform · Integration · Markets
+
+## Engrate on APIs.io
+
+Everything profiled for Engrate is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/engrate/](https://apis.io/providers/engrate/)** — or go straight to one of the APIs or properties below.
+
+### APIs (18)
+
+- [Engrate Audit Logs API](https://apis.io/apis/engrate/engrate-audit-logs-api/) — The audit-logs API from Engrate — 1 operation(s) for audit-logs.
+- [Engrate Benachrichtigung API](https://apis.io/apis/engrate/engrate-benachrichtigung-api/) — Abonnement von Änderungsereignissen.
+- [Engrate Betrieb API](https://apis.io/apis/engrate/engrate-betrieb-api/) — Umsetzungsstand und Betriebsinformationen.
+- [Engrate Clearing API](https://apis.io/apis/engrate/engrate-clearing-api/) — Abweichende Sichtweisen als Vorgang mit definiertem Endzustand.
+- [Engrate Core API](https://apis.io/apis/engrate/engrate-core-api/) — The Core API from Engrate — 5 operation(s) for core.
+- [Engrate Cost Of Energy API](https://apis.io/apis/engrate/engrate-cost-of-energy-api/) — The Cost Of Energy API from Engrate — 5 operation(s) for cost of energy.
+- [Engrate Geo API](https://apis.io/apis/engrate/engrate-geo-api/) — The geo API from Engrate — 1 operation(s) for geo.
+- [Engrate Holidays API](https://apis.io/apis/engrate/engrate-holidays-api/) — The holidays API from Engrate — 1 operation(s) for holidays.
+- [Engrate Lokationen API](https://apis.io/apis/engrate/engrate-lokationen-api/) — Einzelressourcen der referenzierten Netz-, Markt- und Messlokationen.
+- [Engrate Lokationsbündel API](https://apis.io/apis/engrate/engrate-lokationsb-ndel-api/) — Abruf und Pflege von Lokationsbündeln in der Hoheit des Netzbetreibers.
+- [Engrate Mabis API](https://apis.io/apis/engrate/engrate-mabis-api/) — The mabis API from Engrate — 13 operation(s) for mabis.
+- [Engrate Netzbetreiberwechsel API](https://apis.io/apis/engrate/engrate-netzbetreiberwechsel-api/) — Übergabepaket beim Wechsel des zuständigen Netzbetreibers.
+- [Engrate Nl Settlement API](https://apis.io/apis/engrate/engrate-nl-settlement-api/) — The nl-settlement API from Engrate — 4 operation(s) for nl-settlement.
+- [Engrate Profiles API](https://apis.io/apis/engrate/engrate-profiles-api/) — The profiles API from Engrate — 2 operation(s) for profiles.
+- [Engrate Reference API](https://apis.io/apis/engrate/engrate-reference-api/) — The reference API from Engrate — 2 operation(s) for reference.
+- [Engrate Schedules API](https://apis.io/apis/engrate/engrate-schedules-api/) — The schedules API from Engrate — 10 operation(s) for schedules.
+- [Engrate Status Request API](https://apis.io/apis/engrate/engrate-status-request-api/) — The status-request API from Engrate — 1 operation(s) for status-request.
+- [Engrate Time Series API](https://apis.io/apis/engrate/engrate-time-series-api/) — The Time Series API from Engrate — 3 operation(s) for time series.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Engrate Agentic Access](https://apis.io/agentic-access/engrate/engrate-agentic-access/)
+
+#### JSON Schema (12)
+
+The data models the API reads and writes.
+
+- [ClearingCaseWrite](https://apis.io/schemas/engrate/engrate-clearing-case-write/)
+- [ClearingPeriodResponse](https://apis.io/schemas/engrate/engrate-clearing-period-response/)
+- [ImplementationStatus](https://apis.io/schemas/engrate/engrate-implementation-status/)
+- [MarketLocationDocument](https://apis.io/schemas/engrate/engrate-market-location-document/)
+- [MeteringLocationDocument](https://apis.io/schemas/engrate/engrate-metering-location-document/)
+- [NetworkLocationDocument](https://apis.io/schemas/engrate/engrate-network-location-document/)
+- [ObjectionResponse](https://apis.io/schemas/engrate/engrate-objection-response/)
+- [ScheduleSeriesResponse](https://apis.io/schemas/engrate/engrate-schedule-series-response/)
+- [ScheduleVersionResponse](https://apis.io/schemas/engrate/engrate-schedule-version-response/)
+- [SimplifiedTariffResponse](https://apis.io/schemas/engrate/engrate-simplified-tariff-response/)
+- [SubscriptionWrite](https://apis.io/schemas/engrate/engrate-subscription-write/)
+- [Tariff](https://apis.io/schemas/engrate/engrate-tariff/)
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Engrate Context](https://apis.io/jsonld/engrate/engrate-context/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Engrate Openapi Overlay](https://apis.io/overlays/engrate/engrate-openapi-overlay/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [Engrate API Rules](https://apis.io/rules/engrate/engrate-rules/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Engrate Authentication](https://apis.io/security/engrate/engrate-authentication/)
+- [Engrate Domain Security](https://apis.io/security/engrate/engrate-domain-security/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://engrate.io/)
+- [Documentation](https://docs.engrate.io/)
+- [Getting started](https://docs.engrate.io/guides/welcome)
+- [API reference](https://docs.engrate.io/api-reference/)
+- [Changelog](https://docs.engrate.io/changelog/product-updates)
+- [Terms of service](https://engrate.io/legal/terms-of-use)
+- [Privacy policy](https://engrate.io/legal/privacy-policy)
+- [GitHub](https://github.com/engrate)
+
+## API Evangelist rating
+
+**Kin Score 45.3** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 65.0 |
+| Contract governance | 22.0 |
+| Operational transparency | 21.1 |
+| Developer ergonomics | 58.9 |
+| Access clarity | 21.1 |
+
+**Agent readiness 60.0** — agent-native
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | verified |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | verified |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 20.5** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/engrate/](https://apis.io/providers/engrate/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Engrate: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/engrate/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
